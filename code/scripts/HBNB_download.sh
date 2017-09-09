@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# A script to transform a direct download from
-# http://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network/downloads_EEG.html
-# to the PANDA format described
-# https://github.com/NeuroDataDesign/orange-panda-f16s17/blob/master/notes/pipeline/data_format.md
+# Script to download a subject file from the fcp-indi s3 bucket
+#
+# Usage: code/scripts/HBNB_download.sh -sub subject-id -o data
+#
 
 export BUCKET="fcp-indi"
 export BASE_PATH="/data/Projects/HBN/S1/EEG/"
