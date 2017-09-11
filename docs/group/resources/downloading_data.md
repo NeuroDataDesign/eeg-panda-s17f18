@@ -13,7 +13,7 @@ You can try the COINS Data Catalog too, but the HBN data did not seem to be list
 * Raw electrode locations: https://raw.githubusercontent.com/fieldtrip/fieldtrip/master/template/electrode/GSN-HydroCel-128.sfp
 * Mapping of electrodes to 10-20 system names: https://www.egi.com/images/HydroCelGSN_10-10.pdf
 
-* Using the download script in this repo (9/11 Deliv)
+### Using the download script in this repo (9/11 Deliv)
 1. clone this repo.
 2. find a patient id here: https://github.com/NeuroDataDesign/eeg-panda-s17f18/blob/master/data/allowed/subject_ids.csv
   * Note! Not all will work or are in the final set
