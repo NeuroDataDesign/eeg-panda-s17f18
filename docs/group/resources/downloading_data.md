@@ -10,6 +10,7 @@ You can try the COINS Data Catalog too, but the HBN data did not seem to be list
 * Direct Download: http://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network/downloads_EEG.html
 * AWS: http://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network/sharing_neuro.html#aws-and-cyberduck
 * Pipeline Documentation: https://github.com/NeuroDataDesign/orange-panda-f16s17
+* Raw electrode locations: https://raw.githubusercontent.com/fieldtrip/fieldtrip/master/template/electrode/GSN-HydroCel-128.sfp
 
 # MRI
 * Direct: http://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network/downloads_MRI.html
