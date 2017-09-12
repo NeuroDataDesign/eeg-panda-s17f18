@@ -6,10 +6,12 @@ Categories:
   * Brain-to-text
   * Diagnosis algorithm
   * Dataset description
+  * MRI analysis
   * ... add more if none fit ...
   
 | Name of Paper | Author(s) | Category | Very Brief Description | Deliverable Date Read | Link to Notes | Link to Article |
 | ------------- | --------- | -------- | ---------------------- | ----------------------| ------------- | --------------- |
+| Data-driven phenotypic categorization for neurobiological analyses: Beyond DSM-5 labels | Nicholas T Van Dam, David O’Connor, Enitan T Marcelle, Erica J Ho, R Cameron Craddock, Russell H Tobe, Vilma Gabbay, James J Hudziak, F Xavier Castellanos, Bennett L Leventhal, Michael P Milham | Phenotype analysis | ... | ... | ... | [link](http://www.sciencedirect.com/science/article/pii/S0006322316325860) |
 | Age and sex modulate the variability of neural responses to naturalistic videos | Agustin Petroni, Samantha S. Cohen, Lei Ai,  **Nicolas Langer**, Simon Henin,  Tamara Vanderwal,  **Michael P. Milham**,  Lucas C. Parra | EEG Analysis | ... | ... | ... | [link](http://www.biorxiv.org/content/early/2017/07/14/089060) |
 | Dynamic reconfiguration of the default mode network during narrative comprehension | Erez Simony, **Christopher J Honey**, Janice Chen, Olga Lositsky, Yaara Yeshurun, Ami Wiesel & Uri Hasson | ? | ... | ... | ... | [link](https://www.nature.com/articles/ncomms12141) |
 | The p Factor: One General Psychopathology Factor in the Structure of Psychiatric Disorders? | Avshalom Caspi Renate M. Houts, Daniel W. Belsky, Sidra J. Goldman-Mellor, HonaLee Harrington, Salomon Israel, Madeline H. Meier, Sandhya Ramrakha, Idan Shalev, Richie Poulton, and Terrie E. Moffitt | Phenotype analysis | ... | ... | ... | [link](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4209412/) |
