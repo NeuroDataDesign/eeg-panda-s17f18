@@ -4,8 +4,7 @@
 | Name of Paper | Author(s) | Deliverable Date Read | Link to Notes | Link to Article |
 | ------------- | --------- | ----------------------| ------------- | --------------- |
 | Generalized Multiview Analysis: A discriminative latent space | Abhishek Sharma | 9/18 | ... | [link](http://ieeexplore.ieee.org/document/6247923/) |
-| Dimensionality Reduction of Multimodal Labeled Data
-by Local Fisher Discriminant Analysis∗ | Sugiyama | 9/18 | ... | [link](http://www.jmlr.org/papers/volume8/sugiyama07b/sugiyama07b.pdf) |
+| Dimensionality Reduction of Multimodal Labeled Data by Local Fisher Discriminant Analysis∗ | Sugiyama | 9/18 | ... | [link](http://www.jmlr.org/papers/volume8/sugiyama07b/sugiyama07b.pdf) |
 | Multi View Clustering | Steffen Bickel | 9/18 | ... | [link](http://www.cs.uni-potsdam.de/ml/publications/icdm-2004.pdf) |
 | A survey on multi-view learning | Chang Xu | 9/18 | ... | [link](https://arxiv.org/abs/1304.5634) |
 | Multi-modal fusion: An overview of methods, challanges, prospects | Dana Lahat | 9/18 | ... | [link](https://hal.archives-ouvertes.fr/hal-01179853/file/Lahat_Adali_Jutten_DataFusion_2015.pdf) |
