@@ -5,6 +5,9 @@ Cencheng Shen, Carey E. Priebe, Mauro Maggioni, Qing Wang, Joshua T Vogelstein
 * Most current statictical tests do not work well for data that is high dimensional, highly non-linear, and has small sample size.
 * MGC (Multiscale Generalized Correlation) takes a multi-scale resolution approach to solving this problem.
 * MGC generalizes (and theoretically dominates) its global counterparts. E.g., if there exists a global test which will find a dependence, MGC can find that same dependence with the same number or fewer samples
+* Tests an independence hypothesis
+  * null: f(x, y) = fxfy
+  * alt: f(x, y) =\= fxfy
 
 ### Explanatory example?
 * Consider a relationship between two variables (X, Y) in two geometric relationships, linear and a spiral.
