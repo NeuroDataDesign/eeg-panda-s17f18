@@ -9,7 +9,7 @@
 | A survey on multi-view learning | Chang Xu | 9/18 | ... | [link](https://arxiv.org/abs/1304.5634) |
 | Multi-modal fusion: An overview of methods, challanges, prospects | Dana Lahat | 9/18 | ... | [link](https://hal.archives-ouvertes.fr/hal-01179853/file/Lahat_Adali_Jutten_DataFusion_2015.pdf) |
 | Two Step CCA: A new spectral method for estimating vector word models | Dhillon | 9/18 | ... | [link](https://arxiv.org/pdf/1206.6403.pdf) |
-| Kernel CCA Note | Max Welling | 9/18 | ... | [link](http://www.ics.uci.edu/~welling/classnotes/papers_class/kCCA.pdf) |
+| Kernel CCA Note | Max Welling | 9/18 | [link](https://github.com/NeuroDataDesign/eeg-panda-s17f18/blob/master/docs/nkumar14/papers/kcca.md) | [link](http://www.ics.uci.edu/~welling/classnotes/papers_class/kCCA.pdf) |
 | Relations between two sets of variables | Hoteling | 9/18 | ... | [link](http://members.cbio.mines-paristech.fr/~jvert/svn/bibli/local/Hotelling1936Relation.pdf) |
 | Discovering Relationships and their Structures Across Disparate Data Modalities | Cencheng Shen, Carey E. Priebe, Mauro Maggioni, Qing Wang, and Joshua T.Vogelstein | 9/18 | ... | [link](https://arxiv.org/pdf/1609.05148.pdf) |
 | Age and sex modulate the variability of neural responses to naturalistic videos | Agustin Petroni, Samantha Cohen, Lei Ai, Nicolas Langer, Simon Henin, Tamara Vanderwal, Michael P. Milham, Lucas C. Parra | 9/18 | [link](https://github.com/NeuroDataDesign/eeg-panda-s17f18/blob/master/docs/nkumar14/papers/age-sex-variability-naturalistic-stimuli.md) | [link](http://www.biorxiv.org/content/early/2017/07/14/089060.full.pdf+html) |
