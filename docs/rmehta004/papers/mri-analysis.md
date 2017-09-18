@@ -56,13 +56,13 @@ to classify that region in particular mental states.
 [[R]](http://www.brainvoyager.com/bvqx/doc/UsersGuide/MVPA/MultiVoxelPatternAnalysisMVPA.html)  
 - Joint analysis in a group study of fMRI scans. Methods outlined in the linked paper:
 [[R]](https://www.nature.com/neuro/journal/v20/n3/pdf/nn.4499.pdf)
-  - Real-time fMRI analysis (online learning)
-  - Multivariate analysis (see MVPA above)
-  - Shared-response modelling - map to a low dimensional space to capture variance that matters.
-  - Spatial priors from previous neurological research.
-  - Topological Factor Analysis (Spatial Priors + ICA)
-  - Covariance between voxels
-  - Deep Learning (Success with visual systems)
+  - Real-time fMRI analysis (online learning).
+  - Multivariate analysis (see MVPA above).
+  - Shared-response modelling - map multiple subjects' data to a low dimensional space to capture variation of entire sample.
+  - Spatial priors (collected from previous neurological research).
+  - Topological Factor Analysis (Similar to ICA but with spatial factors as sources).
+  - Covariance between voxels as predictors.
+  - Deep Learning (Success with modelling visual system responses).
 
 ## Other Resources
 
