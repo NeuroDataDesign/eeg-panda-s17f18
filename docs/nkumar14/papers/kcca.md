@@ -8,7 +8,7 @@
 - Translates into an eigenvalue equation
 - Kernel equation uses Legrange multipliers and regularization
 
-- Presents a mathematical repreentation of problem, need other references for simpler solution
+- Presents a mathematical representation of problem, need other references for simpler solution
 
 ### Significance to Us
 
