@@ -73,11 +73,18 @@
 - Because components that maximize correlation across all subjects, and there are more young subject, chosen components may be biased towards them
     - Thus recalculated after splitting into groups with an even split
 - For all stimuli, negative relationship remained
-- [Picture here]
 
 #### ISC Correlation Elevated in Males
 
 - Gender differences in ISC correlation is largely significant at younger ages (supporting hypotheses that females neurally mature faster than males)
-- [Picture here]
 
+#### Age's Effect on ISC not due to SSVEP
 
+- SSVEP magnitude weakly declines with age, no real difference between genders
+- Also tried regressing out SSVEP from ISC; residual varies with age but not gender
+
+## Importance to Us
+
+- ISC: potential "discriminability" like metric with strong support
+- Analyses done here are very exploratory; can identify phenotype groups (or known combinations of groups) and compare stimuli on these groups
+- CCA: relevant fMRI metric to help determine locations of high correlations
