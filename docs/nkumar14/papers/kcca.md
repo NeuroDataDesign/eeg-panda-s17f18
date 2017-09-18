@@ -13,3 +13,4 @@
 ### Significance to Us
 
 - It's a relevant method, but we need to look elsewhere to simplify it
+- Potential open source solution [Pyrcca](http://journal.frontiersin.org/article/10.3389/fninf.2016.00049/full) with [code here](https://github.com/gallantlab/pyrcca)
