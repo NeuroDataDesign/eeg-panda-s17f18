@@ -87,4 +87,4 @@
 
 - ISC: potential "discriminability" like metric with strong support
 - Analyses done here are very exploratory; can identify phenotype groups (or known combinations of groups) and compare stimuli on these groups
-- CCA: relevant fMRI metric to help determine locations of high correlations
+- CCA: relevant metric to help determine locations of high correlations on EEG electrodes
