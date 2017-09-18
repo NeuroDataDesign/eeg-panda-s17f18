@@ -2,7 +2,7 @@
 
 ### Main Ideas
 
-- Categorical definitions of illnesses are increasingly apparent
+- Weaknesses of categorical definitions of illnesses are increasingly apparent
 - Labels are necessary for clinical practice but impede search for pathophysiological biomarkers
 - Attempting to create new nosology, but unclear how best to define categories
 - Data-driven approaches may help identify more behaviorally refined biological phenotypes to address the profound heterogeneity
