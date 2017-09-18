@@ -28,7 +28,7 @@
         5. At least 95% completion of each self-report measure
 - Subject Phenotyping
     - Completed Structured Clinical Interview:
-        - DSM-IV Axis I Disorders
+        - DSM-IV Axis I Disorders (SCID)
         - Edinburgh Handedness Inventory
         - Other measures of clincial symptoms and broad behavioral characterisitcs
     - Used subscales of phenotyping
@@ -63,4 +63,58 @@
     - **Clustering Analysis**
         - HHC using tree-structured vector quantization to identify nested participant groups based on Euclidean distances between participant factor score profiles
             - Identifies mutual clusters (close to one another but far from others), constrained divisive clustering (retaining mutual clusters), and divisive clustering (division of mutual clusters)
+    - **Cluster Comparisons**
+        - Pairwise comparisons were made among adjacent clusters at each level using EFA, ASR, and SCID
+        - Used cut scores on ASR to achieve meaningful groupings
+- MRI Processing
+    - Preprocessing- [read the paper, search R-fMRL Preprocessing](http://www.sciencedirect.com/science/article/pii/S0006322316325860?via%3Dihub)
+    - Multivariate Distance Matrix Regression
+        - Compared functional connectivity profiles of different adjacent levels of hierarchy 
+        - Voxel by voxel, 3 steps:
+            1. Pearson's correlation between voxel and the rest of the voxels in same brain
+            2. Distance matrix reflecting distance between maps from both subjects from step 1
+                - Distance defined as sqrt(2 * (1 - r)) where r is spatial correlation
+            3. Pseudo-F statistic computed to evaluate relationship between distance matrix and variable of interest (cluster membership)
+        
+### Results
 
+- **Dimension Reduction**
+    - Parallel analysis -> 6 factor solution accounting for 77.8% of the variance
+    - Constrained model (eliminated low-loading items) accounted for 65.4% of variance
+    - 6 Factors:
+        1. General distress and impairment
+        2. Conscientiousness
+        3. Sensation and risk seeking
+        4. Frustration intolerance
+        5. Contextual sensitivity
+        6. Neuroticism and negative affect
+- **Cluster Analysis**
+    - 3 clear cutpoints from dendrogram yielding 8 groups
+    - Largest ***CHC (Calinski-Harabasz criterion)*** value was observed at *k* = 2 and stable subgroups at *k*  = 4 and 8
+- **Phenotypic Cluster Differences**
+    - 3 levels of dendrogram
+    - **Level 1:**
+        - Robust, reflecting broad-reaching group differences
+        - C1: adaptive functionality, C2; maladaptive functionality
+    - **Level 2:**
+        - C2 divided into internalizing and externalizing charactersistics
+        - C2a: higher rates of lifetime psych diagnosis, C2b: higher senstaion and risk seeking (external)
+    - **Level 3:**
+        - Divided into 8 subclusters, much fewer significant pairwise differences between subclusters (other than C2a2 had  more psychopathology than C2a1)
+- Multivariate Intrinsic Connectivity Differences Among Clusters
+    - Only MDMR on first level of clusters survived comparison corrections
+    - 3 clusters found
+    - Cluster 1: Bilateral primary and secondary somatosensory cortices as well as premotor, motor, and supplementary motor regions and approximately centered on midline near supplementary motor area
+    - Cluster 2: Centered on left thalamus, limbic regions, decision-making regions
+    - Cluster 3: Right hippocampus
+
+### Discussion
+
+- Found personality traits like conscientiousness can be used to differentiating groups
+- Somamotor network which was the largest distinguishing functional cluster is a novel target for usage in diagnoses
+
+## Significance to Us
+
+- Number of fMRI and phenotypic methods that we can use
+- Clustering methods across different dimensions and combining with fMRI data
+- Shown results from such measures on another large dataset
