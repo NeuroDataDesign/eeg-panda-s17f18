@@ -45,6 +45,7 @@
   * if categorical
     * 3d scatter of top 3 explanatory factors from EFA
     * Multiple Correspondence Analysis 3d scatter
-    plot like this: ![]()
+    plot like this: ![](https://user-images.githubusercontent.com/10272301/30644718-4f86116a-9de1-11e7-9658-cbb5409984e0.png)
+    or this: ![](https://user-images.githubusercontent.com/10272301/30644969-35411fc4-9de2-11e7-8fb9-971f4d4c9684.png)
       * scree plot
     
