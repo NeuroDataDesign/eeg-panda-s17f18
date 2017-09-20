@@ -1,6 +1,6 @@
 # Top visualizations for each modality
 ### Given n points in R^d
-1. For each dimension separately
+##### 1. For each dimension separately
   * if categorical
     * show unique values
     * bar plot distribution (ordered if ordinal)
@@ -14,7 +14,7 @@
     * ecdf and cdf of fit gaussian
       * arrow at argmax abs( ecdf(x) - cdf(x) )
       ![](https://user-images.githubusercontent.com/10272301/30643594-991d4086-9ddd-11e7-8715-c658761fe19a.png)
-2. For all dimensions in aggregate
+##### 2. For all dimensions in aggregate
   * if categorical
     * distribution of
       * number of categories
@@ -26,7 +26,7 @@
       * means
       * std. devs
       * kurtosis
-3. Pairwise comparisons of dimensions
+##### 3. Pairwise comparisons of dimensions
   * if real
     * pearson correlation matrix
     * coherence matrix (if signal)
@@ -37,3 +37,14 @@
     ![](https://user-images.githubusercontent.com/10272301/30643852-740b95a8-9dde-11e7-999a-a0ab2b129c74.png)
     * or even better, with clustering:
     ![](https://user-images.githubusercontent.com/10272301/30643929-b3a0dd0e-9dde-11e7-81fc-c86fa816c78e.png)
+##### 4. Dimensionality reduced scatterplots
+  * if real
+    * 3d scatter of data projected onto subspace spanned by top 3 principal vectors
+      * scree plot
+    * 3d scatter of data t-sne'd
+  * if categorical
+    * 3d scatter of top 3 explanatory factors from EFA
+    * Multiple Correspondence Analysis 3d scatter
+    plot like this: ![]()
+      * scree plot
+    
