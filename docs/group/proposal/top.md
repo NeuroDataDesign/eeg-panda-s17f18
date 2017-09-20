@@ -49,3 +49,17 @@
     or this: ![](https://user-images.githubusercontent.com/10272301/30644969-35411fc4-9de2-11e7-8fb9-971f4d4c9684.png)
       * scree plot
     
+### EEG data (T points in R^d where T points are sequential sampled at some number of Hz)
+##### 1. Visualize all signals, nonspatial
+  * heatmap: ![](https://user-images.githubusercontent.com/10272301/30292624-e0f3e08e-9704-11e7-95a9-9b6570ccdfa7.png)
+  * sparklines: ![](https://user-images.githubusercontent.com/10272301/30645401-a64c10ce-9de3-11e7-8bcf-b224d9457e9f.png)
+##### 2. Visualize all signals, interpolated and spatial
+  * spatially structured heatmap: ![](https://user-images.githubusercontent.com/10272301/30645736-9c0e1b74-9de4-11e7-8328-eb7a58d9ca30.png)
+##### 3. Frequency domain information across all channels
+  * heatmap where rows are channels, columns are time windows, values are fourier coefficients of certain frequency (allow user to vary the frequency)... (three dimensional?)
+##### 4. Frequency domain information for each channel
+  * spectrogram for each channel: maybe something nice like this? ![](https://user-images.githubusercontent.com/10272301/30646453-0eacb684-9de7-11e7-9be3-24abdb18564a.png)
+  * wavelet coefficient decay plot: ![](https://user-images.githubusercontent.com/10272301/30646281-76a23bde-9de6-11e7-97b5-fe36edb00132.png)
+##### 5. Dimensionality reduction time-series
+  * color changing dynamical system plot of top 3 PCs
+  * m-tsne ![](https://user-images.githubusercontent.com/10272301/30647696-1f209d5c-9dea-11e7-8478-17037768fa18.png)
