@@ -1,7 +1,7 @@
 # Statement of Work
 
 Multi-modal Brain Visualization
-Team Gold Lemur, 2017
+Team Red Lemur, 2017
 
 | Sprint   | Date Due | Requirements: Portion of manuscript (and package) corresponding to... |
 |---|---|---|
