@@ -1,0 +1,87 @@
+- Function
+    - Input:
+        - Event array
+        - Timeseries
+        - Window around timestamp of event
+            - Have a default value
+    - Output:
+        - Time series split up according to events
+
+## Spectrogram Plots
+
+- Raw Spectrogram
+    - Input:
+        - Sampling Frequency
+        - Patient data per paradigm
+        - Patient ID
+        - Paradigm Name
+        - Custom x, y bounds
+            - Have a set default
+        - Range of channels to present
+        - Slider or subplots
+            - If subplot, each subplot gets a row to itself
+    - Output:
+        - Title: Patient ID, paradigm, channel #
+        - X axis: Frequency (Hz)
+        - Y axis: Amplitude
+
+- Event Based Frequency Comparison
+    - Input:
+        - Sampling Frequency
+        - Patient data per paradigm
+        - Patient ID
+        - Paradigm Name
+        - Event data (parse using function at top)
+        - Custom x, y bounds
+            - Have a set default
+        - Range of channels to present
+        - Have slider
+            - By default yes, not necessary
+    - Output:
+        - Title: Patient ID, paradigm, channel #
+        - X axis: Frequency (Hz)
+        - Y axis: Amplitude
+        - Slider (optional): Move through different channels
+        - Subplots: look below
+    - Notes:
+        - Display different events by subplot
+
+## Sparkline Plots
+
+- Raw Sparklines
+    - Input:
+        - Patient data per paradigm
+        - Patient ID
+        - Paradigm Name
+        - Sampling freq
+        - Custom x, y bounds
+            - Have a set default
+        - Downsample rate
+        - Range of channels to present
+        - Slider or subplots
+            - If subplot, each subplot gets a row to itself
+    - Output:
+        - Title: Patient ID, paradigm, channel #
+        - X axis: Time (decide by sampling freq and downsample rate)
+        - Y axis: Amplitude
+
+- Event Based Sparkline Comparison
+    - Input:
+        - Patient data per paradigm
+        - Patient ID
+        - Paradigm Name
+        - Event data
+        - Custom x, y bounds
+            - Have a set default
+        - Downsample rate
+        - Range of channels to present
+        - Have slider
+            - By default yes, not necessary
+    - Output:
+        - Title: Patient ID, paradigm, channel #
+        - X axis: Frequency (Hz)
+        - Y axis: Amplitude
+        - Slider (optional): Move through different channels
+        - Subplots: look below
+    - Notes:
+        - Display different events by subplot
