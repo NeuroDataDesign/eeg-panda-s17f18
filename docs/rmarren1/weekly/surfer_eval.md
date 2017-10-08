@@ -25,3 +25,6 @@ the following problem arises:
 * ![](https://user-images.githubusercontent.com/10272301/31318962-dd4b83c2-ac28-11e7-9234-a091444e8e1b.png)
 * ![](https://user-images.githubusercontent.com/10272301/31318964-dd4c1814-ac28-11e7-90f0-0beb41f2e251.png)
 * Artifact on the right? ![](https://user-images.githubusercontent.com/10272301/31319201-f40a4338-ac2c-11e7-8e2c-1ba9a83ea541.png)
+##### Functional Images
+* To get fMRI plotting to work, need to [install FreeSurfer](https://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall)
+  * 10GB installation package
