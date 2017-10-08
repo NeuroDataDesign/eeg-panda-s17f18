@@ -44,4 +44,10 @@ ERROR: FreeSurfer license file /usr/local/freesurfer/license.txt not found.
   
 ![](https://user-images.githubusercontent.com/10272301/31321547-e6ebe41c-ac55-11e7-9399-e713355fd421.png)
 ![](https://user-images.githubusercontent.com/10272301/31321548-e6ec1388-ac55-11e7-8e6e-bebb4a3be645.png)
-    
+
+### MEG/EEG
+* PySurfer does not appear to support surface plots, however, it will compute and plot inverse solutions. This uses python-mne, which calls a method called dSPM to find inverse solutions. some notes [here](http://www.nmr.mgh.harvard.edu/meg/pdfs/talks/20071116-Hamalainen-inverse-MNE.pdf) and [general info in the inverse problem](https://en.wikipedia.org/wiki/Magnetoencephalography#The_inverse_problem)
+* Examples of inverse solution plots:
+![](https://user-images.githubusercontent.com/10272301/31321820-a18b3950-ac59-11e7-85ad-6fbf82ba9e0a.png)
+![](https://user-images.githubusercontent.com/10272301/31321821-a18d2c06-ac59-11e7-93e8-886770bd6447.png)
+
