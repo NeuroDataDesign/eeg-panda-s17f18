@@ -17,3 +17,11 @@ the following problem arises:
 * When running in a normal python shell however, the code works fine
 ![](https://user-images.githubusercontent.com/10272301/31318961-dd483974-ac28-11e7-83ab-8b3df549151a.png)
 * Left an [issue](https://github.com/nipy/PySurfer/issues/190#issuecomment-335019610) to let the PySurfer devs know of the problem
+##### Structural Images
+* Color is binerized based on curvature of the surfact at a point
+  * darker = sulci, lighter = gyri
+  ![](https://en.wikipedia.org/wiki/Sulcus_(neuroanatomy)#/media/File:Gyrus_sulcus.png)
+* ![](https://user-images.githubusercontent.com/10272301/31318963-dd4beef2-ac28-11e7-9d1e-2cec02ff3db8.png)
+* ![](https://user-images.githubusercontent.com/10272301/31318962-dd4b83c2-ac28-11e7-9234-a091444e8e1b.png)
+* ![](https://user-images.githubusercontent.com/10272301/31318964-dd4c1814-ac28-11e7-90f0-0beb41f2e251.png)
+* Artifact on the right? ![](https://user-images.githubusercontent.com/10272301/31319201-f40a4338-ac2c-11e7-8e2c-1ba9a83ea541.png)
