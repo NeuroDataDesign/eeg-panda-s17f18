@@ -9,3 +9,6 @@
 using the data here: https://github.com/nipy/PySurfer/tree/master/examples/example_data
 the following problem arises:
 ![](https://user-images.githubusercontent.com/10272301/31318351-af5ae6ce-ac1e-11e7-9ec5-4352af163356.png)
+* There is hope: some data from FreeSurfer at https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/Data.
+  * With this new data, the software does not crash, but no plot is produced (gray box)
+  ![](https://user-images.githubusercontent.com/10272301/31318494-c4d08d12-ac21-11e7-8c6c-f6d21786c764.png)
