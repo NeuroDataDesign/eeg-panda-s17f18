@@ -11,15 +11,18 @@
 
 - Raw Spectrogram
     - Input:
-        - Sampling Frequency
-        - Patient data per paradigm
-        - Patient ID
-        - Paradigm Name
-        - Custom x, y bounds
-            - Have a set default
-        - Range of channels to present
-        - Slider or subplots
-            - If subplot, each subplot gets a row to itself
+        - p_global
+            - Sampling Frequency ['sample_freq']
+            - Patient ID ['patient_id']
+            - Paradigm Title Dictionary\* ['title'] => get_title()
+        - D
+            - Patient data per paradigm
+        - p_local
+            - Custom x, y bounds ['x_bounds'] => (min, max), ['y_bounds'] => (min, max)
+                - Have a set default
+            - Range of channels to present ['disp_chans']
+            - Slider or subplots ['slider']
+                - If subplot, each subplot gets a row to itself
     - Output:
         - Title: Patient ID, paradigm, channel #
         - X axis: Frequency (Hz)
@@ -50,16 +53,19 @@
 
 - Raw Sparklines
     - Input:
-        - Patient data per paradigm
-        - Patient ID
-        - Paradigm Name
-        - Sampling freq
-        - Custom x, y bounds
-            - Have a set default
-        - Downsample rate
-        - Range of channels to present
-        - Slider or subplots
-            - If subplot, each subplot gets a row to itself
+        - p_global
+            - Sampling Frequency ['sample_freq']
+            - Patient ID ['patient_id']
+            - Paradigm Title Dictionary\* ['title'] => get_title()
+        - D
+            - Patient data per paradigm
+        - p_local
+            - Downsample rate
+            - Custom x, y bounds ['x_bounds'] => (min, max), ['y_bounds'] => (min, max)
+                - Have a set default
+            - Range of channels to present ['disp_chans']
+            - Slider or subplots ['slider']
+                - If subplot, each subplot gets a row to itself
     - Output:
         - Title: Patient ID, paradigm, channel #
         - X axis: Time (decide by sampling freq and downsample rate)
