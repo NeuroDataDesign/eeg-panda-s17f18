@@ -28,3 +28,20 @@ the following problem arises:
 ##### Functional Images
 * To get fMRI plotting to work, need to [install FreeSurfer](https://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall)
   * 10GB installation package
+  * Looks like you need a license to use freesurfer...
+```
+    --------------------------------------------------------------------------
+ERROR: FreeSurfer license file /usr/local/freesurfer/license.txt not found.
+  If you are outside the NMR-Martinos Center,
+  go to http://surfer.nmr.mgh.harvard.edu/registration.html to 
+  get a valid license file (it's free).
+  If you are inside the NMR-Martinos Center,
+  make sure to source the standard environment.
+--------------------------------------------------------------------------
+```
+* Images below were created by projecting fMRI images onto a 2d surface using the freesurfer mri_vol2surf function here: https://surfer.nmr.mgh.harvard.edu/fswiki/mri_vol2surf.
+  * Unfortunately not much info. Just gives an author who has a website with not much info and mostly broken links, but some fun gifs: ![](http://www.nmr.mgh.harvard.edu/~greve/copy.gif)
+  
+![](https://user-images.githubusercontent.com/10272301/31321547-e6ebe41c-ac55-11e7-9399-e713355fd421.png)
+![](https://user-images.githubusercontent.com/10272301/31321548-e6ec1388-ac55-11e7-8e6e-bebb4a3be645.png)
+    
