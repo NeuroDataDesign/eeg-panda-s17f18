@@ -7,6 +7,7 @@
 * Freesurfer "creates its own file formats for storing and manipulating volumetric, surface and transform data"
 
 ### Getting the PySurfer demos to work
+* Re creating the demos that are shown [here](http://pysurfer.github.io/auto_examples/)
 * The example plots on the PySurfer website are not reproducible given the data in the repository. E.g., while attempting to follow the [example](https://pysurfer.github.io/auto_examples/plot_basics.html#sphx-glr-auto-examples-plot-basics-py)
 using the [data](https://github.com/nipy/PySurfer/tree/master/examples/example_data)
 the following problem arises:
