@@ -1,0 +1,78 @@
+---
+title: "Analysis of EEG Time Series"
+author: "Ronak Mehta"
+date: "October 9, 2017"
+output: pdf_document
+---
+The following runs Principal Component Analysis (PCA) on the time series of Subject 0's EEG signals from the Healthy Brain network.\\
+
+Required packages below, along with path to subject's CSV file.
+```{r setup}
+require(stats)
+require(data.table)
+subject_file <- "C:/Users/Ronak Mehta/Desktop/NeuroData/NDARAA075AMK_RestingState_data.csv"
+knitr::opts_chunk$set(fig.width=8, fig.height=6) 
+```
+
+## Select Downsampling parameters 
+
+Input the first observation index, last observation index, and the separation between observations.
+
+```{r downsample}
+first_obs_no <- 1
+last_obs_no <- 180001
+sep <- 50
+```
+
+## Ingest Data
+
+The data ingests as a data frame with rows representing observations, and columns representing electrodes.
+
+```{r ingest}
+# Set the columns (observations) we want to take.
+columns <- seq(first_obs_no, last_obs_no, sep)
+
+# Injest CSV of subject's data.
+dat <- transpose(fread(input = subject_file, 
+                     sep = ",", 
+                     nrows = 128,
+                     header = FALSE,
+                     showProgress = TRUE,
+                     select = columns,
+                     data.table = FALSE))
+
+# Set column names to the electrodes.
+col_names <- rep("E", 128)
+for (i in 1:length(col_names)) { col_names[i] <- paste(col_names[i], as.character(i), sep = "") }
+colnames(dat) <- col_names
+```
+
+## Plot Average Times Series
+
+We take the average of each of the channels, and plot that time series. It hikes up aggressively at around observation 1250 $\cdot$ 50 = 62500.  
+
+```{r average}
+avg.ts <- rowMeans(dat)
+
+# Plot time series.
+ts.plot(avg.ts, gpars = list(col = c("black")), ylab = "Voltage")
+```
+
+## Analysis
+
+We split the series into two pieces for analysis - the first 1000 observations above and the last 2000. We will also difference them both once. The second half of the EEG signal appears to follow an ARIMA(0, 1, 2) model. 
+
+```{r split}
+series1 <- avg.ts[2:1001] - avg.ts[1:1000]
+series2 <- avg.ts[1502:3501] - avg.ts[1501:3500]
+
+# First half
+ts.plot(series1, gpars = list(col = c("blue")), ylab = "Voltage", ylim = c(-50, 50))
+acf(series1, main = "ACF of First Half of EEG Data")
+pacf(series1, main = "PACF of First Half of EEG Data")
+
+# Second half
+ts.plot(series2, gpars = list(col = c("red")), ylab = "Voltage", ylim = c(-50, 50))
+acf(series2, main = "ACF of Second Half of EEG Data")
+pacf(series2, main = "ACF of Second Half of EEG Data")
+```

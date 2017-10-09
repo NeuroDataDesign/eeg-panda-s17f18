@@ -52,3 +52,14 @@ ERROR: FreeSurfer license file /usr/local/freesurfer/license.txt not found.
 ![](https://user-images.githubusercontent.com/10272301/31321820-a18b3950-ac59-11e7-85ad-6fbf82ba9e0a.png)
 ![](https://user-images.githubusercontent.com/10272301/31321821-a18d2c06-ac59-11e7-93e8-886770bd6447.png)
 
+### Summary
+* Pros
+  * Works great once you set up the million dependencies
+  * Really nice looking graphs, with 3d rotations
+  * Well supported software, currently in use by many people (github issue responses < 24 hours)
+  * Works pretty quickly (seamless on laptop with 4g ram, no dedicated graphics card)
+* Cons
+  * Everything must be in FreeSurfer file formats, not something nice like BIDS
+  * Registers to FreeSurfer templates, unclear how to integrate other
+  * Documentation of mathematical transforms taken to produce plots is highly variable. Sometimes there is none, sometimes there is some but it is not in the best format (e.g. powerpoint)
+  
