@@ -32,3 +32,14 @@
 - Measures distance between 2 distributions
 - Does so by checking the "randomness" of 2 distributions and comparing them
 - **Asymmetric**
+
+
+## [Network Clustering Methods](https://arxiv.org/pdf/1508.04757.pdf)
+
+- **FG: Fast Greedy Algorithm (like Kruskal's)**
+  - All edges removed, each node is considered a community
+  - Figure out which edge would most increase ***[modularity](https://en.wikipedia.org/wiki/Modularity_(networks))***
+  - Edge inserted and merge communities
+  - Continues till all communities are merged
+  - Choose iteration with highest modularity
+- **WT: Walktrap (a lot like Diffusion Maps???)**
