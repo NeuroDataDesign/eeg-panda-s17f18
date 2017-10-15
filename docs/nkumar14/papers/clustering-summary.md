@@ -26,7 +26,7 @@
 - Can use any distance metric
 - Kind of like Gaussian Kernel Density Estimation... similarity of point *i* to point *j* in the conditional prob that *i* would pick *j* as its neighbor if there was a gaussian centered at *i*
 
-### KL-Divergence
+- ### KL-Divergence
 
 - Relative entropy
 - Measures distance between 2 distributions
