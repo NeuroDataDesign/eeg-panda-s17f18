@@ -43,3 +43,16 @@
   - Continues till all communities are merged
   - Choose iteration with highest modularity
 - **WT: Walktrap (a lot like Diffusion Maps???)**
+  - Each node gets a probability distribution representing probability of reaching other nodes based on some distance metric
+  - Merge communities with similar prob distributions
+- **LP: Label Propagation**
+  - Each vertex gets a label
+  - Random walk, each vertex gets label with highest occurence of neigbors
+  - Algorithm converges when each vertex has the same label as majority of its nieghbors
+
+#### Not sure name but proposed in paper linked above
+
+1. Normalization: pre-processed scaling
+2. Distance measures: calculate distance matrix
+3. Network Construction: use some method (like k-NN)
+4. Community Detection: use one of the algos
