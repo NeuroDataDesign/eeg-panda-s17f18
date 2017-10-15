@@ -50,9 +50,18 @@
   - Random walk, each vertex gets label with highest occurence of neigbors
   - Algorithm converges when each vertex has the same label as majority of its nieghbors
 
-#### Not sure name but proposed in paper linked above
+#### Basic pipeline of implementing clustering methods
 
 1. Normalization: pre-processed scaling
 2. Distance measures: calculate distance matrix
 3. Network Construction: use some method (like k-NN)
 4. Community Detection: use one of the algos
+
+## DBSCAN
+
+- Points are classified as *core points,* *(density-)reachable points,* and *outliers*
+  - Core points: at least *minPts* points within distance *eps*. All points within *eps* are *directly reachable* from *p*. Cannot be directly reachable from a non-core point.
+  - *q* is directly reachable from *p* if there exists a path *p_1, p_2, ... p_i, p_{i+1}, ... q.* Where all *p_{i + 1}* are directly reachable from *p_i*.
+  - All points not reachable from any other points that are outliers
+- **Density connectedness:** *p* and *q* are connected if both are reachable from *o*. This metric is symmetric.
+- **2 parameters:** *minPts*, *eps*
