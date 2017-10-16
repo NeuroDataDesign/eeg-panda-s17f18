@@ -33,7 +33,7 @@ https://github.com/mattcieslak/easy_lausanne
 
 program used in p-factor paper with a prerequisite of FreeSurfer, which we have tested and prefer not to use.
 
-----------------------Method to investigate whole-brain connectivity in p-factor paper------------------------------
+----------------------Method to investigate whole-brain connectivity in p-factor paper----------------------------
 
 # CWAS(connectome-wide association studies)
 - using resting state fMRI
@@ -45,12 +45,14 @@ https://fcp-indi.github.io/docs/developer/_modules/CPAC/cwas/utils.html#calc_cwa
 reference: https://github.com/FCP-INDI/C-PAC/blob/master/CPAC/sca/sca.py
 
 Seed-based Correlation Analysis (SCA) is one of the most common ways to explore functional connectivity within the brain. Based on the time series of a seed voxel (or ROI), connectivity is calculated as the correlation of time series for all other voxels in the brain. The result of SCA is a connectivity map showing Z-scores for each voxel indicating how well its time series correlates with the time series of the seed. Below is an example connectivity map showing correlated voxels based on a seed in the precuneus
+
     - extract a seed time series using Time Series Extraction
     - compute voxel-wise correlation with Seed Timeseries
     - normalized to contain Z-scores （the number of standard deviations from the mean a data point is）via Fisher R to Z transform
 
 - **average distance between each pair of participant’s functional connectivity map**
-    - 1 - correlation computed above
+
+    - distance matrix = 1 - correlation computed above
 
 - **Multivariate Distance Matrix Regression(MDMR)**: (reveal connectivity in visual cortex)
 
