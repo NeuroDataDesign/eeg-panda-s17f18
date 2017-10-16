@@ -26,7 +26,7 @@ def sparklines(D, p_global, p_local):
     #############
     # Set params
     
-    to_plot, downsample, disp_chans, patient_id, title, is_slider, x_bounds, y_bounds = \
+    to_plot, params = \
         _get_params(D, p_global, p_local, 'Raw Sparklines')
     
     #############
@@ -44,8 +44,8 @@ def sparklines(D, p_global, p_local):
     
     layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
     
-    if is_slider:
-        layout['sliders'] = _make_slider(disp_chans, 0)
+    if params['is_slider']:
+        layout['sliders'] = _make_slider(params['disp_chans'], 0)
     
     #############
     # Add data
@@ -53,7 +53,7 @@ def sparklines(D, p_global, p_local):
         visible = False,
         mode = 'markers',
         x = range(to_plot.shape[1] / downsample),
-        y = to_plot[i, ::downsample]) for i in disp_chans]
+        y = to_plot[i, ::downsample]) for i in params['disp_chans']
     data[0]['visible'] = True
     
     fig = dict(data=data, layout=layout)
@@ -63,7 +63,7 @@ def spectrogram(D, p_global, p_local):
     #############
     # Set params
     
-    to_plot, downsample, disp_chans, patient_id, title, is_slider, x_bounds, y_bounds = \
+    to_plot, params = \
         _get_params(D, p_global, p_local, 'Raw Spectrograms')
     
     F_s = p_global['sample_freq']
@@ -84,14 +84,14 @@ def spectrogram(D, p_global, p_local):
     
     layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
     
-    if is_slider:
-        layout['sliders'] = _make_slider(disp_chans, 0)
+    if params['is_slider']:
+        layout['sliders'] = _make_slider(params['disp_chans'], 0)
     
     #############
     # Add data
     data = []
     
-    for i in disp_chans:
+    for i in params['disp_chans']:
         data.append(_make_spectrogram(to_plot, i, dt, downsample))
     data[0]['visible'] = True
     
@@ -131,25 +131,26 @@ def _get_params(D, p_global, p_local, graph_title):
     # get data of specific paradigm to plot
     to_plot = D[p_local['paradigm']]
     
+    params = dict()
+    
     # downsample rate for PLOTTING
-    downsample = p_local.get('downsample', 1)
+    params['downsample'] = p_local.get('downsample', 1)
     
     # set range of chans to visualize
-    disp_chans = p_local.get('disp_chans', range(to_plot.shape[0]))
+    params['disp_chans'] = p_local.get('disp_chans', range(to_plot.shape[0]))
         
     # make title
-    patient_id = p_global['patient_id']
-    title = 'Patient ' + patient_id + ' ' +    \
+    params['title'] = 'Patient ' + p_global['patient_id'] + ' ' +    \
         p_global['title'].get(p_local['paradigm'], p_local['paradigm']) + ' ' + graph_title
 
     # is slider
-    is_slider = p_local.get('is_slider', True)
+    params['is_slider'] = p_local.get('is_slider', True)
     
     # custom bounds
-    x_bounds = list(p_local.get('x_bounds', []))
-    y_bounds = list(p_local.get('y_bounds', []))
+    params['x_bounds'] = list(p_local.get('x_bounds', []))
+    params['y_bounds'] = list(p_local.get('y_bounds', []))
     
-    return to_plot, downsample, disp_chans, patient_id, title, is_slider, x_bounds, y_bounds
+    return to_plot, params 
 
 def _make_spectrogram(data, chan, dt, downsample):
     sample_points = np.arange(data.shape[1]) * dt
