@@ -33,7 +33,7 @@ https://github.com/mattcieslak/easy_lausanne
 
 program used in p-factor paper with a prerequisite of FreeSurfer, which we have tested and prefer not to use.
 
-----------------------Method to investigate whole-brain connectivity in p-factor paper--------------------------------
+----------------------Method to investigate whole-brain connectivity in p-factor paper------------------------------
 
 # CWAS(connectome-wide association studies)
 - using resting state fMRI
@@ -55,6 +55,7 @@ Seed-based Correlation Analysis (SCA) is one of the most common ways to explore 
 - **Multivariate Distance Matrix Regression(MDMR)**: (reveal connectivity in visual cortex)
 
 reference: https://fcp-indi.github.io/docs/developer/_modules/CPAC/cwas/mdmr.html#mdmr
+
     - compute Gower's centered matrix
     - calculate MDMR statistics for the voxel
     - determine significance of MDMR statistics with permutation tests
