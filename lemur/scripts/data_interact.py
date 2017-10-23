@@ -20,7 +20,7 @@ def get_patient(patient_num):
     # initialize patient
     patient = {}
     # set path to data
-    patient_dir = "../../../data/" + patient_num + "/EEG/raw/PANDA"
+    patient_dir = "../../../../data/" + patient_num + "/EEG/raw/PANDA"
     # iterate through available datasets for given patient
     for filename in os.listdir(patient_dir):
         if filename.endswith(".pkl"): 
