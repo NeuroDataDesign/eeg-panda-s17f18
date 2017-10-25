@@ -71,6 +71,9 @@ class BIDSDataset:
         D = LoadBIDSData(self.base_path, self.dataset, subject, task)
         if self.Meta["dims_in_columns"]:
             D = D.T
+            tmp = self.Meta['row_variable']
+            self.Meta['row_variable'] = self.Meta['column_variable'] 
+            self.Meta['column_variable'] = tmp
         return D
         
 def barf(string):
