@@ -34,26 +34,24 @@ def sparklines(D, p_global, p_local):
     
     # Setup titles
     xaxis = dict(
-        title = 'Time (' + str(1. / p_global['sample_freq'] * downsample) + ' seconds timestamps)',
-        range = x_bounds
+        title = 'Time (' + str(1. / p_global['sample_freq'] * params['downsample']) + ' seconds timestamps)',
+        range = params['x_bounds']
     )
     yaxis = dict(
         title = 'Intensity (microVolts)',
-        range = y_bounds
+        range = ['y_bounds']
     )
     
-    layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+    layout = dict(title=params['title'], xaxis=xaxis, yaxis=yaxis)
     
     if params['is_slider']:
         layout['sliders'] = _make_slider(params['disp_chans'], 0)
     
     #############
     # Add data
-    data = [dict(
-        visible = False,
-        mode = 'markers',
-        x = range(to_plot.shape[1] / downsample),
-        y = to_plot[i, ::downsample]) for i in params['disp_chans']
+    data = [dict(visible = False, mode = 'lines',
+        x = np.arange(to_plot.shape[1] // params['downsample']),
+        y = to_plot[i, ::params['downsample']]) for i in params['disp_chans']]
     data[0]['visible'] = True
     
     fig = dict(data=data, layout=layout)
@@ -75,14 +73,14 @@ def spectrogram(D, p_global, p_local):
     # Setup titles
     xaxis = dict(
         title = 'Frequency (Hz)',
-        range = x_bounds
+        range = params['x_bounds']
     )
     yaxis = dict(
         title = 'Magnitude',
-        range = y_bounds
+        range = params['y_bounds']
     )
     
-    layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+    layout = dict(title=params['title'], xaxis=xaxis, yaxis=yaxis)
     
     if params['is_slider']:
         layout['sliders'] = _make_slider(params['disp_chans'], 0)
@@ -92,14 +90,125 @@ def spectrogram(D, p_global, p_local):
     data = []
     
     for i in params['disp_chans']:
-        data.append(_make_spectrogram(to_plot, i, dt, downsample))
+        data.append(_make_spectrogram(to_plot, i, dt, params['downsample']))
     data[0]['visible'] = True
     
     fig = dict(data=data, layout=layout)
     iplot(fig)
 
-####################################
-# Helper functions
+def signal_heatmap(D, p_global, p_local):
+    #############
+    # Set params
+    
+    to_plot, params = \
+        _get_params(D, p_global, p_local, 'Heatmap')
+     
+    if params['pc_proj'] is not None:
+        params['title'] += " PC-PROJ = " + str(params['pc_proj'])
+        U, _, _ = np.linalg.svd(to_plot, full_matrices=False)
+        U = U[:, params['pc_proj'][0]:params['pc_proj'][1]]
+        if not params['pc_collapse']:
+            P = U.dot(U.T)
+        else:
+            P = U
+            params['title'] += " COLLAPSED"
+        to_plot = P.T.dot(to_plot)
+    
+    #############
+    # Set layout
+    
+    # Setup titles
+    xaxis = dict(
+        title = 'Time (seconds)'
+    )
+    yaxis = dict(
+        title = 'Channel'
+    )
+    
+    layout = dict(title=params['title'], xaxis=xaxis, yaxis=yaxis)
+     
+    #############
+    # Add data
+    trace = go.Heatmap(z = to_plot[:, ::params['downsample']])
+    data = [trace]
+    
+    fig = dict(data=data, layout=layout)
+    iplot(fig)
+
+def distance_matrix_heatmap(D, p_global, p_local):
+    to_plot, params = \
+        _get_params(D, p_global, p_local, '')
+    params['title'] += params['metric'].__name__
+    labels = [x for x in D.keys()]
+    dataset = [x.T for x in D.values()]
+    metric = params['metric'](dataset)
+    dist_mat = getDistMat(metric)
+    _square_heatmap(dist_mat, "paradigms", params['title']) 
+    for i in range(len(labels)):
+        print(i, labels[i])
+
+def getDistMat(Metric):
+    N = Metric.N
+    dist_mat = np.zeros([N, N])
+    for i in range(N):
+        for j in range(N):
+            dist_mat[i, j] = Metric.distance(i, j)
+            dist_mat[j, i] = dist_mat[i, j] 
+    return dist_mat
+
+def correlation_heatmap(D, p_global, p_local):
+    p_local['squarevar'] = "Channels" 
+    to_plot, params = \
+        _get_params(D, p_global, p_local, 'Correlation Matrix')
+    with np.errstate(divide = 'ignore', invalid = 'ignore'):
+        corr = np.nan_to_num(np.corrcoef(to_plot))
+    _square_heatmap(corr, params["squarevar"], params["title"])
+
+def covariance_heatmap(D, p_global, p_local):
+    p_local['squarevar'] = "Channels"
+    to_plot, params = \
+        _get_params(D, p_global, p_local, 'Covariance Matrix')
+    with np.errstate(divide = 'ignore', invalid = 'ignore'):
+        corr = to_plot.dot(to_plot.T)
+    _square_heatmap(corr, params["squarevar"], params["title"])
+
+def scree_plot(D, p_global, p_local):
+    to_plot, params = \
+        _get_params(D, p_global, p_local, 'Scree Plot')
+    _, spectrum, _ = np.linalg.svd(to_plot, full_matrices=False)
+    scree = np.cumsum(spectrum) / np.sum(spectrum)
+    scree = scree[scree < .999]
+    xaxis = dict(
+        title = 'PC number'
+    )
+    yaxis = dict(
+        title = 'Cum. variance explained'
+    )
+    data = [dict(mode = 'line',
+                 x = np.arange(len(scree)),
+                 y = scree)] 
+    layout = dict(title=params['title'], xaxis=xaxis, yaxis=yaxis)
+
+    fig = dict(data=data, layout=layout)
+    iplot(fig)
+
+
+
+def _square_heatmap(D, squarevar, title):
+    
+    # Setup titles
+    xaxis = dict(title = squarevar)
+    yaxis = dict(title = squarevar)
+    
+    layout = dict(title=title, xaxis=xaxis, yaxis=yaxis, width=500, height=500)
+     
+    #############
+    # Add data
+    trace = go.Heatmap(z = D)
+    data = [trace]
+    
+    fig = dict(data=data, layout=layout)
+    iplot(fig)
 
 def _make_slider(disp_chans, active):
     # Set different elecs as different ticks in slider
@@ -134,14 +243,13 @@ def _get_params(D, p_global, p_local, graph_title):
     params = dict()
     
     # downsample rate for PLOTTING
-    params['downsample'] = p_local.get('downsample', 1)
+    params['downsample'] = int(p_local.get('downsample', 1))
     
     # set range of chans to visualize
     params['disp_chans'] = p_local.get('disp_chans', range(to_plot.shape[0]))
         
     # make title
-    params['title'] = 'Patient ' + p_global['patient_id'] + ' ' +    \
-        p_global['title'].get(p_local['paradigm'], p_local['paradigm']) + ' ' + graph_title
+    params['title'] = p_global['patient_id'] + ' ' + p_local['paradigm'] + ' ' +  graph_title
 
     # is slider
     params['is_slider'] = p_local.get('is_slider', True)
@@ -149,6 +257,12 @@ def _get_params(D, p_global, p_local, graph_title):
     # custom bounds
     params['x_bounds'] = list(p_local.get('x_bounds', []))
     params['y_bounds'] = list(p_local.get('y_bounds', []))
+
+    params['pc_proj'] = p_local.get('pc_proj', None)
+    params['pc_collapse'] = p_local.get('pc_collapse', False)
+
+    params['squarevar'] = p_local.get('squarevar', "Variable")
+    params['metric'] = p_local.get('metric', None)
     
     return to_plot, params 
 
