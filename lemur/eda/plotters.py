@@ -62,3 +62,10 @@ class CorrelationMatrixPlotter(SquareMatrixPlotter):
         with np.errstate(divide = 'ignore', invalid = 'ignore'):
             corr = np.nan_to_num(np.corrcoef(D))
         return corr
+class CovarianceMatrixPlotter(SquareMatrixPlotter):
+    plotname = "Covariance Matrix"
+
+    def squareComputation(self, D):
+        with np.errstate(divide = 'ignore', invalid = 'ignore'):
+            cov = D.dot(D.T)
+        return cov
