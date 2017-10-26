@@ -2,6 +2,10 @@ from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 from plotly import tools
 import plotly.graph_objs as go
 import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from lemur.distance.functions import energy_distance
 
 
 class BasePlotter:
@@ -20,17 +24,25 @@ class ScreePlotter(BasePlotter):
         D, titleheader = self.getInfo(*args, **kwargs)
         title = titleheader + self.plotname 
         _, S, _ = np.linalg.svd(D, full_matrices=False)
-        scree = np.cumsum(S) / np.sum(S)
-        scree = scree[scree < .999]
+        y = S
+        x = np.arange(1, len(S) + 1)
+        sy = np.sum(y)
+        cy = np.cumsum(y)
         xaxis = dict(
-            title = 'PC number'
+            title = 'Factors'
         )
         yaxis = dict(
-            title = 'Cum. variance explained'
+            title = 'Proportion of Total Variance'
         )
-        data = [dict(mode = 'line',
-                 x = np.arange(len(scree)),
-                 y = scree)] 
+        var = go.Scatter(mode = 'lines+markers',
+                         x = x,
+                         y = y / sy,
+                         name = "Variance")
+        cumvar = go.Scatter(mode = 'lines+markers',
+                            x = x,
+                            y = cy / sy,
+                            name = "Cumulative Variance")
+        data = [var, cumvar]
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data=data, layout=layout)
         iplot(fig)
@@ -65,3 +77,39 @@ class CovarianceMatrixPlotter(SquareMatrixPlotter):
         with np.errstate(divide = 'ignore', invalid = 'ignore'):
             cov = D.dot(D.T)
         return cov
+
+class EnergyDistanceMatrixPlotter(SquareMatrixPlotter):
+    plotname = "Energy Distance Matrix"
+
+    def squareComputation(self, D):
+        d, n = D.shape
+        ed = np.empty([d, d])
+        for i in range(d):
+            for j in range(i + 1):
+                if len(D[i, :]) > 1000:
+                    x = np.random.choice(D[i, :], size = 1000)
+                else:
+                    x = D[i, :]
+                if len(D[j, :]) > 1000:
+                    y = np.random.choice(D[j, :], size = 1000)
+                else:
+                    x = D[j, :]
+                ed[i, j] = energy_distance(x, y)
+                ed[j, i] = ed[i, j]
+        return ed
+
+class EigenvectorPairsPlotter(BasePlotter):
+    plotname = "Eigenvectors Pairs Plot"
+
+    def plot(self, *args, **kwargs):
+        D, titleheader = self.getInfo(*args, **kwargs)
+        title = titleheader + self.plotname 
+        U, _, _ = np.linalg.svd(D, full_matrices=False)
+        U = U[:, :5]
+        P = U.T.dot(D)
+        Pdf = pd.DataFrame(P.T, columns = ["PC" + str(x) for x in range(1, 5 + 1)])
+        sns.pairplot(data=Pdf, diag_kind="kde", markers="+",
+                     diag_kws=dict(shade=True), kind='reg')
+        plt.subplots_adjust(top=0.9)
+        plt.suptitle(title)
+        plt.show()

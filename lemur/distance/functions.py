@@ -1,4 +1,5 @@
 import numpy as np
+from numba import jit
 
 class FroMetric:
     def __init__(self, dataset):
@@ -84,3 +85,16 @@ def distMatInnerOuter(distMat, labels):
                 outer.append(distMat[i, j])
     return inner, outer
 
+
+@jit(nopython=True,  cache=True)
+def energy_distance(x, y):
+    n = len(x)
+    sxy = 0
+    sxx = 0
+    syy = 0
+    for i in range(n):
+        for j in range(i + 1):
+            sxy += np.abs(x[i] - y[j])
+            sxx += np.abs(x[i] - x[j])
+            syy += np.abs(y[i] - y[j])
+    return 2 * 2 * sxy / (n*n) - 2 * sxx / (n*n) - 2 * syy / (n*n)
