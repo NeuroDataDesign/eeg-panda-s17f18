@@ -12,6 +12,24 @@ SUBSTRING = "sub_%03d"
 TASKSTRING = "task_%03d"
 SUBERROR = "Invalid subject index %d for dataset with %d subjects."
 TASKERROR = "Invalid task index %d for dataset with %d tasks."
+BIDSTITLEHEADER = '%s - %s - %s - '
+
+class GenericDataObject:
+
+    def __init__(self, D, dims_in_columns, row_variable = "rowvar", column_variable = "colvar"):
+        self.D = D
+        self.Meta = {
+                "row_variable": row_variable,
+                "column_variable": column_variable,
+                "dims_in_columns": dims_in_columns
+        }
+
+    def getData(self):
+        return self.D
+
+    def getTitleHeader(self):
+        return ''
+
 
 class BIDSDataset:
     
@@ -75,6 +93,12 @@ class BIDSDataset:
             self.Meta['row_variable'] = self.Meta['column_variable'] 
             self.Meta['column_variable'] = tmp
         return D
+
+    def getTitleHeader(self, sub, task):
+        title = BIDSTITLEHEADER % (self.Meta["dataset_name"],
+                                   self.subjects[sub],
+                                   self.tasks[task])
+        return title
         
 def barf(string):
     print(string)

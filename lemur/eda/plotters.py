@@ -3,27 +3,22 @@ from plotly import tools
 import plotly.graph_objs as go
 import numpy as np
 
-import lemur.utils.io as lio
 
-BASETITLE = '''
-<b>%s - %s - %s - %s</b>
-'''
+class BasePlotter:
+    def __init__(self, data):
+        self.data = data
 
-class BasePlotter(lio.BIDSDataset):
-    def getTitle(self, sub, task):
-        title = BASETITLE % (self.Meta["dataset_name"],
-                             self.subjects[sub],
-                             self.tasks[task],
-                             self.plotname)
-        return title
-
+    def getInfo(self, *args, **kwargs):
+        D = self.data.getData(*args, **kwargs)
+        titleheader = self.data.getTitleHeader(*args, **kwargs)
+        return D, titleheader
 
 class ScreePlotter(BasePlotter):
     plotname = "Scree Plot"
 
-    def plot(self, sub, task):
-        title = self.getTitle(sub, task)
-        D = self.getData(sub, task)
+    def plot(self, *args, **kwargs):
+        D, titleheader = self.getInfo(*args, **kwargs)
+        title = titleheader + self.plotname 
         _, S, _ = np.linalg.svd(D, full_matrices=False)
         scree = np.cumsum(S) / np.sum(S)
         scree = scree[scree < .999]
@@ -41,12 +36,12 @@ class ScreePlotter(BasePlotter):
         iplot(fig)
 
 class SquareMatrixPlotter(BasePlotter):
-    def plot(self, sub, task):
-        title = self.getTitle(sub, task)
-        D = self.getData(sub, task)
+    def plot(self, *args, **kwargs):
+        D, titleheader = self.getInfo(*args, **kwargs)
+        title = titleheader + self.plotname 
         D_square = self.squareComputation(D)
-        xaxis = dict(title = self.Meta['row_variable'])
-        yaxis = dict(title = self.Meta['row_variable'])
+        xaxis = dict(title = self.data.Meta['row_variable'])
+        yaxis = dict(title = self.data.Meta['row_variable'])
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis, width=600, height=600)
      
         trace = go.Heatmap(z = D_square)
@@ -62,6 +57,7 @@ class CorrelationMatrixPlotter(SquareMatrixPlotter):
         with np.errstate(divide = 'ignore', invalid = 'ignore'):
             corr = np.nan_to_num(np.corrcoef(D))
         return corr
+
 class CovarianceMatrixPlotter(SquareMatrixPlotter):
     plotname = "Covariance Matrix"
 
