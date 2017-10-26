@@ -2,6 +2,7 @@ from plotly.offline import iplot
 import plotly.graph_objs as go
 import seaborn as sns
 import matplotlib.pyplot as plt
+from IPython.html.widgets import interact
 
 import numpy as np
 import pandas as pd
@@ -158,3 +159,25 @@ class HeatmapPlotter(BasePlotter):
         data = [trace]
         fig = dict(data=data, layout=layout)
         iplot(fig)
+
+class ParallelCoordinatePlotter(BasePlotter):
+    plotname = "Parallel Coordinate Plot"
+
+    def plot(self, *args, **kwargs):
+        D, titleheader = self.getInfo(*args, **kwargs)
+        title = titleheader + self.plotname 
+        U, s, _, mu = PCA(D)
+        P = U[:, :5]
+        D = P.T.dot(D - mu)
+        d, n = D.shape
+        D = D - np.min(D, axis=1).reshape(d, 1)
+        D = D / np.max(D, axis=1).reshape(d, 1)
+        def view_plot(w1, w2):
+            dims = [dict(label = "PC" + str(x),
+                         values = D[x, :]) for x in range(5)]
+            dims[0]["constraintrange"] = [w1, w2]
+            trace = go.Parcoords(dimensions = list(dims))
+            data = [trace]
+            fig = dict(data = data)
+            iplot(fig)
+        return interact(view_plot, w1=(0, 1), w2=(0, 1))
