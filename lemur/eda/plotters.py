@@ -1,11 +1,14 @@
-from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
-from plotly import tools
+from plotly.offline import iplot
 import plotly.graph_objs as go
-import numpy as np
-import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+
+import numpy as np
+import pandas as pd
+
+from sklearn.cluster import KMeans
 from lemur.distance.functions import energy_distance
+from lemur.eda.reducers import PCA
 
 
 class BasePlotter:
@@ -23,7 +26,7 @@ class ScreePlotter(BasePlotter):
     def plot(self, *args, **kwargs):
         D, titleheader = self.getInfo(*args, **kwargs)
         title = titleheader + self.plotname 
-        _, S, _ = np.linalg.svd(D, full_matrices=False)
+        _, S, _, _ = PCA(D)
         y = S
         x = np.arange(1, len(S) + 1)
         sy = np.sum(y)
@@ -101,15 +104,57 @@ class EnergyDistanceMatrixPlotter(SquareMatrixPlotter):
 class EigenvectorPairsPlotter(BasePlotter):
     plotname = "Eigenvectors Pairs Plot"
 
+
     def plot(self, *args, **kwargs):
         D, titleheader = self.getInfo(*args, **kwargs)
         title = titleheader + self.plotname 
-        U, _, _ = np.linalg.svd(D, full_matrices=False)
-        U = U[:, :5]
-        P = U.T.dot(D)
-        Pdf = pd.DataFrame(P.T, columns = ["PC" + str(x) for x in range(1, 5 + 1)])
-        sns.pairplot(data=Pdf, diag_kind="kde", markers="+",
-                     diag_kws=dict(shade=True), kind='reg')
+        U, _, _, mu = PCA(D)
+        U = U[:, :3]
+        P = U.T.dot(D - mu) + U.T.dot(mu)
+        Pdf = pd.DataFrame(P.T, columns = ["PC" + str(x) for x in range(1, 3 + 1)])
+        if Pdf.shape[0] > 500:
+            g = sns.PairGrid(Pdf)
+            g.map_diag(plt.hist)
+            g.map_offdiag(plt.hexbin,
+                          linewidths=0,
+                          gridsize=20,
+                          bins = 'log',
+                          cmap=sns.light_palette("blue", as_cmap=True))
+        else:
+            sns.pairplot(data=Pdf, diag_kind="kde", markers="+",
+                         diag_kws=dict(shade=True), kind='reg')
         plt.subplots_adjust(top=0.9)
         plt.suptitle(title)
         plt.show()
+
+class HeatmapPlotter(BasePlotter):
+    plotname = "Heatmap Plot"
+
+    def plot(self, *args, **kwargs):
+        D, titleheader = self.getInfo(*args, **kwargs)
+        title = titleheader + self.plotname 
+        U, s, _, mu = PCA(D)
+        cv = np.cumsum(s)
+        P = U[:, s < .9]
+        D = P.T.dot(D - mu) + P.T.dot(mu)
+        if D.shape[1] > 1000:
+            kmeans = KMeans(n_clusters = 1000,
+                            max_iter = 5,
+                            n_init = 4,
+                            n_jobs = 4,
+                            algorithm = "elkan",
+                            random_state = 123).fit(D.T)
+            centers = kmeans.cluster_centers_
+            samples = []
+            for c in centers:
+                s = np.argmin(np.linalg.norm(D.T - c, axis=1))
+                samples.append(s) 
+            D = D[:, samples]
+
+        xaxis = dict(title = "Samples closest to 1000 k-means centers")
+        yaxis = dict(title = "PCA Dims with <.9 cum. var. explained")
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis, width=600, height=600) 
+        trace = go.Heatmap(z = D)
+        data = [trace]
+        fig = dict(data=data, layout=layout)
+        iplot(fig)
