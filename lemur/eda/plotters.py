@@ -21,6 +21,12 @@ class BasePlotter:
         titleheader = self.data.getTitleHeader(*args, **kwargs)
         return D, titleheader
 
+class BIDSPlotter(BasePlotter):
+    def getInfo(self, *args, **kwargs):
+        DMO = self.data.getDistanceMatrixGDO()
+        header = self.data.Meta["dataset_name"] + " - "
+        return DMO, header
+
 class ScreePlotter(BasePlotter):
     plotname = "Scree Plot"
 
@@ -134,10 +140,14 @@ class HeatmapPlotter(BasePlotter):
     def plot(self, *args, **kwargs):
         D, titleheader = self.getInfo(*args, **kwargs)
         title = titleheader + self.plotname 
-        U, s, _, mu = PCA(D)
-        cv = np.cumsum(s)
-        P = U[:, s < .9]
-        D = P.T.dot(D - mu) + P.T.dot(mu)
+        xaxis = dict(title = self.data.Meta["row_variable"])
+        yaxis = dict(title = self.data.Meta["column_variable"])
+        if D.shape[0] > 100:
+            U, s, _, mu = PCA(D)
+            cv = np.cumsum(s)
+            P = U[:, s < .9]
+            D = P.T.dot(D - mu) + P.T.dot(mu)
+            yaxis = dict(title = "PCA Dims with <.9 cum. var. explained")
         if D.shape[1] > 1000:
             kmeans = KMeans(n_clusters = 1000,
                             max_iter = 5,
@@ -151,12 +161,39 @@ class HeatmapPlotter(BasePlotter):
                 s = np.argmin(np.linalg.norm(D.T - c, axis=1))
                 samples.append(s) 
             D = D[:, samples]
-
-        xaxis = dict(title = "Samples closest to 1000 k-means centers")
-        yaxis = dict(title = "PCA Dims with <.9 cum. var. explained")
+            xaxis = dict(title = "Samples closest to 1000 k-means centers")
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis, width=600, height=600) 
         trace = go.Heatmap(z = D)
         data = [trace]
+        fig = dict(data=data, layout=layout)
+        iplot(fig)
+
+class DistanceMatrixPlotter(BIDSPlotter):
+    plotname = "Distance Matrix"
+
+    def plot(self, *args, **kwargs):
+        DMO, titleheader = self.getInfo(*args, **kwargs)
+        title = titleheader + self.plotname 
+        M = DMO.getData()
+        xaxis = go.XAxis(
+                title = "observations",
+                ticktext = DMO.ticks,
+                ticks = "",
+                showticklabels=False,
+                mirror=True,
+                tickvals = [i for i in range(len(DMO.ticks))])
+        yaxis = go.YAxis(
+                title = "observations",
+                ticktext = DMO.ticks,
+                ticks = "",
+                showticklabels=False,
+                mirror=True,
+                tickvals = [i for i in range(len(DMO.ticks))])
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis, width=600, height=600)
+     
+        trace = go.Heatmap(z = M)
+        data = [trace]
+    
         fig = dict(data=data, layout=layout)
         iplot(fig)
 

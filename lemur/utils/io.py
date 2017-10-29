@@ -2,6 +2,7 @@ import os
 import pickle as pkl
 import re
 import pandas as pd
+import numpy as np
 import sys
 import json
 
@@ -87,7 +88,7 @@ class BIDSDataset:
         subject = self.getSubject(sub)
         task = self.getTask(task)
         D = LoadBIDSData(self.base_path, self.dataset, subject, task)
-        if self.Meta["dims_in_columns"]:
+        if D is not None and self.Meta["dims_in_columns"]:
             D = D.T
             tmp = self.Meta['row_variable']
             self.Meta['row_variable'] = self.Meta['column_variable'] 
@@ -99,6 +100,43 @@ class BIDSDataset:
                                    self.subjects[sub],
                                    self.tasks[task])
         return title
+
+    def getLinearGenerator(self):
+        for s in range(self.num_subjects):
+            for t in range(self.num_tasks):
+                yield self.getData(s, t)
+
+    def setDistanceMetric(self, metric, precompute = False, **kwargs):
+        self.metric = metric(self.getLinearGenerator(), **kwargs)
+        self.distanceMatrix = self.getDistanceMatrix()
+
+    def getDistanceMatrix(self):
+        N = self.num_subjects * self.num_tasks
+        matrix = np.zeros([N, N])
+        for i in range(self.num_subjects):
+            for j in range(self.num_tasks):
+                for ip in range(self.num_subjects):
+                    for jp in range(self.num_tasks):
+                        I = i * self.num_tasks + j
+                        J = ip * self.num_tasks + jp
+                        matrix[I, J] = self.distance(i, j, ip, jp)
+        return matrix
+     
+    def distance(self, i, j, ip, jp):
+        if self.metric is None:
+            print("No distance metric set!!!")
+        else:
+            return self.metric.distance(i * self.num_tasks + j, ip * self.num_tasks + jp)
+
+    def getDistanceMatrixGDO(self):
+        M = self.distanceMatrix
+        GDO = GenericDataObject(M, False, row_variable = "subjects", column_variable = "colvar")
+        ticks = []
+        for s in self.subjects:
+            for t in self.tasks:
+                ticks.append(s + "/" + t)
+        GDO.ticks = ticks
+        return GDO
         
 def barf(string):
     print(string)
