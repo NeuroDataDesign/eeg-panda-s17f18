@@ -14,16 +14,16 @@ class FroMetric:
             return np.linalg.norm(self.correls[i] - self.correls[j]) / self.n**2
 
 class ErosMetric:
-    def __init__(self, dataset, agg):
+    def __init__(self, dataset, agg = np.mean):
         eigenvals, right_evs = self.eros_preprocess(dataset)
         self.right_evs = right_evs
-        self.S = np.column_stack(eigenvals)
+        self.S = np.column_stack(list(filter(lambda x: x is not None, eigenvals)))
         self.N = self.S.shape[1]
         self.n = self.S.shape[0]
         self.w = self.compute_weight_ratio(self.S, agg)
         
     def get_evecs_evals(self, A):
-        B = (A.T.dot(A)) / A.shape[0]
+        B = (A.dot(A.T)) / A.shape[0]
         _, D, E = np.linalg.svd(B, full_matrices=False)
         return D, E
 
@@ -31,10 +31,14 @@ class ErosMetric:
         eigenvalues = []
         right_evs = []
         for A in dset:
-            A = A - np.mean(A, axis=0)
-            D, E = self.get_evecs_evals(A)
-            eigenvalues.append(D)
-            right_evs.append(E)
+            if A is None:
+                eigenvalues.append(None)
+                right_evs.append(None)
+            else:
+                A = A - np.mean(A, axis=0)
+                D, E = self.get_evecs_evals(A)
+                eigenvalues.append(D)
+                right_evs.append(E)
         return eigenvalues, right_evs
     
     def compute_weight_raw(self, S, fn):
@@ -48,6 +52,8 @@ class ErosMetric:
         return self.compute_weight_raw(S, fn)
     
     def distance(self, i, j):
+        if self.right_evs[i] is None or self.right_evs[j] is None:
+            return np.nan
         Av = self.right_evs[i]
         Bv = self.right_evs[j]
         s = 0.0

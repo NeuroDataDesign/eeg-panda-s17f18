@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 from sklearn.cluster import KMeans
-from sklearn.manifold import TSNE
+from sklearn.manifold import TSNE, MDS
 from lemur.distance.functions import energy_distance
 from lemur.eda.reducers import PCA
 
@@ -198,9 +198,7 @@ class DistanceMatrixPlotter(BIDSPlotter):
         fig = dict(data=data, layout=layout)
         iplot(fig)
 
-class TSNEScatterPlotter(BIDSPlotter):
-    plotname = "TSNE Scatter Plotter"
-
+class PDScatterPlotter(BIDSPlotter):
     def plot(self, pivot="s", *args, **kwargs):
         DMO, titleheader = self.getInfo(*args, **kwargs)
         title = titleheader + self.plotname 
@@ -213,9 +211,7 @@ class TSNEScatterPlotter(BIDSPlotter):
         subjects = list(map(lambda x: x.split("/")[0], ticks))
         tasks = list(map(lambda x: x.split("/")[1], ticks))
 
-        tsne = TSNE(metric="precomputed")
-        tsne.fit(M)
-        emb = tsne.embedding_
+        emb = self.computeEmbedding(M)
         d = {
             'factor 1': emb[:, 0],
             'factor 2': emb[:, 1],
@@ -230,6 +226,24 @@ class TSNEScatterPlotter(BIDSPlotter):
                     hue=pivot)
         plt.title(title)
         plt.show()
+
+class TSNEScatterPlotter(PDScatterPlotter):
+    plotname = "TSNE Scatter Plotter"
+
+    def computeEmbedding(self, M):
+        tsne = TSNE(metric="precomputed")
+        tsne.fit(M)
+        emb = tsne.embedding_
+        return emb
+
+class MDSScatterPlotter(PDScatterPlotter):
+    plotname = "MDS Scatter Plotter"
+
+    def computeEmbedding(self, M):
+        mds = MDS(dissimilarity="precomputed")
+        mds.fit(M)
+        emb = mds.embedding_
+        return emb
 
 class ParallelCoordinatePlotter(BasePlotter):
     plotname = "Parallel Coordinate Plot"
