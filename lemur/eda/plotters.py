@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 from sklearn.cluster import KMeans
+from sklearn.manifold import TSNE
 from lemur.distance.functions import energy_distance
 from lemur.eda.reducers import PCA
 
@@ -110,15 +111,15 @@ class EnergyDistanceMatrixPlotter(SquareMatrixPlotter):
 
 class EigenvectorPairsPlotter(BasePlotter):
     plotname = "Eigenvectors Pairs Plot"
-
+    num_pcs = 5
 
     def plot(self, *args, **kwargs):
         D, titleheader = self.getInfo(*args, **kwargs)
         title = titleheader + self.plotname 
         U, _, _, mu = PCA(D)
-        U = U[:, :3]
+        U = U[:, :self.num_pcs]
         P = U.T.dot(D - mu) + U.T.dot(mu)
-        Pdf = pd.DataFrame(P.T, columns = ["PC" + str(x) for x in range(1, 3 + 1)])
+        Pdf = pd.DataFrame(P.T, columns = ["PC" + str(x) for x in range(1, self.num_pcs + 1)])
         if Pdf.shape[0] > 500:
             g = sns.PairGrid(Pdf)
             g.map_diag(plt.hist)
@@ -196,6 +197,39 @@ class DistanceMatrixPlotter(BIDSPlotter):
     
         fig = dict(data=data, layout=layout)
         iplot(fig)
+
+class TSNEScatterPlotter(BIDSPlotter):
+    plotname = "TSNE Scatter Plotter"
+
+    def plot(self, pivot="s", *args, **kwargs):
+        DMO, titleheader = self.getInfo(*args, **kwargs)
+        title = titleheader + self.plotname 
+        M = DMO.getData()
+        notnan = ~np.isnan(M).all(0)
+        M = M[notnan, :]
+        M = M[:, notnan]
+
+        ticks = np.array(DMO.ticks)[notnan]
+        subjects = list(map(lambda x: x.split("/")[0], ticks))
+        tasks = list(map(lambda x: x.split("/")[1], ticks))
+
+        tsne = TSNE(metric="precomputed")
+        tsne.fit(M)
+        emb = tsne.embedding_
+        d = {
+            'factor 1': emb[:, 0],
+            'factor 2': emb[:, 1],
+            's': subjects,
+            't': tasks
+        }
+        D = pd.DataFrame(d)
+        sns.lmplot('factor 1',
+                   'factor 2',
+                    data = D,
+                    fit_reg = False,
+                    hue=pivot)
+        plt.title(title)
+        plt.show()
 
 class ParallelCoordinatePlotter(BasePlotter):
     plotname = "Parallel Coordinate Plot"
