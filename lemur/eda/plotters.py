@@ -1,4 +1,5 @@
 from plotly.offline import iplot
+import plotly.figure_factory as ff
 import plotly.graph_objs as go
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -181,3 +182,13 @@ class ParallelCoordinatePlotter(BasePlotter):
             fig = dict(data = data)
             iplot(fig)
         return interact(view_plot, w1=(0, 1), w2=(0, 1))
+
+class DendogramPlotter(BasePlotter):
+    plotname = "Dendogram Plot"
+
+    def plot(self, *args, **kwargs):
+        D, titleheader = self.getInfo(*args, **kwargs)
+        title = titleheader + self.plotname 
+        dendro = ff.create_dendrogram(D)
+        dendro['layout'].update({'width':800, 'height':500})
+        iplot(dendro)
