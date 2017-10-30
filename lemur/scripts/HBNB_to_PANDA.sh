@@ -29,4 +29,4 @@ done
 
 echo "Converting $INPUT to $OUTPUT"
 
-python code/scripts/HBNB_to_PANDA.py $INPUT $OUTPUT
+python lemur/scripts/HBNB_to_PANDA.py $INPUT $OUTPUT

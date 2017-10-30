@@ -220,12 +220,37 @@ class ParallelCoordinatePlotter(BasePlotter):
             iplot(fig)
         return interact(view_plot, w1=(0, 1), w2=(0, 1))
 
-class DendogramPlotter(BasePlotter):
-    plotname = "Dendogram Plot"
+class DendrogramBIDS(BIDSPlotter):
+    plotname = "Dendrogram Plot"
+
+    def plot(self, *args, **kwargs):
+        DMO, titleheader = self.getInfo(*args, **kwargs)
+        M = DMO.getData()
+        title = titleheader + self.plotname 
+        dendro = ff.create_dendrogram(M.T, labels=DMO.ticks)
+        layout = dict(
+            width = 800,
+            height = 500,
+            yaxis = dict(
+                showticklabels=False
+            )
+        )
+        dendro['layout'].update(layout)
+        iplot(dendro)
+
+class DendrogramBase(BasePlotter):
+    plotname = "Dendrogram Plot"
 
     def plot(self, *args, **kwargs):
         D, titleheader = self.getInfo(*args, **kwargs)
         title = titleheader + self.plotname 
-        dendro = ff.create_dendrogram(D)
-        dendro['layout'].update({'width':800, 'height':500})
+        dendro = ff.create_dendrogram(D.T)
+        layout = dict(
+            width = 800,
+            height = 500,
+            yaxis = dict(
+                showticklabels=False
+            )
+        )
+        dendro['layout'].update(layout)
         iplot(dendro)
