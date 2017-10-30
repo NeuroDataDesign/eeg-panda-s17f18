@@ -3,12 +3,15 @@ from numba import jit
 
 class FroMetric:
     def __init__(self, dataset):
-        self.correls = list(map(lambda x: x.T.dot(x) / x.shape[0] , dataset))
+        self.correls = list(map(lambda x: x.dot(x.T) / x.shape[1] if x is not None else None, dataset))
         self.N = len(self.correls)
         self.n = self.correls[0].shape[0]
     
     def distance(self, i, j):
-        return np.linalg.norm(self.correls[i] - self.correls[j]) / self.n**2
+        if self.correls[i] is None or self.correls[j] is None:
+            return np.nan
+        else:
+            return np.linalg.norm(self.correls[i] - self.correls[j]) / self.n**2
 
 class ErosMetric:
     def __init__(self, dataset, agg):
