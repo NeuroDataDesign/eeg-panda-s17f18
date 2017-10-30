@@ -89,6 +89,14 @@ class CovarianceMatrixPlotter(SquareMatrixPlotter):
             cov = D.dot(D.T)
         return cov
 
+class EigenvectorMatrixPlotter(SquareMatrixPlotter):
+    plotname = "Eigenvector Matrix"
+
+    def squareComputation(self, D):
+        with np.errstate(divide = 'ignore', invalid = 'ignore'):
+            U, _, _, _ = PCA(D)
+        return U
+
 class EnergyDistanceMatrixPlotter(SquareMatrixPlotter):
     plotname = "Energy Distance Matrix"
 
@@ -108,6 +116,67 @@ class EnergyDistanceMatrixPlotter(SquareMatrixPlotter):
                 ed[i, j] = energy_distance(x, y)
                 ed[j, i] = ed[i, j]
         return ed
+
+
+class MDSPairsPlotter(BasePlotter):
+    num_components = 5
+    plotname = "MDS Pairs Plotter"
+
+    def plot(self, *args, **kwargs):
+        D, titleheader = self.getInfo(*args, **kwargs)
+        title = titleheader + self.plotname 
+        emb = self.computeEmbedding(D)
+        Pdf = pd.DataFrame(emb, columns = ["Factor" + str(x) for x in range(1, self.num_components + 1)])
+        if Pdf.shape[0] > 500:
+            g = sns.PairGrid(Pdf)
+            g.map_diag(plt.hist)
+            g.map_offdiag(plt.hexbin,
+                          linewidths=0,
+                          gridsize=20,
+                          bins = 'log',
+                          cmap=sns.light_palette("blue", as_cmap=True))
+        else:
+            sns.pairplot(data=Pdf, diag_kind="kde", markers="+",
+                         diag_kws=dict(shade=True))
+        plt.subplots_adjust(top=0.9)
+        plt.suptitle(title)
+        plt.show()
+
+    def computeEmbedding(self, M):
+        mds = MDS(n_components = self.num_components, dissimilarity="precomputed")
+        mds.fit(M)
+        emb = mds.embedding_
+        return emb
+
+class TSNEPairsPlotter(BasePlotter):
+    num_components = 3
+    plotname = "TSNE Pairs Plotter"
+
+    def plot(self, *args, **kwargs):
+        D, titleheader = self.getInfo(*args, **kwargs)
+        title = titleheader + self.plotname 
+        emb = self.computeEmbedding(D)
+        Pdf = pd.DataFrame(emb, columns = ["Factor" + str(x) for x in range(1, self.num_components + 1)])
+        if Pdf.shape[0] > 500:
+            g = sns.PairGrid(Pdf)
+            g.map_diag(plt.hist)
+            g.map_offdiag(plt.hexbin,
+                          linewidths=0,
+                          gridsize=20,
+                          bins = 'log',
+                          cmap=sns.light_palette("blue", as_cmap=True))
+        else:
+            sns.pairplot(data=Pdf, diag_kind="kde", markers="+",
+                         diag_kws=dict(shade=True))
+        plt.subplots_adjust(top=0.9)
+        plt.suptitle(title)
+        plt.show()
+
+    def computeEmbedding(self, M):
+        tsne = TSNE(n_components = self.num_components, metric="precomputed")
+        tsne.fit(M)
+        emb = tsne.embedding_
+        return emb
 
 class EigenvectorPairsPlotter(BasePlotter):
     plotname = "Eigenvectors Pairs Plot"
@@ -244,6 +313,13 @@ class MDSScatterPlotter(PDScatterPlotter):
         mds.fit(M)
         emb = mds.embedding_
         return emb
+
+class PCAScatterPlotter(PDScatterPlotter):
+    plotname = "PCA Embedding Scatter Plotter"
+
+    def computeEmbedding(self, M):
+        U, s, Vt, m = PCA(M) 
+        return (U[:, :2].T.dot(M)).T
 
 class ParallelCoordinatePlotter(BasePlotter):
     plotname = "Parallel Coordinate Plot"
