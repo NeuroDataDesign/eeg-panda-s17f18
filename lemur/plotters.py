@@ -57,3 +57,15 @@ class Embedding2DScatter(DistanceMatrixPlotter):
         plt.title(title)
         plt.show()
 
+class EmbeddingPairsPlotter(DistanceMatrixPlotter):
+    titlestring = "%s embedding of %s distance matrix Pairs Plot"
+
+    def plot(self, embedder):
+        title = self.titlestring % (embedder.embedding_name, self.metric_name)
+        emb = embedder.embed(self.dm)
+        Pdf = pd.DataFrame(emb, columns = ["factor %s"%x for x in range(1, emb.shape[1] + 1)])
+        Pdf[self.label_name] = self.label
+        sns.pairplot(data=Pdf, hue=self.label_name, diag_kind="hist")
+        plt.subplots_adjust(top=0.9)
+        plt.suptitle(title)
+        plt.show()
