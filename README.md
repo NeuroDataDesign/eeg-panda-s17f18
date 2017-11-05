@@ -1,3 +1,3 @@
 # lemur-s17f18
-![](https://user-images.githubusercontent.com/10272301/30820602-5ffd1e18-a1f0-11e7-9022-45ea8d243b76.jpg)
+![](https://user-images.githubusercontent.com/10272301/32417867-a9e85e72-c22d-11e7-9f56-9f1dd2b062c0.png)
 Multi-Modal Neuroimaging visualizaitons made easy!
