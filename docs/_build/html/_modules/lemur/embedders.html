@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>lemur.embedders &#8212; Lemur 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          Lemur</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary">
+<form action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
+  <h1>Source code for lemur.embedders</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="k">import</span> <span class="n">TSNE</span><span class="p">,</span> <span class="n">MDS</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="BaseEmbedder"><a class="viewcode-back" href="../../lemur.html#lemur.embedders.BaseEmbedder">[docs]</a><span class="k">class</span> <span class="nc">BaseEmbedder</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A generic embedder object to be extended.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    num_components : int</span>
+<span class="sd">	The number of dimensions the embedding should have.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    num_components : int</span>
+<span class="sd">        The number of dimensions the embedding should have.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_components</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_components</span> <span class="o">=</span> <span class="n">num_components</span></div>
+
+<div class="viewcode-block" id="MDSEmbedder"><a class="viewcode-back" href="../../lemur.html#lemur.embedders.MDSEmbedder">[docs]</a><span class="k">class</span> <span class="nc">MDSEmbedder</span><span class="p">(</span><span class="n">BaseEmbedder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A MultiDimensional Scaling embedder.</span>
+
+<span class="sd">    This uses the sklearn.manifold.MDS function.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    embedding_name : str</span>
+<span class="sd">        The name of this embedding (default is `MDS`)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">embedding_name</span> <span class="o">=</span> <span class="s2">&quot;MDS&quot;</span>
+<div class="viewcode-block" id="MDSEmbedder.embed"><a class="viewcode-back" href="../../lemur.html#lemur.embedders.MDSEmbedder.embed">[docs]</a>    <span class="k">def</span> <span class="nf">embed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Embed a distance matrix using MDS.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        M : :obj:`ndarray`</span>
+<span class="sd">            The distance matrix to be embedded</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`ndarray`</span>
+<span class="sd">            A :obj:`ndarray` of the embedding.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mds</span> <span class="o">=</span> <span class="n">MDS</span><span class="p">(</span><span class="n">n_components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_components</span><span class="p">,</span> <span class="n">dissimilarity</span><span class="o">=</span><span class="s2">&quot;precomputed&quot;</span><span class="p">)</span>
+        <span class="n">mds</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+        <span class="n">emb</span> <span class="o">=</span> <span class="n">mds</span><span class="o">.</span><span class="n">embedding_</span>
+        <span class="k">return</span> <span class="n">emb</span></div></div>
+
+<div class="viewcode-block" id="TSNEEmbedder"><a class="viewcode-back" href="../../lemur.html#lemur.embedders.TSNEEmbedder">[docs]</a><span class="k">class</span> <span class="nc">TSNEEmbedder</span><span class="p">(</span><span class="n">BaseEmbedder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A TSNE embedder.</span>
+
+<span class="sd">    This uses the sklearn.manifold.TSNE function.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    embedding_name : str</span>
+<span class="sd">        The name of this embedding (default is `TSNE`)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">embedding_name</span> <span class="o">=</span> <span class="s2">&quot;TSNE&quot;</span>
+<div class="viewcode-block" id="TSNEEmbedder.embed"><a class="viewcode-back" href="../../lemur.html#lemur.embedders.TSNEEmbedder.embed">[docs]</a>    <span class="k">def</span> <span class="nf">embed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Embed a distance matrix using TSNE.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        M : :obj:`ndarray`</span>
+<span class="sd">            The distance matrix to be embedded</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`ndarray`</span>
+<span class="sd">            A :obj:`ndarray` of the embedding.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tsne</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">n_components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_components</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;precomputed&quot;</span><span class="p">)</span>
+        <span class="n">tsne</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+        <span class="n">emb</span> <span class="o">=</span> <span class="n">tsne</span><span class="o">.</span><span class="n">embedding_</span>
+        <span class="k">return</span> <span class="n">emb</span> </div></div>
+
+<div class="viewcode-block" id="SVD"><a class="viewcode-back" href="../../lemur.html#lemur.embedders.SVD">[docs]</a><span class="k">def</span> <span class="nf">SVD</span><span class="p">(</span><span class="n">D</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A helper function to do SVD.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    D : :obj:`ndarray`</span>
+<span class="sd">        The matrix to compute SVD on.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    U : :obj:`ndarray`</span>
+<span class="sd">        An :obj:`ndarray` of the left singular matrix.</span>
+<span class="sd">    s : :obj:`ndarray`</span>
+<span class="sd">        An :obj:`ndarray` of the singular values (just a vector, not a square matrix).</span>
+<span class="sd">    Vt : :obj:`ndarray`</span>
+<span class="sd">        An :obj:`ndarray` of the right singular matrix.</span>
+<span class="sd">    m : :obj:`ndarray`</span>
+<span class="sd">        An :obj:`ndarray` of the affine translation required to center the data  (just a vector, not a square matrix).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">D</span> <span class="o">-</span> <span class="n">mu</span>
+    <span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">Vt</span><span class="p">,</span> <span class="n">mu</span></div>
+
+<div class="viewcode-block" id="PCAEmbedder"><a class="viewcode-back" href="../../lemur.html#lemur.embedders.PCAEmbedder">[docs]</a><span class="k">class</span> <span class="nc">PCAEmbedder</span><span class="p">(</span><span class="n">BaseEmbedder</span><span class="p">):</span>
+    <span class="n">embedding_name</span> <span class="o">=</span> <span class="s2">&quot;PCA&quot;</span>
+<div class="viewcode-block" id="PCAEmbedder.embed"><a class="viewcode-back" href="../../lemur.html#lemur.embedders.PCAEmbedder.embed">[docs]</a>    <span class="k">def</span> <span class="nf">embed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">Vt</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">SVD</span><span class="p">(</span><span class="n">M</span><span class="p">)</span> 
+        <span class="k">return</span> <span class="p">(</span><span class="n">U</span><span class="p">[:,</span> <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">num_components</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">M</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>  </div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2017, Team Red Lemur.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
