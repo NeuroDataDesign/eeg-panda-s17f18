@@ -8,6 +8,28 @@ import numpy as np
 from ipywidgets import interact
 
 class DistanceMatrixPlotter:
+    """A generic aggregate plotter acting on a distance matrix to be extended.
+
+    Parameters
+    ----------
+    dm : :obj:`DistanceMatrix`
+        The distance matrix object.
+    primary_label : string
+        The name of the column of the dataset which contains the primary label. By default, this is the `resource_path` column which is just the path to the data point resource.
+    Attributes
+    ----------
+    dataset_name : string
+        The name of the dataset from which this distance matrix was computed.
+    dm : :obj:`ndarray`
+        The distance matrix.
+    label_name : string
+        The name of the primary label to be conditioned on in some plots.
+    label : :obj:`list`
+        A list of labels (the primary label) for each data point.
+    metric_name : string
+        The name of the metric which with the distance matrix was computed.
+
+    """
 
     def __init__(self, dm, primary_label = "resource_path"):
         self.dataset_name = dm.dataset.name
@@ -21,6 +43,9 @@ class DistanceMatrixHeatmap(DistanceMatrixPlotter):
     titlestring = "%s Distance Matrix Heatmap under %s metric"
 
     def plot(self):
+        """Constructs a distance matrix heatmap using the :obj:`DistanceMatrix` object, in plotly.
+
+        """
         title = self.titlestring % (self.dataset_name, self.metric_name)
         xaxis = go.XAxis(
                 title="data points",
@@ -46,6 +71,11 @@ class DistanceMatrixEigenvectorHeatmap(DistanceMatrixPlotter):
     titlestring = "%s Distance Matrix Eigenvector Heatmap under %s metric"
 
     def plot(self):
+        """Constructs an eigenvector heatmap of the :obj:`DistanceMatrix` object, in plotly.
+
+        This essentially a heatmap of the square left eigenvector matrix.
+
+        """
         title = self.titlestring % (self.dataset_name, self.metric_name)
         U, _, _ = np.linalg.svd(self.dm, full_matrices=False)
         xaxis = go.XAxis(
@@ -72,6 +102,9 @@ class DistanceMatrixScreePlotter(DistanceMatrixPlotter):
     titlestring = "%s Distance Matrix Scree Plot under %s metric"
 
     def plot(self):
+        """Constructs a scree plot of the spectrum of the :obj:`DistanceMatrix` object, in plotly.
+
+        """
         title = self.titlestring % (self.dataset_name, self.metric_name)
         _, S, _ = np.linalg.svd(self.dm, full_matrices=False)
         y = S
@@ -101,6 +134,14 @@ class Embedding2DScatter(DistanceMatrixPlotter):
     titlestring = "%s 2D %s Embedding Scatter under %s metric"
 
     def plot(self, embedder):
+        """Constructs a 2d scatter plot of the embedded :obj:`DistanceMatrix` object, colorized by primary label.
+
+        Parameters
+        ----------
+        embedder : :obj:`BaseEmbedder`
+            An embedder object which should be used to embed the data into 2d space.
+
+        """
         title = self.titlestring % (self.dataset_name, embedder.embedding_name, self.metric_name)
         emb = embedder.embed(self.dm)
         d = {
@@ -121,6 +162,14 @@ class EmbeddingHeatmap(DistanceMatrixPlotter):
     titlestring = "%s %s Embedding Heatmap under %s metric"
 
     def plot(self, embedder):
+        """Constructs a heatmap of the embedded :obj:`DistanceMatrix` object.
+
+        Parameters
+        ----------
+        embedder : :obj:`BaseEmbedder`
+            An embedder object which should be used to embed the data.
+
+        """
         title = self.titlestring % (self.dataset_name, embedder.embedding_name, self.metric_name)
         emb = embedder.embed(self.dm).T
         xaxis = go.XAxis(
@@ -147,6 +196,14 @@ class EmbeddingPairsPlotter(DistanceMatrixPlotter):
     titlestring = "%s %s Embedding Pairs Plot under %s metric"
 
     def plot(self, embedder):
+        """Constructs a pairs plot of the embedded :obj:`DistanceMatrix` object dimensions.
+
+        Parameters
+        ----------
+        embedder : :obj:`BaseEmbedder`
+            An embedder object which should be used to embed the data.
+
+        """
         title = self.titlestring % (self.dataset_name, embedder.embedding_name, self.metric_name)
         emb = embedder.embed(self.dm)
         Pdf = pd.DataFrame(emb, columns = ["factor %s"%x for x in range(1, emb.shape[1] + 1)])
@@ -160,6 +217,14 @@ class EmbeddingParallelCoordinatePlotter(DistanceMatrixPlotter):
     titlestring = "%s %s Embedding Parallel Coordinate Plot under %s metric"
 
     def plot(self, embedder):
+        """Constructs a parallel coordinate plot of the embedded :obj:`DistanceMatrix` object.
+
+        Parameters
+        ----------
+        embedder : :obj:`BaseEmbedder`
+            An embedder object which should be used to embed the data.
+
+        """
         title = self.titlestring % (self.dataset_name, embedder.embedding_name, self.metric_name)
         emb = embedder.embed(self.dm)
         D = emb.T
@@ -190,6 +255,9 @@ class DendrogramPlotter(DistanceMatrixPlotter):
     titlestring = "%s Dendrogram under %s metric"
 
     def plot(self):
+        """Constructs a dendrogram using the :obj:`DistanceMatrix` object, in plotly.
+
+        """
         title = self.titlestring % (self.dataset_name, self.metric_name)
         observations = np.zeros([2, 2])
         unique_labels = np.unique(self.label)
@@ -211,6 +279,35 @@ class DendrogramPlotter(DistanceMatrixPlotter):
         iplot(dendro)
 
 class TimeSeriesPlotter:
+    """A generic one-to-one plotter for time series data to be extended.
+
+    Parameters
+    ----------
+    data : :obj:`ndarray`
+        The time series data.
+    resource_name : string
+        The name of the time series being plotted.
+    row_name : string
+        The name of the rows in the time-series (e.g. channels, sources. ect.).
+    column_name : string
+        The name of the columns in the time-series (e.g. time points, time steps, seconds, ect.).
+
+    Attributes
+    ----------
+    data : :obj:`ndarray`
+        The time series data.
+    d : int
+        The number of dimensions in the time series
+    n : int
+        The number of time points in the time series
+    row_name : string
+        The name of the rows in the time-series (e.g. channels, sources. ect.).
+    column_name : string
+        The name of the columns in the time-series (e.g. time points, time steps, seconds, ect.).
+    resource_name : string
+        The name of the time series being plotted.
+
+    """
 
     def __init__(self, data, resource_name = "single resource", 
                  row_name = "sources", col_name = "time points"):
@@ -224,6 +321,18 @@ class SparkLinePlotter(TimeSeriesPlotter):
     titlestring = "Sparklines for %s"
 
     def plot(self, sample_freq):
+        """Constructs a downsampled spark line plot of the time series.
+
+        If there are more than 500 time points, the time series will be down sampled to
+        500 column variables by windowed averaging. This is done by splitting the time series 
+        into 500 equal sized segments in the time domain, then plotting the mean for each segment.
+
+        Parameters
+        ----------
+        sample_freq : int
+            The sampling frequency (how many times sampled per second).
+
+        """
         title = self.titlestring % (self.resource_name)
         xaxis = dict(
             title = "Time in Seconds"
