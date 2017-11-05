@@ -23,12 +23,14 @@ class DistanceMatrixHeatmap(DistanceMatrixPlotter):
     def plot(self):
         title = self.titlestring % (self.dataset_name, self.metric_name)
         xaxis = go.XAxis(
+                title="data points",
                 ticktext = self.label,
                 ticks = "",
                 showticklabels=False,
                 mirror=True,
                 tickvals = [i for i in range(len(self.label))])
         yaxis = go.YAxis(
+                title="data points",
                 ticktext = self.label,
                 ticks = "",
                 showticklabels=False,
@@ -47,12 +49,14 @@ class DistanceMatrixEigenvectorHeatmap(DistanceMatrixPlotter):
         title = self.titlestring % (self.dataset_name, self.metric_name)
         U, _, _ = np.linalg.svd(self.dm, full_matrices=False)
         xaxis = go.XAxis(
+                title="eigenvectors",
                 ticktext = ["Eigenvector %s"%i for i in range(1, len(self.label) + 1)],
                 ticks = "",
                 showticklabels=False,
                 mirror=True,
                 tickvals = [i for i in range(len(self.label))])
         yaxis = go.YAxis(
+                title="eigenvector components",
                 ticktext = ["Component %s"%i for i in range(1, len(self.label) + 1)],
                 ticks = "",
                 showticklabels=False,
@@ -112,6 +116,32 @@ class Embedding2DScatter(DistanceMatrixPlotter):
                     hue=self.label_name)
         plt.title(title)
         plt.show()
+
+class EmbeddingHeatmap(DistanceMatrixPlotter):
+    titlestring = "%s %s Embedding Heatmap under %s metric"
+
+    def plot(self, embedder):
+        title = self.titlestring % (self.dataset_name, embedder.embedding_name, self.metric_name)
+        emb = embedder.embed(self.dm).T
+        xaxis = go.XAxis(
+                title="data points",
+                ticktext = self.label,
+                ticks = "",
+                showticklabels=False,
+                mirror=True,
+                tickvals = [i for i in range(len(self.label))])
+        yaxis = go.YAxis(
+                title="embedding dimensions",
+                ticktext = ["factor %s"%i for i in range(1, len(self.label) + 1)],
+                ticks = "",
+                showticklabels=False,
+                mirror=True,
+                tickvals = [i for i in range(len(self.label))])
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis, width=600, height=600)
+        trace = go.Heatmap(z = emb)
+        data = [trace]
+        fig = dict(data=data, layout=layout)
+        iplot(fig)
 
 class EmbeddingPairsPlotter(DistanceMatrixPlotter):
     titlestring = "%s %s Embedding Pairs Plot under %s metric"
