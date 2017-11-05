@@ -1,5 +1,6 @@
 from plotly.offline import iplot
 import plotly.graph_objs as go
+import plotly.figure_factory as ff
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -101,3 +102,27 @@ class EmbeddingParallelCoordinatePlotter(DistanceMatrixPlotter):
         )
         fig = dict(data = data, layout = layout)
         iplot(fig)
+
+class DendrogramPlotter(DistanceMatrixPlotter):
+    titlestring = "%s Dendrogram under %s metric"
+
+    def plot(self):
+        title = self.titlestring % (self.dataset_name, self.metric_name)
+        observations = np.zeros([2, 2])
+        unique_labels = np.unique(self.label)
+        label_to_number = dict(zip(unique_labels, range(1, len(unique_labels) + 1)))
+        number_labels = [label_to_number[l] for l in self.label]
+        def distance_function(x):
+            return self.dm[np.triu_indices(self.dm.shape[0], k=1)].flatten()
+
+        dendro = ff.create_dendrogram(X = observations,
+                                      distfun = distance_function,
+                                      labels=number_labels)
+        dendro.layout.update(dict(title=title))
+        dendro.layout.xaxis.update(dict(ticktext=self.label,
+                                        title=self.label_name,
+                                        ticklen=2))
+        dendro.layout.xaxis.tickfont.update(dict(size=8))
+        dendro.layout.yaxis.update(dict(title=self.metric_name))
+        dendro.layout.margin.update(dict(b = 100))
+        iplot(dendro)
