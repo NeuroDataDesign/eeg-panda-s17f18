@@ -40,6 +40,30 @@ class DistanceMatrixHeatmap(DistanceMatrixPlotter):
         fig = dict(data=data, layout=layout)
         iplot(fig)
 
+class DistanceMatrixEigenvectorHeatmap(DistanceMatrixPlotter):
+    titlestring = "%s Distance Matrix Eigenvector Heatmap under %s metric"
+
+    def plot(self):
+        title = self.titlestring % (self.dataset_name, self.metric_name)
+        U, _, _ = np.linalg.svd(self.dm, full_matrices=False)
+        xaxis = go.XAxis(
+                ticktext = ["Eigenvector %s"%i for i in range(1, len(self.label) + 1)],
+                ticks = "",
+                showticklabels=False,
+                mirror=True,
+                tickvals = [i for i in range(len(self.label))])
+        yaxis = go.YAxis(
+                ticktext = ["Component %s"%i for i in range(1, len(self.label) + 1)],
+                ticks = "",
+                showticklabels=False,
+                mirror=True,
+                tickvals = [i for i in range(len(self.label))])
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis, width=600, height=600)
+        trace = go.Heatmap(z = U)
+        data = [trace]
+        fig = dict(data=data, layout=layout)
+        iplot(fig)
+
 class DistanceMatrixScreePlotter(DistanceMatrixPlotter): 
     titlestring = "%s Distance Matrix Scree Plot under %s metric"
 
