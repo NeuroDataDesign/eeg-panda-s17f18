@@ -40,6 +40,35 @@ class DistanceMatrixHeatmap(DistanceMatrixPlotter):
         fig = dict(data=data, layout=layout)
         iplot(fig)
 
+class DistanceMatrixScreePlotter(DistanceMatrixPlotter): 
+    titlestring = "%s Distance Matrix Scree Plot under %s metric"
+
+    def plot(self):
+        title = self.titlestring % (self.dataset_name, self.metric_name)
+        _, S, _ = np.linalg.svd(self.dm, full_matrices=False)
+        y = S
+        x = np.arange(1, len(S) + 1)
+        sy = np.sum(y)
+        cy = np.cumsum(y)
+        xaxis = dict(
+            title = 'Factors'
+        )
+        yaxis = dict(
+            title = 'Proportion of Total Variance'
+        )
+        var = go.Scatter(mode = 'lines+markers',
+                         x = x,
+                         y = y / sy,
+                         name = "Variance")
+        cumvar = go.Scatter(mode = 'lines+markers',
+                            x = x,
+                            y = cy / sy,
+                            name = "Cumulative Variance")
+        data = [var, cumvar]
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        fig = dict(data=data, layout=layout)
+        iplot(fig)
+    
 class Embedding2DScatter(DistanceMatrixPlotter):
     titlestring = "%s 2D %s Embedding Scatter under %s metric"
 
