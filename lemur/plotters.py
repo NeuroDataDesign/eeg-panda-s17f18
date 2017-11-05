@@ -209,3 +209,37 @@ class DendrogramPlotter(DistanceMatrixPlotter):
         dendro.layout.yaxis.update(dict(title=self.metric_name))
         dendro.layout.margin.update(dict(b = 100))
         iplot(dendro)
+
+class TimeSeriesPlotter:
+
+    def __init__(self, data, resource_name = "single resource", 
+                 row_name = "sources", col_name = "time points"):
+        self.data = data
+        self.d, self.n = data.shape
+        self.row_name = row_name
+        self.col_name = col_name
+        self.resource_name = resource_name
+
+class SparkLinePlotter(TimeSeriesPlotter):
+    titlestring = "Sparklines for %s"
+
+    def plot(self, sample_freq):
+        title = self.titlestring % (self.resource_name)
+        xaxis = dict(
+            title = "Time in Seconds"
+        )
+        yaxis = dict(
+            title = "Intensity"
+        )
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        if self.n > 500:
+            winsize = self.n // 500
+            df = pd.DataFrame(self.data.T)
+            df = df.groupby(lambda x: x // winsize).mean()
+            downsampled_data = df.as_matrix().T
+            data = [dict(mode="lines",
+                         hoverinfo="none",
+                         x=(np.arange(downsampled_data.shape[1]) * winsize) / sample_freq,
+                         y=downsampled_data[i, :]) for i in range(downsampled_data.shape[0])]
+        fig = dict(data=data, layout=layout)
+        iplot(fig)
