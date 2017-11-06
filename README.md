@@ -5,6 +5,8 @@ Welcome to Lemur!
 Lemur is a library to assist in the aggregate and one-to-one visualization of any set of data points. This tool was build to help in the visualize multi-modal neuroscience/psychology datasets, but it can be used for any set of objects and similarity / dissimilarity function acting on pairs of such objects.
 
 ### Sprint 1 Release:
+[Sprint 1 Demo Slides](https://docs.google.com/presentation/d/1WhvT_KDLle6KnK6QdVPW1PvJf-FzisBHaIJUEnq5vf0/edit?usp=sharing)
+
 ##### Demos
 * [EEG Demo](https://nbviewer.jupyter.org/github/NeuroDataDesign/lemur-f17s18/blob/master/docs/notebooks/rmarren1/Lemur%20EEG.ipynb)
 * [fMRI Demo](https://nbviewer.jupyter.org/github/NeuroDataDesign/lemur-f17s18/blob/master/docs/notebooks/rmarren1/Lemur%20fMRI.ipynb)
@@ -18,7 +20,6 @@ Lemur is a library to assist in the aggregate and one-to-one visualization of an
   * [Motivating Research](https://github.com/NeuroDataDesign/lemur-f17s18/blob/master/docs/group/proposal/Literature%20Scoping.pdf)
   * [Proposal Slides](https://github.com/NeuroDataDesign/lemur-f17s18/blob/master/docs/group/proposal/proposal.pdf)
   * [Statement of Work](https://github.com/NeuroDataDesign/lemur-f17s18/blob/master/docs/group/proposal/sow.md)
-  * 
 
 ##### Download
 * [PyPI release](https://pypi.python.org/pypi/redlemur)
