@@ -118,6 +118,8 @@
       
   <h1>Source code for lemur.metrics</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.signal</span> <span class="k">as</span> <span class="nn">signal</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
 
 <div class="viewcode-block" id="FroCorr"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.FroCorr">[docs]</a><span class="k">class</span> <span class="nc">FroCorr</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;An implementation the Frobenius-norm-of-correlation-matricies metric.</span>
@@ -125,7 +127,7 @@
 <span class="sd">    This is not a class to be instantiated, but rather a way to organize and separate the </span>
 <span class="sd">    parameterization and comparison steps of the metric calculation to optimize a distance </span>
 <span class="sd">    matrix computation (e.g., compute the correlation matrix for each datapoint `once`, then</span>
-<span class="sd">    just compare correlation matricies.</span>
+<span class="sd">    just compare correlation matricies).</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
         
@@ -148,6 +150,51 @@
 
 <div class="viewcode-block" id="FroCorr.compare"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.FroCorr.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute the euclidian distance of two correlation matricies.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : :obj:`ndarray`</span>
+<span class="sd">            The left correlation matrix argument.</span>
+<span class="sd">        y : :obj:`ndarray`</span>
+<span class="sd">            The left correlation matrix argument.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The distance.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="DiffAve"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.DiffAve">[docs]</a><span class="k">class</span> <span class="nc">DiffAve</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A MRI distance. The euclidian distance of the average voxel intensity volumes.</span>
+
+<span class="sd">    This is not a class to be instantiated, but rather a way to organize and separate the </span>
+<span class="sd">    parameterization and comparison steps of the metric calculation to optimize a distance </span>
+<span class="sd">    matrix computation (e.g., compute the correlation matrix for each datapoint `once`, then</span>
+<span class="sd">    just compare correlation matricies).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+        
+<div class="viewcode-block" id="DiffAve.parameterize"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.DiffAve.parameterize">[docs]</a>    <span class="k">def</span> <span class="nf">parameterize</span><span class="p">(</span><span class="n">D</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute the correlation matrix of a single data point.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        D : :obj:`DataSet`</span>
+<span class="sd">            The lemur data set object to parameterize.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`list` of :obj:`ndarray`</span>
+<span class="sd">            The average of each object in the dataset.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">j</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">getResource</span><span class="p">(</span><span class="n">j</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">N</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="DiffAve.compare"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.DiffAve.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute the euclidian distance of two average volumes.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -208,8 +255,7 @@
     <span class="sd">&quot;&quot;&quot;An implementation of the coherence metric.</span>
 <span class="sd">    </span>
 <span class="sd">    This is not a class to be instantiated, but just a method to calculate the intra-datapoint</span>
-<span class="sd">    coherence distance. This metric can then be used with a metric such as FroCorr to compute</span>
-<span class="sd">    a distance between datapoints.</span>
+<span class="sd">    coherence distance.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     
@@ -234,7 +280,7 @@
         <span class="n">coherence_pars</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">dat</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">dat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
 
         <span class="n">pool</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">NUM_WORKERS</span><span class="p">)</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">map_async</span><span class="p">(</span><span class="n">get_coh</span><span class="p">,</span> <span class="n">coherence_pars</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">map_async</span><span class="p">(</span><span class="n">Coh</span><span class="o">.</span><span class="n">get_coh</span><span class="p">,</span> <span class="n">coherence_pars</span><span class="p">)</span>
         <span class="n">coherence_vals</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">dat</span><span class="p">),</span> <span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">coherence_pars</span><span class="p">,</span> <span class="n">coherence_vals</span><span class="p">):</span>
@@ -246,7 +292,26 @@
 <div class="viewcode-block" id="Coh.get_coh"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.Coh.get_coh">[docs]</a>    <span class="k">def</span> <span class="nf">get_coh</span><span class="p">(</span><span class="n">tup</span><span class="p">):</span>
         <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">dat</span> <span class="o">=</span> <span class="n">tup</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">tup</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">coherence</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">dat</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="p">:],</span> <span class="n">fs</span><span class="o">=</span><span class="mi">500</span><span class="p">)[</span><span class="mi">1</span><span class="p">]))</span></div></div>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">coherence</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">dat</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="p">:],</span> <span class="n">fs</span><span class="o">=</span><span class="mi">500</span><span class="p">)[</span><span class="mi">1</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="Coh.compare"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.Coh.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute the euclidian distance of two correlation matricies.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : :obj:`ndarray`</span>
+<span class="sd">            The left correlation matrix argument.</span>
+<span class="sd">        y : :obj:`ndarray`</span>
+<span class="sd">            The left correlation matrix argument.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The distance.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span></div></div>
+
 </pre></div>
 
     </div>

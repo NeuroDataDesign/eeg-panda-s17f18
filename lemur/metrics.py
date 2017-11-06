@@ -8,7 +8,7 @@ class FroCorr:
     This is not a class to be instantiated, but rather a way to organize and separate the 
     parameterization and comparison steps of the metric calculation to optimize a distance 
     matrix computation (e.g., compute the correlation matrix for each datapoint `once`, then
-    just compare correlation matricies.
+    just compare correlation matricies).
 
     """
         
@@ -53,7 +53,7 @@ class DiffAve:
     This is not a class to be instantiated, but rather a way to organize and separate the 
     parameterization and comparison steps of the metric calculation to optimize a distance 
     matrix computation (e.g., compute the correlation matrix for each datapoint `once`, then
-    just compare correlation matricies.
+    just compare correlation matricies).
 
     """
         
@@ -136,8 +136,7 @@ class Coh:
     """An implementation of the coherence metric.
     
     This is not a class to be instantiated, but just a method to calculate the intra-datapoint
-    coherence distance. This metric can then be used with a metric such as FroCorr to compute
-    a distance between datapoints.
+    coherence distance.
 
     """
     
