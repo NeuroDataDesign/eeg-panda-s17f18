@@ -1,4 +1,6 @@
 import numpy as np
+import scipy.signal as signal
+import multiprocessing
 
 class FroCorr:
     """An implementation the Frobenius-norm-of-correlation-matricies metric.
@@ -160,7 +162,7 @@ class Coh:
         coherence_pars = [(i, j, dat) for i in range(dat.shape[0]) for j in range(i, dat.shape[0])]
 
         pool = multiprocessing.Pool(processes=NUM_WORKERS)
-        results = pool.map_async(get_coh, coherence_pars)
+        results = pool.map_async(Coh.get_coh, coherence_pars)
         coherence_vals = results.get()
 
         for ((i, j, dat), val) in zip(coherence_pars, coherence_vals):
@@ -173,3 +175,22 @@ class Coh:
         i, j, dat = tup[0], tup[1], tup[2]
         with np.errstate(divide = 'ignore', invalid = 'ignore'):
             return np.mean(np.nan_to_num(signal.coherence(dat[i, :], dat[j, :], fs=500)[1]))
+
+    def compare(x, y):
+        """Compute the euclidian distance of two correlation matricies.
+
+        Parameters
+        ----------
+        x : :obj:`ndarray`
+            The left correlation matrix argument.
+        y : :obj:`ndarray`
+            The left correlation matrix argument.
+
+        Returns
+        -------
+        float
+            The distance.
+
+        """
+        return np.linalg.norm(x - y)
+
