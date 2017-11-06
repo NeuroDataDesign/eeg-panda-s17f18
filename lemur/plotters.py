@@ -406,3 +406,47 @@ class SparkLinePlotter(TimeSeriesPlotter):
                          y=downsampled_data[i, :]) for i in range(downsampled_data.shape[0])]
         fig = dict(data=data, layout=layout)
         self.makeplot(fig)
+
+class SpectrogramPlotter(TimeSeriesPlotter):
+    titlestring = "Spectrograms for %s"
+
+    def plot(self, sample_freq):
+        """Constructs a spectrogram plot of the time series.
+
+
+        Parameters
+        ----------
+        sample_freq : int
+            The sampling frequency (how many times sampled per second).
+
+        """
+        title = self.titlestring % (self.resource_name)
+        xaxis = dict(
+            title = "Hz",
+            range = [0, 10]
+        )
+        yaxis = dict(
+            title = "Intensity",
+            range = [0, 1000]
+        )
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+
+	dt = 1./sample_freq
+	data = [
+	for i in range(1):
+		sample_points = np.arange(self.data.T.shape[1]) * dt
+		signal = self.data.T[i, :]
+		ft = np.fft.fft(signal) * dt
+		ft = ft[: len(sample_points)/2]
+		freq = np.fft.fftfreq(len(sample_points), dt)
+		freq = freq[:len(sample_points)/2]
+
+		trace = go.Scatter(
+			x = freq[:2000],
+			y = np.abs(ft)[:2000],
+			mode = 'markers'
+		)]
+
+	fig= dict(data=data, layout=layout)
+	iplot(fig)
+
