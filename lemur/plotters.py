@@ -351,13 +351,25 @@ class TimeSeriesPlotter:
         self.row_name = row_name
         self.col_name = col_name
         self.resource_name = resource_name
-        self.mode = mode
+        self.plot_mode = mode
 
     def makeplot(self, fig):
+        """Make the plotly figure visable to the user in the way they want.
+
+        Parameters
+        ----------
+        gid : :obj:`figure`
+            An plotly figure.
+
+        """
+        
         if self.plot_mode == "notebook":
             iplot(fig)
         if self.plot_mode == "html":
-            plot(fig, output_type='file', filename="tempplot.html")
+            fig["layout"]["autosize"] = True
+            h = random.getrandbits(128)
+            fname = "%032x.html"%h
+            plot(fig, output_type='file', filename=fname)
 
 class SparkLinePlotter(TimeSeriesPlotter):
     titlestring = "Sparklines for %s"
