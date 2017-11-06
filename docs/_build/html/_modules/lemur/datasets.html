@@ -171,6 +171,51 @@
                 <span class="k">return</span> <span class="n">pkl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
             <span class="k">return</span> <span class="n">pkl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div></div>
 
+<div class="viewcode-block" id="DFDataSet"><a class="viewcode-back" href="../../lemur.html#lemur.datasets.DFDataSet">[docs]</a><span class="k">class</span> <span class="nc">DFDataSet</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A dataset living locally in a Pandas data frame.</span>
+
+<span class="sd">    Columns of the Pandas data frame hold vectors of the same variable for all subjets, while</span>
+<span class="sd">    rows of the Pandas data frame hold vectors of the same subject for all variables.</span>
+
+<span class="sd">    The index of the dataframe should be whatever label you would like to appear on plots.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df_path : str</span>
+<span class="sd">	Path to the .csv file describing the DiskDataSet.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataframe : pandas DataFrame</span>
+<span class="sd">        A DataFrame object describing the dataset.</span>
+<span class="sd">    N : int</span>
+<span class="sd">        The number of observations in the dataset.</span>
+<span class="sd">    name : string</span>
+<span class="sd">        A descriptive name for the dataset.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;mydataset&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">=</span> <span class="n">dataframe</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+<div class="viewcode-block" id="DFDataSet.getResource"><a class="viewcode-back" href="../../lemur.html#lemur.datasets.DFDataSet.getResource">[docs]</a>    <span class="k">def</span> <span class="nf">getResource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a specific data point from the data set.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        index : int</span>
+<span class="sd">            The index of the data point in `D`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`ndarray`</span>
+<span class="sd">            A ndarray of the data point.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span></div></div>
+
+
 <div class="viewcode-block" id="DistanceMatrix"><a class="viewcode-back" href="../../lemur.html#lemur.datasets.DistanceMatrix">[docs]</a><span class="k">class</span> <span class="nc">DistanceMatrix</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;A distance matrix computed from a DataSet object.</span>
 

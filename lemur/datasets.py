@@ -52,6 +52,51 @@ class DiskDataSet:
                 return pkl.load(f).T
             return pkl.load(f)
 
+class DFDataSet:
+    """A dataset living locally in a Pandas data frame.
+
+    Columns of the Pandas data frame hold vectors of the same variable for all subjets, while
+    rows of the Pandas data frame hold vectors of the same subject for all variables.
+
+    The index of the dataframe should be whatever label you would like to appear on plots.
+
+    Parameters
+    ----------
+    df_path : str
+	Path to the .csv file describing the DiskDataSet.
+
+    Attributes
+    ----------
+    dataframe : pandas DataFrame
+        A DataFrame object describing the dataset.
+    N : int
+        The number of observations in the dataset.
+    name : string
+        A descriptive name for the dataset.
+
+    """
+    def __init__(self, dataframe, name = "mydataset"):
+        self.D = dataframe
+        self.N = dataframe.shape[0]
+        self.name = name
+
+    def getResource(self, index):
+        """Get a specific data point from the data set.
+
+        Parameters
+        ----------
+        index : int
+            The index of the data point in `D`.
+
+        Returns
+        -------
+        :obj:`ndarray`
+            A ndarray of the data point.
+
+        """
+        return self.D.iloc[index].as_matrix().astype(float)
+
+
 class DistanceMatrix:
     """A distance matrix computed from a DataSet object.
 
