@@ -139,6 +139,60 @@
 <div class="section" id="module-lemur.datasets">
 <span id="lemur-datasets-module"></span><h2>lemur.datasets module<a class="headerlink" href="#module-lemur.datasets" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="lemur.datasets.DFDataSet">
+<em class="property">class </em><code class="descclassname">lemur.datasets.</code><code class="descname">DFDataSet</code><span class="sig-paren">(</span><em>dataframe</em>, <em>name='mydataset'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/datasets.html#DFDataSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.datasets.DFDataSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A dataset living locally in a Pandas data frame.</p>
+<p>Columns of the Pandas data frame hold vectors of the same variable for all subjets, while
+rows of the Pandas data frame hold vectors of the same subject for all variables.</p>
+<p>The index of the dataframe should be whatever label you would like to appear on plots.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>df_path</strong> (<em>str</em>) – Path to the .csv file describing the DiskDataSet.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="lemur.datasets.DFDataSet.dataframe">
+<code class="descname">dataframe</code><a class="headerlink" href="#lemur.datasets.DFDataSet.dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>pandas DataFrame</em> – A DataFrame object describing the dataset.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lemur.datasets.DFDataSet.N">
+<code class="descname">N</code><a class="headerlink" href="#lemur.datasets.DFDataSet.N" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – The number of observations in the dataset.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lemur.datasets.DFDataSet.name">
+<code class="descname">name</code><a class="headerlink" href="#lemur.datasets.DFDataSet.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>string</em> – A descriptive name for the dataset.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lemur.datasets.DFDataSet.getResource">
+<code class="descname">getResource</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/datasets.html#DFDataSet.getResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.datasets.DFDataSet.getResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a specific data point from the data set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<em>int</em>) – The index of the data point in <cite>D</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A ndarray of the data point.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-obj docutils literal"><span class="pre">ndarray</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="lemur.datasets.DiskDataSet">
 <em class="property">class </em><code class="descclassname">lemur.datasets.</code><code class="descname">DiskDataSet</code><span class="sig-paren">(</span><em>df_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/datasets.html#DiskDataSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.datasets.DiskDataSet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
@@ -391,6 +445,39 @@ linked to by the <cite>resource_path</cite> variable.</p>
 <div class="section" id="module-lemur.metrics">
 <span id="lemur-metrics-module"></span><h2>lemur.metrics module<a class="headerlink" href="#module-lemur.metrics" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="lemur.metrics.Coh">
+<em class="property">class </em><code class="descclassname">lemur.metrics.</code><code class="descname">Coh</code><a class="reference internal" href="_modules/lemur/metrics.html#Coh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.metrics.Coh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>An implementation of the coherence metric.</p>
+<p>This is not a class to be instantiated, but just a method to calculate the intra-datapoint
+coherence distance. This metric can then be used with a metric such as FroCorr to compute
+a distance between datapoints.</p>
+<dl class="method">
+<dt id="lemur.metrics.Coh.get_coh">
+<code class="descname">get_coh</code><span class="sig-paren">(</span><em>tup</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/metrics.html#Coh.get_coh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.metrics.Coh.get_coh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lemur.metrics.Coh.parameterize">
+<code class="descname">parameterize</code><span class="sig-paren">(</span><em>D</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/metrics.html#Coh.parameterize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.metrics.Coh.parameterize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the coherence matrix of a single data point.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>D</strong> (<code class="xref py py-obj docutils literal"><span class="pre">ndarray</span></code>) – A data matrix on which to compute the coherence matrix.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The coherence matrix.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-obj docutils literal"><span class="pre">ndarray</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="lemur.metrics.FroCorr">
 <em class="property">class </em><code class="descclassname">lemur.metrics.</code><code class="descname">FroCorr</code><a class="reference internal" href="_modules/lemur/metrics.html#FroCorr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.metrics.FroCorr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
@@ -431,11 +518,60 @@ just compare correlation matricies.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>D</strong> (<code class="xref py py-obj docutils literal"><span class="pre">ndarray</span></code>) – A data matrix on which to compute the correlation matrix.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>D</strong> (<code class="xref py py-obj docutils literal"><span class="pre">DataSet</span></code>) – The lemur data set object to parameterize.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The correlation matrix.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The correlation matrix of each object in the dataset.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-obj docutils literal"><span class="pre">ndarray</span></code></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal"><span class="pre">ndarray</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lemur.metrics.NanDotProduct">
+<em class="property">class </em><code class="descclassname">lemur.metrics.</code><code class="descname">NanDotProduct</code><a class="reference internal" href="_modules/lemur/metrics.html#NanDotProduct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.metrics.NanDotProduct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>The dot product between two vectors, except nans are just treated as 0.</p>
+<dl class="method">
+<dt id="lemur.metrics.NanDotProduct.compare">
+<code class="descname">compare</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/metrics.html#NanDotProduct.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.metrics.NanDotProduct.compare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the euclidian distance of two correlation matricies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<code class="xref py py-obj docutils literal"><span class="pre">ndarray</span></code>) – The left vector argument.</li>
+<li><strong>y</strong> (<code class="xref py py-obj docutils literal"><span class="pre">ndarray</span></code>) – The left vector argument.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The distance.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="lemur.metrics.NanDotProduct.parameterize">
+<code class="descname">parameterize</code><span class="sig-paren">(</span><em>D</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/metrics.html#NanDotProduct.parameterize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.metrics.NanDotProduct.parameterize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identity function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>D</strong> (<code class="xref py py-obj docutils literal"><span class="pre">DataSet</span></code>) – A dataset.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The a list of each vector in the dataset.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal"><span class="pre">ndarray</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -448,7 +584,7 @@ just compare correlation matricies.</p>
 <span id="lemur-plotters-module"></span><h2>lemur.plotters module<a class="headerlink" href="#module-lemur.plotters" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="lemur.plotters.DendrogramPlotter">
-<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">DendrogramPlotter</code><span class="sig-paren">(</span><em>dm</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#DendrogramPlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.DendrogramPlotter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">DendrogramPlotter</code><span class="sig-paren">(</span><em>dm</em>, <em>mode='notebook'</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#DendrogramPlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.DendrogramPlotter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lemur.plotters.DistanceMatrixPlotter" title="lemur.plotters.DistanceMatrixPlotter"><code class="xref py py-class docutils literal"><span class="pre">lemur.plotters.DistanceMatrixPlotter</span></code></a></p>
 <dl class="method">
 <dt id="lemur.plotters.DendrogramPlotter.plot">
@@ -465,7 +601,7 @@ just compare correlation matricies.</p>
 
 <dl class="class">
 <dt id="lemur.plotters.DistanceMatrixEigenvectorHeatmap">
-<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">DistanceMatrixEigenvectorHeatmap</code><span class="sig-paren">(</span><em>dm</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#DistanceMatrixEigenvectorHeatmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.DistanceMatrixEigenvectorHeatmap" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">DistanceMatrixEigenvectorHeatmap</code><span class="sig-paren">(</span><em>dm</em>, <em>mode='notebook'</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#DistanceMatrixEigenvectorHeatmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.DistanceMatrixEigenvectorHeatmap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lemur.plotters.DistanceMatrixPlotter" title="lemur.plotters.DistanceMatrixPlotter"><code class="xref py py-class docutils literal"><span class="pre">lemur.plotters.DistanceMatrixPlotter</span></code></a></p>
 <dl class="method">
 <dt id="lemur.plotters.DistanceMatrixEigenvectorHeatmap.plot">
@@ -483,7 +619,7 @@ just compare correlation matricies.</p>
 
 <dl class="class">
 <dt id="lemur.plotters.DistanceMatrixHeatmap">
-<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">DistanceMatrixHeatmap</code><span class="sig-paren">(</span><em>dm</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#DistanceMatrixHeatmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.DistanceMatrixHeatmap" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">DistanceMatrixHeatmap</code><span class="sig-paren">(</span><em>dm</em>, <em>mode='notebook'</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#DistanceMatrixHeatmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.DistanceMatrixHeatmap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lemur.plotters.DistanceMatrixPlotter" title="lemur.plotters.DistanceMatrixPlotter"><code class="xref py py-class docutils literal"><span class="pre">lemur.plotters.DistanceMatrixPlotter</span></code></a></p>
 <dl class="method">
 <dt id="lemur.plotters.DistanceMatrixHeatmap.plot">
@@ -500,7 +636,7 @@ just compare correlation matricies.</p>
 
 <dl class="class">
 <dt id="lemur.plotters.DistanceMatrixPlotter">
-<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">DistanceMatrixPlotter</code><span class="sig-paren">(</span><em>dm</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#DistanceMatrixPlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.DistanceMatrixPlotter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">DistanceMatrixPlotter</code><span class="sig-paren">(</span><em>dm</em>, <em>mode='notebook'</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#DistanceMatrixPlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.DistanceMatrixPlotter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>A generic aggregate plotter acting on a distance matrix to be extended.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -545,11 +681,25 @@ just compare correlation matricies.</p>
 <dd><p><em>string</em> – The name of the metric which with the distance matrix was computed.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="lemur.plotters.DistanceMatrixPlotter.makeplot">
+<code class="descname">makeplot</code><span class="sig-paren">(</span><em>fig</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#DistanceMatrixPlotter.makeplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.DistanceMatrixPlotter.makeplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make the plotly figure visable to the user in the way they want.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>gid</strong> (<code class="xref py py-obj docutils literal"><span class="pre">figure</span></code>) – An plotly figure.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="lemur.plotters.DistanceMatrixScreePlotter">
-<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">DistanceMatrixScreePlotter</code><span class="sig-paren">(</span><em>dm</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#DistanceMatrixScreePlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.DistanceMatrixScreePlotter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">DistanceMatrixScreePlotter</code><span class="sig-paren">(</span><em>dm</em>, <em>mode='notebook'</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#DistanceMatrixScreePlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.DistanceMatrixScreePlotter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lemur.plotters.DistanceMatrixPlotter" title="lemur.plotters.DistanceMatrixPlotter"><code class="xref py py-class docutils literal"><span class="pre">lemur.plotters.DistanceMatrixPlotter</span></code></a></p>
 <dl class="method">
 <dt id="lemur.plotters.DistanceMatrixScreePlotter.plot">
@@ -566,7 +716,7 @@ just compare correlation matricies.</p>
 
 <dl class="class">
 <dt id="lemur.plotters.Embedding2DScatter">
-<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">Embedding2DScatter</code><span class="sig-paren">(</span><em>dm</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#Embedding2DScatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.Embedding2DScatter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">Embedding2DScatter</code><span class="sig-paren">(</span><em>dm</em>, <em>mode='notebook'</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#Embedding2DScatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.Embedding2DScatter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lemur.plotters.DistanceMatrixPlotter" title="lemur.plotters.DistanceMatrixPlotter"><code class="xref py py-class docutils literal"><span class="pre">lemur.plotters.DistanceMatrixPlotter</span></code></a></p>
 <dl class="method">
 <dt id="lemur.plotters.Embedding2DScatter.plot">
@@ -591,7 +741,7 @@ just compare correlation matricies.</p>
 
 <dl class="class">
 <dt id="lemur.plotters.EmbeddingHeatmap">
-<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">EmbeddingHeatmap</code><span class="sig-paren">(</span><em>dm</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#EmbeddingHeatmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.EmbeddingHeatmap" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">EmbeddingHeatmap</code><span class="sig-paren">(</span><em>dm</em>, <em>mode='notebook'</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#EmbeddingHeatmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.EmbeddingHeatmap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lemur.plotters.DistanceMatrixPlotter" title="lemur.plotters.DistanceMatrixPlotter"><code class="xref py py-class docutils literal"><span class="pre">lemur.plotters.DistanceMatrixPlotter</span></code></a></p>
 <dl class="method">
 <dt id="lemur.plotters.EmbeddingHeatmap.plot">
@@ -616,7 +766,7 @@ just compare correlation matricies.</p>
 
 <dl class="class">
 <dt id="lemur.plotters.EmbeddingPairsPlotter">
-<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">EmbeddingPairsPlotter</code><span class="sig-paren">(</span><em>dm</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#EmbeddingPairsPlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.EmbeddingPairsPlotter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">EmbeddingPairsPlotter</code><span class="sig-paren">(</span><em>dm</em>, <em>mode='notebook'</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#EmbeddingPairsPlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.EmbeddingPairsPlotter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lemur.plotters.DistanceMatrixPlotter" title="lemur.plotters.DistanceMatrixPlotter"><code class="xref py py-class docutils literal"><span class="pre">lemur.plotters.DistanceMatrixPlotter</span></code></a></p>
 <dl class="method">
 <dt id="lemur.plotters.EmbeddingPairsPlotter.plot">
@@ -641,7 +791,7 @@ just compare correlation matricies.</p>
 
 <dl class="class">
 <dt id="lemur.plotters.EmbeddingParallelCoordinatePlotter">
-<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">EmbeddingParallelCoordinatePlotter</code><span class="sig-paren">(</span><em>dm</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#EmbeddingParallelCoordinatePlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.EmbeddingParallelCoordinatePlotter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">EmbeddingParallelCoordinatePlotter</code><span class="sig-paren">(</span><em>dm</em>, <em>mode='notebook'</em>, <em>primary_label='resource_path'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#EmbeddingParallelCoordinatePlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.EmbeddingParallelCoordinatePlotter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lemur.plotters.DistanceMatrixPlotter" title="lemur.plotters.DistanceMatrixPlotter"><code class="xref py py-class docutils literal"><span class="pre">lemur.plotters.DistanceMatrixPlotter</span></code></a></p>
 <dl class="method">
 <dt id="lemur.plotters.EmbeddingParallelCoordinatePlotter.plot">
@@ -651,7 +801,7 @@ just compare correlation matricies.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>embedder</strong> (<code class="xref py py-obj docutils literal"><span class="pre">BaseEmbedder</span></code>) – An embedder object which should be used to embed the data.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>embedder</strong> (<code class="xref py py-obj docutils literal"><span class="pre">BaseEmbedder</span></code>) – </td>
 </tr>
 </tbody>
 </table>
@@ -666,7 +816,7 @@ just compare correlation matricies.</p>
 
 <dl class="class">
 <dt id="lemur.plotters.SparkLinePlotter">
-<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">SparkLinePlotter</code><span class="sig-paren">(</span><em>data</em>, <em>resource_name='single resource'</em>, <em>row_name='sources'</em>, <em>col_name='time points'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#SparkLinePlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.SparkLinePlotter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">SparkLinePlotter</code><span class="sig-paren">(</span><em>data</em>, <em>mode='notebook'</em>, <em>resource_name='single resource'</em>, <em>row_name='sources'</em>, <em>col_name='time points'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#SparkLinePlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.SparkLinePlotter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lemur.plotters.TimeSeriesPlotter" title="lemur.plotters.TimeSeriesPlotter"><code class="xref py py-class docutils literal"><span class="pre">lemur.plotters.TimeSeriesPlotter</span></code></a></p>
 <dl class="method">
 <dt id="lemur.plotters.SparkLinePlotter.plot">
@@ -694,7 +844,7 @@ into 500 equal sized segments in the time domain, then plotting the mean for eac
 
 <dl class="class">
 <dt id="lemur.plotters.TimeSeriesPlotter">
-<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">TimeSeriesPlotter</code><span class="sig-paren">(</span><em>data</em>, <em>resource_name='single resource'</em>, <em>row_name='sources'</em>, <em>col_name='time points'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#TimeSeriesPlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.TimeSeriesPlotter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">lemur.plotters.</code><code class="descname">TimeSeriesPlotter</code><span class="sig-paren">(</span><em>data</em>, <em>mode='notebook'</em>, <em>resource_name='single resource'</em>, <em>row_name='sources'</em>, <em>col_name='time points'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#TimeSeriesPlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.TimeSeriesPlotter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>A generic one-to-one plotter for time series data to be extended.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -746,6 +896,11 @@ into 500 equal sized segments in the time domain, then plotting the mean for eac
 <code class="descname">resource_name</code><a class="headerlink" href="#lemur.plotters.TimeSeriesPlotter.resource_name" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>string</em> – The name of the time series being plotted.</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="lemur.plotters.TimeSeriesPlotter.makeplot">
+<code class="descname">makeplot</code><span class="sig-paren">(</span><em>fig</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#TimeSeriesPlotter.makeplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.TimeSeriesPlotter.makeplot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
