@@ -84,3 +84,47 @@ class NanDotProduct:
 
         """
         return np.nansum(x * y)
+
+class Coh:
+    """An implementation of the coherence metric.
+    
+    This is not a class to be instantiated, but just a method to calculate the intra-datapoint
+    coherence distance. This metric can then be used with a metric such as FroCorr to compute
+    a distance between datapoints.
+
+    """
+    
+    def parameterize(D):
+        """Compute the coherence matrix of a single data point.
+
+        Parameters
+        ----------
+        D : :obj:`ndarray`
+            A data matrix on which to compute the coherence matrix.
+
+        Returns
+        -------
+        :obj:`ndarray`
+            The coherence matrix.
+
+        """
+        NUM_WORKERS = multiprocessing.cpu_count() - 1
+        dat = D.getResource(0)
+    
+        coherence = np.zeros((dat.shape[0], dat.shape[0]))
+        coherence_pars = [(i, j, dat) for i in range(dat.shape[0]) for j in range(i, dat.shape[0])]
+
+        pool = multiprocessing.Pool(processes=NUM_WORKERS)
+        results = pool.map_async(get_coh, coherence_pars)
+        coherence_vals = results.get()
+
+        for ((i, j, dat), val) in zip(coherence_pars, coherence_vals):
+            coherence[i, j] = val
+            coherence[j, i] = val
+
+        return coherence
+
+    def get_coh(tup):
+        i, j, dat = tup[0], tup[1], tup[2]
+        with np.errstate(divide = 'ignore', invalid = 'ignore'):
+            return np.mean(np.nan_to_num(signal.coherence(dat[i, :], dat[j, :], fs=500)[1]))
