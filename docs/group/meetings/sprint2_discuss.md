@@ -18,7 +18,7 @@
   - **Wants signal processing and implementation experience**
   
   
-- **Sprint 2 Goals**
+### **Sprint 2 Goals**
   - Dockerization + Deployment:
     - Yuka + Ryan/Nitin tap in/out
   - Quantify Distance Metrics
