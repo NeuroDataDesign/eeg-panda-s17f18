@@ -9,14 +9,11 @@
     - Eg the CPAC stuff
   - Many of sprint 2 goals, don't know what they are, would like to explore regardless
   - **Wants to learn how to work with the different CS tools over the algorithms**
-    - Work on the cloudy part
-    
+    - Work on the cloudy part    
 - Vidur
-  - 
-  
+  - fadfs
 - Nitin
-  -
-  
+  - fads
 - Ronak
   - **Wants signal processing and implementation experience**
   
