@@ -79,8 +79,9 @@ class CSVDataSet:
         # Set the column multi index
         column_tuples = list(map(lambda x: tuple(x.split(heirarchy_separator)), D.columns))
         D.columns = pd.MultiIndex.from_tuples(column_tuples)
-        if column_level_names is not None:
-            D.columns.names = column_level_names
+        for c in column_tuples:
+            if c[0] == "Unnamed: 0":
+                del D[c]
 
         # Convert to numeric all numeric rows
         D = D.replace(NA_val, "nan")
@@ -89,6 +90,8 @@ class CSVDataSet:
         newindex = D.index
         D = list(d)
         D = pd.DataFrame(dict(zip(newcolumns, D)), index = newindex)
+        if column_level_names is not None:
+            D.columns.names = column_level_names
         self.D = D
 
     def getResource(self, index):
@@ -164,10 +167,22 @@ class CSVDataSet:
             An array x of the unique labels, and an array y of the count of that label
 
         """
-        x = self.getColumnValues(index)
+        x = self.getColumn(index)
         column = self.getColumn(index)
         y = [np.sum(column == v) for v in x]
         return x, y
+
+    def getColumnNADist(self, index):
+        column = self.getColumn(index)
+        if column.dtype == "float64":
+            na = np.sum([np.isnan(x) for x in column])
+            not_na = len(column) - na
+            return na, not_na
+        else:
+            na = np.sum([x == "NA" for x in column])
+            not_na = len(column) - na
+            return na, not_na
+        return na, not_na
 
     def getColumnDescription(self, index, sep = "\n"):
         """Get a description of the column.
@@ -179,6 +194,10 @@ class CSVDataSet:
         for i, name in enumerate(self.D.columns.names):
             desc.append(name + ": " + index[i])
         return sep.join(desc)
+
+    def getLevelValues(self, index):
+        return np.unique(self.D.columns.get_level_values(index))
+
 
 
 class DFDataSet:

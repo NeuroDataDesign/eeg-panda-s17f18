@@ -1,3 +1,5 @@
+import os
+
 from plotly.offline import iplot, plot
 import plotly.graph_objs as go
 import plotly.figure_factory as ff
@@ -32,8 +34,12 @@ class CSVPlotter:
             h = random.getrandbits(128)
             fname = "%032x.html"%h
             plot(fig, output_type='file', filename=fname)
+        if self.plot_mode == "div":
+            fig["layout"]["autosize"] = True
+            return plot(fig, output_type='div', include_plotlyjs=False)
 
-class ColumnPlotter(CSVPlotter):
+
+class ColumnDistributionPlotter(CSVPlotter):
     def plot(self, column):
         x, y = self.ds.getColumnDistribution(column)
         trace = go.Bar(
@@ -41,12 +47,50 @@ class ColumnPlotter(CSVPlotter):
             y = y
         )
         layout = go.Layout(
-            title = self.ds.getColumnDescription(column, sep="<br>"),
+            title = "Column Distribution Plot<br>" + self.ds.getColumnDescription(column, sep="<br>"),
             xaxis = dict(title="Value"),
             yaxis = dict(title="Frequency")
         )
         fig = go.Figure(data = [trace], layout=layout)
-        self.makeplot(fig)
+        return self.makeplot(fig)
+
+class ColumnNADistPlotter(CSVPlotter):
+    def plot(self, column):
+        na, not_na = self.ds.getColumnNADist(column)
+        trace = go.Pie(
+            labels = ['NA', 'Not NA'],
+            values = [na, not_na]
+        )
+        layout = go.Layout(
+            title = "Column NA Distribution Plot<br>" + self.ds.getColumnDescription(column, sep="<br>"),
+            #xaxis = dict(title="Value"),
+            #yaxis = dict(title="Frequency")
+        )
+        fig = go.Figure(data = [trace], layout=layout)
+        return self.makeplot(fig)
+
+class EverythingPlotter(CSVPlotter):
+    html_data = """
+	<html>
+	    <head>
+		<title>
+		%s
+		</title>
+		<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+	    </head>
+	    <body>
+              %s
+            </body>
+         </html>
+	"""
+    def plot(self, base, plotter):
+        cp = plotter(self.ds, mode="div")
+        for c in self.ds.D.columns:
+            path = os.path.join(base, *c)
+            os.makedirs(path, exist_ok=True)
+            div = cp.plot(c)
+            with open(os.path.join(path, plotter.__name__ + ".html"), "w") as f:
+                    f.write(self.html_data%(plotter.__name__, div))
 
 class DistanceMatrixPlotter:
     """A generic aggregate plotter acting on a distance matrix to be extended.
