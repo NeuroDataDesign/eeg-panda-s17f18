@@ -145,7 +145,8 @@ class CSVDataSet:
         column = self.getColumn(index)
         if column.dtype == "float64":
             column = column[~np.isnan(column)]
-        column = column[np.array([x != "NA" for x in column])]
+        else:
+            column = column[np.array([x != "NA" for x in column])]
         return np.unique(column)
 
 
@@ -164,9 +165,20 @@ class CSVDataSet:
 
         """
         x = self.getColumnValues(index)
-        y = []
-        
+        column = self.getColumn(index)
+        y = [np.sum(column == v) for v in x]
+        return x, y
 
+    def getColumnDescription(self, index, sep = "\n"):
+        """Get a description of the column.
+
+        """
+        desc = []
+        if type(index) is int:
+            index = self.D.columns.values[index]
+        for i, name in enumerate(self.D.columns.names):
+            desc.append(name + ": " + index[i])
+        return sep.join(desc)
 
 
 class DFDataSet:
