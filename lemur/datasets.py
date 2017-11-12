@@ -59,6 +59,7 @@ def convertDtype(l):
         pass
     l = np.array(l, dtype=str)
     l[l == 'nan'] = 'NA'
+    return l
 
 class CSVDataSet:
     """ A dataset living locally in a .csv file
@@ -89,6 +90,82 @@ class CSVDataSet:
         D = list(d)
         D = pd.DataFrame(dict(zip(newcolumns, D)), index = newindex)
         self.D = D
+
+    def getResource(self, index):
+        """Get a specific data point from the data set.
+
+        Parameters
+        ----------
+        index : int or string
+            The index of the data point in `D`, either positional or a string.
+
+        Returns
+        -------
+        :obj:`ndarray`
+            A ndarray of the data point.
+
+        """
+        if type(index) is int:
+            return self.D.iloc[index].as_matrix()
+        else:
+            return self.D.loc[index].as_matrix()
+
+    def getColumn(self, index):
+        """Get a column of the dataframe.
+ 
+        Parameters
+        ----------
+        index : int or string
+            The index of the column in `D`, either positional or a string.
+
+        Returns
+        -------
+        :obj:`ndarray`
+            The values in the column.
+        """
+        if type(index) is int:
+            return self.D.iloc[:, index].as_matrix()
+        else:
+            return self.D[index].as_matrix()
+
+    def getColumnValues(self, index):
+        """Get the unique values of a column.
+
+        Parameters
+        ----------
+        index : int or string
+            The index of the column in `D`, either positional or a string.
+
+        Returns
+        -------
+        :obj:`ndarray`
+            A ndarray of the unique values.
+
+        """
+        column = self.getColumn(index)
+        if column.dtype == "float64":
+            column = column[~np.isnan(column)]
+        column = column[np.array([x != "NA" for x in column])]
+        return np.unique(column)
+
+
+    def getColumnDistribution(self, index):
+        """Get the distribution of values in a column.
+
+        Parameters
+        ----------
+        index : int or string
+            The index of the column in `D`, either positional or a string.
+
+        Returns
+        -------
+        :obj:`ndarray`, :obj:`ndarray`
+            An array x of the unique labels, and an array y of the count of that label
+
+        """
+        x = self.getColumnValues(index)
+        y = []
+        
 
 
 
