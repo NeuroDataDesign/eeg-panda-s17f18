@@ -52,6 +52,46 @@ class DiskDataSet:
                 return pkl.load(f).T
             return pkl.load(f)
 
+def convertDtype(l):
+    try:
+        return np.array(l, dtype="float")
+    except:
+        pass
+    l = np.array(l, dtype=str)
+    l[l == 'nan'] = 'NA'
+
+class CSVDataSet:
+    """ A dataset living locally in a .csv file
+
+    """
+    def __init__(self, csv_path, index_column = None, column_level_names = None,
+                 heirarchy_separator = ",", NA_val = "."):
+        # Load the data set
+        D = pd.read_csv(csv_path, dtype="unicode")
+
+        # Set the index column as specified
+        if index_column is not None:
+            D[index_column] = list(map(str, D[index_column]))
+            D.index = D[index_column]
+            del D[index_column]
+
+        # Set the column multi index
+        column_tuples = list(map(lambda x: tuple(x.split(heirarchy_separator)), D.columns))
+        D.columns = pd.MultiIndex.from_tuples(column_tuples)
+        if column_level_names is not None:
+            D.columns.names = column_level_names
+
+        # Convert to numeric all numeric rows
+        D = D.replace(NA_val, "nan")
+        d = list(map(lambda c: convertDtype(list(D[c])), D.columns))
+        newcolumns = D.columns
+        newindex = D.index
+        D = list(d)
+        D = pd.DataFrame(dict(zip(newcolumns, D)), index = newindex)
+        self.D = D
+
+
+
 class DFDataSet:
     """A dataset living locally in a Pandas data frame.
 
