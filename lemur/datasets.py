@@ -66,7 +66,9 @@ class CSVDataSet:
 
     """
     def __init__(self, csv_path, index_column = None, column_level_names = None,
-                 heirarchy_separator = ",", NA_val = "."):
+                 heirarchy_separator = ",", NA_val = ".", name = "mydataset"):
+        self.name = name
+
         # Load the data set
         D = pd.read_csv(csv_path, dtype="unicode")
 
@@ -93,6 +95,7 @@ class CSVDataSet:
         if column_level_names is not None:
             D.columns.names = column_level_names
         self.D = D
+        self.N = self.D.shape[0]
 
     def getResource(self, index):
         """Get a specific data point from the data set.
@@ -167,7 +170,7 @@ class CSVDataSet:
             An array x of the unique labels, and an array y of the count of that label
 
         """
-        x = self.getColumn(index)
+        x = self.getColumnValues(index)
         column = self.getColumn(index)
         y = [np.sum(column == v) for v in x]
         return x, y

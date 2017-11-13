@@ -130,7 +130,8 @@ class NanDotProduct:
             The distance.
 
         """
-        return np.nansum(x * y)
+        return np.nansum((x - y) * (x - y))
+
 
 class Coh:
     """An implementation of the coherence metric.

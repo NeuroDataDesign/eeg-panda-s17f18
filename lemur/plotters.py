@@ -42,29 +42,53 @@ class CSVPlotter:
 class ColumnDistributionPlotter(CSVPlotter):
     def plot(self, column):
         x, y = self.ds.getColumnDistribution(column)
-        trace = go.Bar(
+        yn = y / np.nansum(y)
+        title = "Column Distribution Plot<br>" + self.ds.getColumnDescription(column, sep="<br>")
+        trace_frequency = go.Bar(
             x = x,
-            y = y
+            y = y,
+            name = 'Frequency'
+        )
+        trace_proportion = go.Bar(
+            x = x,
+            y = yn,
+            visible = False,
+            name = 'Proportion'
         )
         layout = go.Layout(
-            title = "Column Distribution Plot<br>" + self.ds.getColumnDescription(column, sep="<br>"),
+            title = title,
             xaxis = dict(title="Value"),
             yaxis = dict(title="Frequency")
         )
-        fig = go.Figure(data = [trace], layout=layout)
+        updatemenus = list([
+            dict(buttons = list([
+                dict(args = [{'visible': [True, False]}, {'yaxis': dict(title="Frequency")}],
+                     label = 'Frequency',
+                     method = 'update'
+                ),
+                dict(args = [{'visible': [False, True]}, {'yaxis': dict(title="Proportion")}],
+                     label = 'Proportion',
+                     method = 'update'
+                ),
+                ]),
+                showactive = True,
+                type = 'buttons'
+            )
+        ])
+        layout.updatemenus = updatemenus
+        fig = go.Figure(data = [trace_frequency, trace_proportion], layout=layout)
         return self.makeplot(fig)
 
 class ColumnNADistPlotter(CSVPlotter):
     def plot(self, column):
         na, not_na = self.ds.getColumnNADist(column)
+        title = "Column NA Distribution Plot<br>" + self.ds.getColumnDescription(column, sep="<br>")
         trace = go.Pie(
             labels = ['NA', 'Not NA'],
             values = [na, not_na]
         )
         layout = go.Layout(
-            title = "Column NA Distribution Plot<br>" + self.ds.getColumnDescription(column, sep="<br>"),
-            #xaxis = dict(title="Value"),
-            #yaxis = dict(title="Frequency")
+            title=title
         )
         fig = go.Figure(data = [trace], layout=layout)
         return self.makeplot(fig)
@@ -120,7 +144,7 @@ class DistanceMatrixPlotter:
         self.dataset_name = dm.dataset.name
         self.dm = dm.getMatrix()
         self.label_name = primary_label
-        if type(dm.dataset).__name__ == 'DFDataSet':
+        if type(dm.dataset).__name__ == 'DFDataSet' or type(dm.dataset).__name__ == 'CSVDataSet':
             self.label = dm.dataset.D.index
         elif type(dm.dataset).__name__ == 'DiskDataSet':
             self.label = dm.dataset.D[primary_label]
