@@ -1,3 +1,5 @@
+import os
+
 from plotly.offline import iplot, plot
 import plotly.graph_objs as go
 import plotly.figure_factory as ff
@@ -10,6 +12,109 @@ from ipywidgets import interact
 import random
 
 
+class CSVPlotter:
+    def __init__(self, ds, mode = "notebook"):
+        self.ds = ds
+        self.plot_mode = mode
+
+    def makeplot(self, fig):
+        """Make the plotly figure visable to the user in the way they want.
+
+        Parameters
+        ----------
+        gid : :obj:`figure`
+            An plotly figure.
+
+        """
+        
+        if self.plot_mode == "notebook":
+            iplot(fig)
+        if self.plot_mode == "html":
+            fig["layout"]["autosize"] = True
+            h = random.getrandbits(128)
+            fname = "%032x.html"%h
+            plot(fig, output_type='file', filename=fname)
+        if self.plot_mode == "div":
+            fig["layout"]["autosize"] = True
+            return plot(fig, output_type='div', include_plotlyjs=False)
+
+
+class ColumnDistributionPlotter(CSVPlotter):
+    def plot(self, column):
+        x, y = self.ds.getColumnDistribution(column)
+        yn = y / np.nansum(y)
+        title = "Column Distribution Plot<br>" + self.ds.getColumnDescription(column, sep="<br>")
+        trace_frequency = go.Bar(
+            x = x,
+            y = y,
+            name = 'Frequency'
+        )
+        trace_proportion = go.Bar(
+            x = x,
+            y = yn,
+            visible = False,
+            name = 'Proportion'
+        )
+        layout = go.Layout(
+            title = title,
+            xaxis = dict(title="Value"),
+            yaxis = dict(title="Frequency")
+        )
+        updatemenus = list([
+            dict(buttons = list([
+                dict(args = [{'visible': [True, False]}, {'yaxis': dict(title="Frequency")}],
+                     label = 'Frequency',
+                     method = 'update'
+                ),
+                dict(args = [{'visible': [False, True]}, {'yaxis': dict(title="Proportion")}],
+                     label = 'Proportion',
+                     method = 'update'
+                ),
+                ]),
+                showactive = True,
+                type = 'buttons'
+            )
+        ])
+        layout.updatemenus = updatemenus
+        fig = go.Figure(data = [trace_frequency, trace_proportion], layout=layout)
+        return self.makeplot(fig)
+
+class ColumnNADistPlotter(CSVPlotter):
+    def plot(self, column):
+        na, not_na = self.ds.getColumnNADist(column)
+        title = "Column NA Distribution Plot<br>" + self.ds.getColumnDescription(column, sep="<br>")
+        trace = go.Pie(
+            labels = ['NA', 'Not NA'],
+            values = [na, not_na]
+        )
+        layout = go.Layout(
+            title=title
+        )
+        fig = go.Figure(data = [trace], layout=layout)
+        return self.makeplot(fig)
+
+class EverythingPlotter(CSVPlotter):
+    html_data = """
+	<html>
+	    <head>
+		<title>
+		%s
+		</title>
+		<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+	    </head>
+	    <body>
+              %s
+            </body>
+         </html>
+	"""
+    def plot(self, base, plotter):
+        cp = plotter(self.ds, mode="div")
+        for c in self.ds.D.columns:
+            path = os.path.join(base, *c)
+            os.makedirs(path, exist_ok=True)
+            div = cp.plot(c)
+            with open(os.path.join(path, plotter.__name__ + ".html"), "w") as f:
+                    f.write(self.html_data%(plotter.__name__, div))
 
 class DistanceMatrixPlotter:
     """A generic aggregate plotter acting on a distance matrix to be extended.
@@ -39,7 +144,7 @@ class DistanceMatrixPlotter:
         self.dataset_name = dm.dataset.name
         self.dm = dm.getMatrix()
         self.label_name = primary_label
-        if type(dm.dataset).__name__ == 'DFDataSet':
+        if type(dm.dataset).__name__ == 'DFDataSet' or type(dm.dataset).__name__ == 'CSVDataSet':
             self.label = dm.dataset.D.index
         elif type(dm.dataset).__name__ == 'DiskDataSet':
             self.label = dm.dataset.D[primary_label]
@@ -351,13 +456,25 @@ class TimeSeriesPlotter:
         self.row_name = row_name
         self.col_name = col_name
         self.resource_name = resource_name
-        self.mode = mode
+        self.plot_mode = mode
 
     def makeplot(self, fig):
+        """Make the plotly figure visable to the user in the way they want.
+
+        Parameters
+        ----------
+        gid : :obj:`figure`
+            An plotly figure.
+
+        """
+        
         if self.plot_mode == "notebook":
             iplot(fig)
         if self.plot_mode == "html":
-            plot(fig, output_type='file', filename="tempplot.html")
+            fig["layout"]["autosize"] = True
+            h = random.getrandbits(128)
+            fname = "%032x.html"%h
+            plot(fig, output_type='file', filename=fname)
 
 class SparkLinePlotter(TimeSeriesPlotter):
     titlestring = "Sparklines for %s"
