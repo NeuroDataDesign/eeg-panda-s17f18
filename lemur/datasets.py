@@ -52,6 +52,157 @@ class DiskDataSet:
                 return pkl.load(f).T
             return pkl.load(f)
 
+def convertDtype(l):
+    try:
+        return np.array(l, dtype="float")
+    except:
+        pass
+    l = np.array(l, dtype=str)
+    l[l == 'nan'] = 'NA'
+    return l
+
+class CSVDataSet:
+    """ A dataset living locally in a .csv file
+
+    """
+    def __init__(self, csv_path, index_column = None, column_level_names = None,
+                 heirarchy_separator = ",", NA_val = ".", name = "mydataset"):
+        self.name = name
+
+        # Load the data set
+        D = pd.read_csv(csv_path, dtype="unicode")
+
+        # Set the index column as specified
+        if index_column is not None:
+            D[index_column] = list(map(str, D[index_column]))
+            D.index = D[index_column]
+            del D[index_column]
+
+        # Set the column multi index
+        column_tuples = list(map(lambda x: tuple(x.split(heirarchy_separator)), D.columns))
+        D.columns = pd.MultiIndex.from_tuples(column_tuples)
+        for c in column_tuples:
+            if c[0] == "Unnamed: 0":
+                del D[c]
+
+        # Convert to numeric all numeric rows
+        D = D.replace(NA_val, "nan")
+        d = list(map(lambda c: convertDtype(list(D[c])), D.columns))
+        newcolumns = D.columns
+        newindex = D.index
+        D = list(d)
+        D = pd.DataFrame(dict(zip(newcolumns, D)), index = newindex)
+        if column_level_names is not None:
+            D.columns.names = column_level_names
+        self.D = D
+        self.N = self.D.shape[0]
+
+    def getResource(self, index):
+        """Get a specific data point from the data set.
+
+        Parameters
+        ----------
+        index : int or string
+            The index of the data point in `D`, either positional or a string.
+
+        Returns
+        -------
+        :obj:`ndarray`
+            A ndarray of the data point.
+
+        """
+        if type(index) is int:
+            return self.D.iloc[index].as_matrix()
+        else:
+            return self.D.loc[index].as_matrix()
+
+    def getColumn(self, index):
+        """Get a column of the dataframe.
+ 
+        Parameters
+        ----------
+        index : int or string
+            The index of the column in `D`, either positional or a string.
+
+        Returns
+        -------
+        :obj:`ndarray`
+            The values in the column.
+        """
+        if type(index) is int:
+            return self.D.iloc[:, index].as_matrix()
+        else:
+            return self.D[index].as_matrix()
+
+    def getColumnValues(self, index):
+        """Get the unique values of a column.
+
+        Parameters
+        ----------
+        index : int or string
+            The index of the column in `D`, either positional or a string.
+
+        Returns
+        -------
+        :obj:`ndarray`
+            A ndarray of the unique values.
+
+        """
+        column = self.getColumn(index)
+        if column.dtype == "float64":
+            column = column[~np.isnan(column)]
+        else:
+            column = column[np.array([x != "NA" for x in column])]
+        return np.unique(column)
+
+
+    def getColumnDistribution(self, index):
+        """Get the distribution of values in a column.
+
+        Parameters
+        ----------
+        index : int or string
+            The index of the column in `D`, either positional or a string.
+
+        Returns
+        -------
+        :obj:`ndarray`, :obj:`ndarray`
+            An array x of the unique labels, and an array y of the count of that label
+
+        """
+        x = self.getColumnValues(index)
+        column = self.getColumn(index)
+        y = [np.sum(column == v) for v in x]
+        return x, y
+
+    def getColumnNADist(self, index):
+        column = self.getColumn(index)
+        if column.dtype == "float64":
+            na = np.sum([np.isnan(x) for x in column])
+            not_na = len(column) - na
+            return na, not_na
+        else:
+            na = np.sum([x == "NA" for x in column])
+            not_na = len(column) - na
+            return na, not_na
+        return na, not_na
+
+    def getColumnDescription(self, index, sep = "\n"):
+        """Get a description of the column.
+
+        """
+        desc = []
+        if type(index) is int:
+            index = self.D.columns.values[index]
+        for i, name in enumerate(self.D.columns.names):
+            desc.append(name + ": " + index[i])
+        return sep.join(desc)
+
+    def getLevelValues(self, index):
+        return np.unique(self.D.columns.get_level_values(index))
+
+
+
 class DFDataSet:
     """A dataset living locally in a Pandas data frame.
 

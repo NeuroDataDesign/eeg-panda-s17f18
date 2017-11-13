@@ -8,7 +8,7 @@ class FroCorr:
     This is not a class to be instantiated, but rather a way to organize and separate the 
     parameterization and comparison steps of the metric calculation to optimize a distance 
     matrix computation (e.g., compute the correlation matrix for each datapoint `once`, then
-    just compare correlation matricies.
+    just compare correlation matricies).
 
     """
         
@@ -31,6 +31,51 @@ class FroCorr:
 
     def compare(x, y):
         """Compute the euclidian distance of two correlation matricies.
+
+        Parameters
+        ----------
+        x : :obj:`ndarray`
+            The left correlation matrix argument.
+        y : :obj:`ndarray`
+            The left correlation matrix argument.
+
+        Returns
+        -------
+        float
+            The distance.
+
+        """
+        return np.linalg.norm(x - y)
+
+class DiffAve:
+    """A MRI distance. The euclidian distance of the average voxel intensity volumes.
+
+    This is not a class to be instantiated, but rather a way to organize and separate the 
+    parameterization and comparison steps of the metric calculation to optimize a distance 
+    matrix computation (e.g., compute the correlation matrix for each datapoint `once`, then
+    just compare correlation matricies).
+
+    """
+        
+    def parameterize(D):
+        """Compute the correlation matrix of a single data point.
+
+        Parameters
+        ----------
+        D : :obj:`DataSet`
+            The lemur data set object to parameterize.
+
+        Returns
+        -------
+        :obj:`list` of :obj:`ndarray`
+            The average of each object in the dataset.
+
+        """
+        with np.errstate(divide = 'ignore', invalid = 'ignore'):
+            return list(map(lambda j: np.mean(D.getResource(j), axis=3), range(D.N)))
+
+    def compare(x, y):
+        """Compute the euclidian distance of two average volumes.
 
         Parameters
         ----------
@@ -85,14 +130,14 @@ class NanDotProduct:
             The distance.
 
         """
-        return np.nansum(x * y)
+        return np.nansum((x - y) * (x - y))
+
 
 class Coh:
     """An implementation of the coherence metric.
     
     This is not a class to be instantiated, but just a method to calculate the intra-datapoint
-    coherence distance. This metric can then be used with a metric such as FroCorr to compute
-    a distance between datapoints.
+    coherence distance.
 
     """
     

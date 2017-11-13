@@ -450,8 +450,31 @@ linked to by the <cite>resource_path</cite> variable.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>An implementation of the coherence metric.</p>
 <p>This is not a class to be instantiated, but just a method to calculate the intra-datapoint
-coherence distance. This metric can then be used with a metric such as FroCorr to compute
-a distance between datapoints.</p>
+coherence distance.</p>
+<dl class="method">
+<dt id="lemur.metrics.Coh.compare">
+<code class="descname">compare</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/metrics.html#Coh.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.metrics.Coh.compare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the euclidian distance of two correlation matricies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<code class="xref py py-obj docutils literal"><span class="pre">ndarray</span></code>) – The left correlation matrix argument.</li>
+<li><strong>y</strong> (<code class="xref py py-obj docutils literal"><span class="pre">ndarray</span></code>) – The left correlation matrix argument.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The distance.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="lemur.metrics.Coh.get_coh">
 <code class="descname">get_coh</code><span class="sig-paren">(</span><em>tup</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/metrics.html#Coh.get_coh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.metrics.Coh.get_coh" title="Permalink to this definition">¶</a></dt>
@@ -478,6 +501,59 @@ a distance between datapoints.</p>
 </dd></dl>
 
 <dl class="class">
+<dt id="lemur.metrics.DiffAve">
+<em class="property">class </em><code class="descclassname">lemur.metrics.</code><code class="descname">DiffAve</code><a class="reference internal" href="_modules/lemur/metrics.html#DiffAve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.metrics.DiffAve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A MRI distance. The euclidian distance of the average voxel intensity volumes.</p>
+<p>This is not a class to be instantiated, but rather a way to organize and separate the
+parameterization and comparison steps of the metric calculation to optimize a distance
+matrix computation (e.g., compute the correlation matrix for each datapoint <cite>once</cite>, then
+just compare correlation matricies).</p>
+<dl class="method">
+<dt id="lemur.metrics.DiffAve.compare">
+<code class="descname">compare</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/metrics.html#DiffAve.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.metrics.DiffAve.compare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the euclidian distance of two average volumes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<code class="xref py py-obj docutils literal"><span class="pre">ndarray</span></code>) – The left correlation matrix argument.</li>
+<li><strong>y</strong> (<code class="xref py py-obj docutils literal"><span class="pre">ndarray</span></code>) – The left correlation matrix argument.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The distance.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="lemur.metrics.DiffAve.parameterize">
+<code class="descname">parameterize</code><span class="sig-paren">(</span><em>D</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/metrics.html#DiffAve.parameterize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.metrics.DiffAve.parameterize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the correlation matrix of a single data point.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>D</strong> (<code class="xref py py-obj docutils literal"><span class="pre">DataSet</span></code>) – The lemur data set object to parameterize.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The average of each object in the dataset.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal"><span class="pre">ndarray</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="lemur.metrics.FroCorr">
 <em class="property">class </em><code class="descclassname">lemur.metrics.</code><code class="descname">FroCorr</code><a class="reference internal" href="_modules/lemur/metrics.html#FroCorr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.metrics.FroCorr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
@@ -485,7 +561,7 @@ a distance between datapoints.</p>
 <p>This is not a class to be instantiated, but rather a way to organize and separate the
 parameterization and comparison steps of the metric calculation to optimize a distance
 matrix computation (e.g., compute the correlation matrix for each datapoint <cite>once</cite>, then
-just compare correlation matricies.</p>
+just compare correlation matricies).</p>
 <dl class="method">
 <dt id="lemur.metrics.FroCorr.compare">
 <code class="descname">compare</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/metrics.html#FroCorr.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.metrics.FroCorr.compare" title="Permalink to this definition">¶</a></dt>
@@ -900,7 +976,16 @@ into 500 equal sized segments in the time domain, then plotting the mean for eac
 <dl class="method">
 <dt id="lemur.plotters.TimeSeriesPlotter.makeplot">
 <code class="descname">makeplot</code><span class="sig-paren">(</span><em>fig</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lemur/plotters.html#TimeSeriesPlotter.makeplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lemur.plotters.TimeSeriesPlotter.makeplot" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Make the plotly figure visable to the user in the way they want.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>gid</strong> (<code class="xref py py-obj docutils literal"><span class="pre">figure</span></code>) – An plotly figure.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
