@@ -37,7 +37,7 @@
                                   often: Swear at you, insult you,
                                   put you down, or humiliate you?
                                   or Act in a way that made you afraid
-                                  that you might be physically hurt?"
+                                  that you might be physically hurt?",
             "columnValues": ["0", "1"],
             "columnValueComments": ["No", "Yes"]
         },
@@ -73,7 +73,7 @@
         },
         {
             "columnName": ["EEG", "ChanLocs"],
-            "columnType": "LOCATION":
+            "columnType": "LOCATION",
             "columnRole": "s3data",
             "columnDescription": "EEG Electrode Locations File"
         },
