@@ -21,13 +21,27 @@ Team Red Lemur, 2017
   
 - A plotting library which can generate one to one or aggregate plots for each of the EEG, fMRI, Phenotypic modalities. This library will include 10 possible plots for each modality, where 7 are aggregate plots and 3 are one-to-one plots. This library will be available via PyPI and have a documentation page generated via Sphinx. The documentation page will have information on how to use each plotting function, as well as general information for the input format of each data modality. The plots to include will be geared towards answering questions relating to the p-factor, or visualizations to create a dimensional view of mental disorders.
 
-*This week, I want to see an example of **every single plot you will be providing**.  I want them to include all 10 meda plots for aggregate plots.* 
 
+
+*This week, I want to see an example of **every single plot you will be providing**.  I want them to include all 10 meda plots for aggregate plots.
 *I maintain that 10 plots for **graphs** will be incredibly useful.  For example, for both the EEG & fMRI data, they are often represented as graphs.  So, if you have 10 graph plots, that works for both, you'd just need a few modality specific plots.  Check out https://github.com/neurodata/Graph-Explorer and https://github.com/neurodata/ExploratoryGraph for some examples.*
 
 *Another task is to get the HBN dataset "tidy", meaning to get the data into a format that meda can run on and that the results are sensible.  This may require interating to address mislabeled columns, missing numbers, etc.   The DoD is a csv file that is meda compliant. *
 
 *For your webservice to work sensibly on the phenotypic data, simply ingesting a csv file will be inadequate in the long term.  For example, some variables will be categorical will >2 categories.  MEDA will need to know that so when you do factor analysis, it operates on those data appropriately.  So, there should also be a json file and spec that defines things like the type for each column, and maybe other stuff. I've uploaded a file to your slack channel.  That file should not be made public. Determine whether you want this to happen in sprint 1 or not and specify.*
 
-
-
+#### Aggregate Plots (ways to visualize a pairwise distance matrix between objects)
+* [X] Distance Matrix Heatmap
+* [X] Distance Matrix Eigenvector Heatmap
+* [X] Distance Matrix Scree Plot
+* [X] Dendrogram
+* [X] Parallel Coordinate Plot (of an embedding of the Distance Matrix)
+* [X] 2D Scatter Plot of an embedding of the Distance Matrix, (colored by some other data -- like diagnostic category and p-factor)
+* [X] Pairs Plot of top k (k < 10) dimensions of an embedding of the distance matrix
+* [ ] 1D heatmap
+  * Below, except y axis label is subject ids, the heatmap is the distribution of distances between that subject and all the other subjects
+  * ![image](https://user-images.githubusercontent.com/10272301/32965535-ba37ccd8-cba4-11e7-83ac-4ae29c31ff92.png)
+* [ ] Correlation matrix (how? given numeric values from phenotypic this makes sense... given time series?)
+* [ ] Heirarchical GMM (how is this done given a time series?)
+* [ ] Cluster Means plot (?)
+* [ ] Stacked Cluster Means Plot (?)
