@@ -30,6 +30,7 @@ Team Red Lemur, 2017
 
 *For your webservice to work sensibly on the phenotypic data, simply ingesting a csv file will be inadequate in the long term.  For example, some variables will be categorical will >2 categories.  MEDA will need to know that so when you do factor analysis, it operates on those data appropriately.  So, there should also be a json file and spec that defines things like the type for each column, and maybe other stuff. I've uploaded a file to your slack channel.  That file should not be made public. Determine whether you want this to happen in sprint 1 or not and specify.*
 
+
 #### Aggregate Plots (ways to visualize a pairwise distance matrix between objects)
 * [X] Distance Matrix Heatmap
 * [X] Distance Matrix Eigenvector Heatmap
