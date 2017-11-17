@@ -1,0 +1,64 @@
+% Example for Phenotypic data
+
+% version: The version of the dataset, if the dataset is edited in any way (e.g. new releases of HBN)
+% rowID: The column of the CSV which is used as an index, e.g. the subject ID
+% dataFormat: The format, e.g. CSV, TSV
+% dataFileContainsHeader: true if first row of data contains the column names. If false, assume
+%                         that the column descriptions are ordered.
+% columnName: A heirarchical column index, left values are higher in heirarchy. Just string means flat heirarchy
+% columnType: Data type of the column. ["ORDINAL", "INTEGER", "FLOAT", "CATEGORICAL"]
+% columnRole: What the column is used for.
+%     attribute - a column used as a variable, e.g., answers to the questions
+%     metadata - a column containing information which should not be used as a variable in statistical tasks, e.g. season
+% columnDescription: Explain what this column is with words (used in documentation). e.g. what is the question asked
+% columnValues: For ORDINAL and CATEGORICAL, a list of values. For INTEGER and FLOAT, a range of possible values.
+%     - a float between zero and one would have columnValues [0, 1]
+%     - a float between zero and one noninclusive would have columnValues (0, 1)
+%     - if columnValues is not specified, assume Z and R for INTEGER and FLOAT respectively.
+% columnValueComments: For ORDINAL and CATEGORICAL, a description for each column value,
+%                      for INTEGER and FLOAT, empty, or a description for the value is computed.
+                      
+{
+    "version": "1.0",
+    "rowId": "Identifiers",
+    "dataFormat": "CSV",
+    "dataFileContainsHeader": true,
+    "columns": [
+        {
+            "columnName": ["ACE", "ACE_01"],
+            "columnType": "ORDINAL",
+            "columnRole": "attribute",
+            "columnDescription": "Did a parent or other adult 
+                                  in the household often or very
+                                  often: Swear at you, insult you,
+                                  put you down, or humiliate you?
+                                  or Act in a way that made you afraid
+                                  that you might be physically hurt?"
+            "columnValues": ["0", "1"],
+            "columnValueComments": ["No", "Yes"]
+        },
+        {
+            "columnName": ["ACE", "ACE_Score"],
+            "columnType": "INTEGER",
+            "columnRole": "attribute",
+            "columnDescription": "ACE Test Total Score"
+            "columnValues": [0, 10],
+            "columnValueComments": "Sum of ACE_01 through ACE_10"
+        },
+        {
+            "columneName": ["ACE", "Season"],
+            "columnType": "CATEGORICAL",
+            "columnRole": "metadata",
+            "columnDescription": "What season the ACE study was conducted.
+                                  NA if study was not conducted.",
+            "columnValues": ["NA", "Spring", "Winter", "Summer", "Fall"]
+            
+        },
+        {
+            "columnName": ["Physical", "BMI"],
+            "columnType": "FLOAT",
+            "columnRole": "metadata",
+            "columnDescription": "Body Mass Index of subject",
+        }
+    ]
+}
