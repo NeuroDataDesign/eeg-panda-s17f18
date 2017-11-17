@@ -1,4 +1,4 @@
-% Example for Phenotypic data
+% Example for HBN
 
 % version: The version of the dataset, if the dataset is edited in any way (e.g. new releases of HBN)
 % rowID: The column of the CSV which is used as an index, e.g. the subject ID
@@ -6,10 +6,14 @@
 % dataFileContainsHeader: true if first row of data contains the column names. If false, assume
 %                         that the column descriptions are ordered.
 % columnName: A heirarchical column index, left values are higher in heirarchy. Just string means flat heirarchy
-% columnType: Data type of the column. ["ORDINAL", "INTEGER", "FLOAT", "CATEGORICAL"]
+% columnType: Data type of the column. ["ORDINAL", "INTEGER", "FLOAT",
+                                        "CATEGORICAL", "TIMESERIES", "LOCATION",
+                                        "NIFTI"]
 % columnRole: What the column is used for.
 %     attribute - a column used as a variable, e.g., answers to the questions
 %     metadata - a column containing information which should not be used as a variable in statistical tasks, e.g. season
+%     s3data - link to a data resource on S3
+%     localdata - link to the data resource on hard disk
 % columnDescription: Explain what this column is with words (used in documentation). e.g. what is the question asked
 % columnValues: For ORDINAL and CATEGORICAL, a list of values. For INTEGER and FLOAT, a range of possible values.
 %     - a float between zero and one would have columnValues [0, 1]
@@ -59,6 +63,25 @@
             "columnType": "FLOAT",
             "columnRole": "metadata",
             "columnDescription": "Body Mass Index of subject",
-        }
+        },
+        % The below part would be automatically generated given a BIDS-EEG formated folder
+        {
+            "columnName": ["EEG", "RawTimeSeries"],
+            "columnType": "TIMESERIES",
+            "columnRole": "s3data",
+            "columnDescription": "Preprocessed EEG TimeSeries"
+        },
+        {
+            "columnName": ["EEG", "ChanLocs"],
+            "columnType": "LOCATION":
+            "columnRole": "s3data",
+            "columnDescription": "EEG Electrode Locations File"
+        },
+        {
+            "columnName": ["fMRI", "RawData"],
+            "columnType": "NIFTI",
+            "columnRole": "s3data",
+            "columnDescription": "Preprocessed fMRI data"
+        }
     ]
 }
