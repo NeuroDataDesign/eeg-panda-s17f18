@@ -2,9 +2,11 @@ import sys, os
 import boto3
 import botocore
 from flask import Flask, render_template, request, send_from_directory
+import logging
+from logging.handlers import RotatingFileHandler
 
-# TODO make lemur pip-installable and reachable from the product
-sys.path.append(os.path.abspath(os.path.join('..', 'lemur')))
+
+# from lemur import datasets as lds, metrics as lms, plotters as lpl, embedders as leb
 
 app = Flask(__name__)
 
@@ -19,8 +21,7 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload():
     target = os.path.join(APP_ROOT,'text')
-    print("1")
-    print(target)
+    app.logger.info('Target route: %s', target)
 
     if not os.path.isdir(target):
         os.mkdir(target)
@@ -30,15 +31,14 @@ def upload():
         filename = file.filename
         destination = "/".join([target,filename])
         file.save(destination)
-        print("Accept incoming file:", filename)
-        print("Save it to:", destination)
+        app.logger.info('Accept incoming file: %s', filename)
+        app.logger.info('Save it to: %s', destination)
     return render_template("complete.html", file_name=filename)
 
 @app.route('/s3upload', methods=['POST'])
 def s3upload():
     target = os.path.join(APP_ROOT,'text')
-    print("1")
-    print(target)
+    app.logger.info('Target route: %s', target)
 
     if not os.path.isdir(target):
         os.mkdir(target)
@@ -47,8 +47,8 @@ def s3upload():
         # print file
         filename = file.filename
         destination = "/".join([target,filename])
-        print ("Accept incoming file:", filename)
-        print ("Save it to:", destination)
+        app.logger.info('Accept incoming file: %s', filename)
+        app.logger.info('Save it to: %s', destination)
         file.save(destination)
 
         s3 = boto3.client('s3')
@@ -64,12 +64,12 @@ def s3upload():
 
         try:
             s3.Bucket(bucket_name).download_file(KEY, KEY)
-            print ("Downloading file from S3...")
+            app.logger.info('Downloading file from S3...')
             # s = open(filename, 'r')
             # print s.read()
         except botocore.exceptions.ClientError as e:
             if e.response['Error']['Code'] == "404":
-                print("The object does not exist.")
+                app.logger.error('The object does not exist.')
             else:
                 raise
                 # s = open(destination, 'r')
@@ -85,8 +85,11 @@ def display_file(filename):
     target = os.path.join(APP_ROOT,'text')
     destination = "/".join([target, filename])
     s = open(destination, 'r')
-    print(s.read())
+    # print(s.read())
     return render_template("home.html", file_name=filename)
 
 if __name__ == '__main__':
+    handler = RotatingFileHandler('foo.log', maxBytes=10000, backupCount=1)
+    handler.setLevel(logging.INFO)
+    app.logger.addHandler(handler)
     app.run()
