@@ -6,7 +6,16 @@
 </head>
 <body>
 
+<h3>Pipeline Upload</h3>
 <form id="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+    <strong>Files:</strong><br>
+    <input id="file-picker" type="file" name="file" accept="text/csv">
+    <div id="msg"></div>
+    <input type="submit" value="Upload" id="upload-button">
+</form>
+
+<h3>S3 Upload</h3>
+<form id="upload-form" action="{{ url_for('s3upload') }}" method="POST" enctype="multipart/form-data">
     <strong>Files:</strong><br>
     <input id="file-picker" type="file" name="file" accept="text/csv">
     <div id="msg"></div>
