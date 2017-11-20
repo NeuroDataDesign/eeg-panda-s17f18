@@ -1,16 +1,10 @@
-<<<<<<< HEAD
 import sys, os
-=======
-import os
 import boto3
 import botocore
->>>>>>> 85a2cafd8f35e13961ecef1490d31024b68411fd
 from flask import Flask, render_template, request, send_from_directory
 
 # TODO make lemur pip-installable and reachable from the product
 sys.path.append(os.path.abspath(os.path.join('..', 'lemur')))
-
-from lemur import
 
 app = Flask(__name__)
 
@@ -41,7 +35,7 @@ def upload():
     return render_template("complete.html", file_name=filename)
 
 @app.route('/s3upload', methods=['POST'])
-def upload():
+def s3upload():
     target = os.path.join(APP_ROOT,'text')
     print("1")
     print(target)
