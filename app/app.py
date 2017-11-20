@@ -1,11 +1,17 @@
-import os
+import sys, os
 from flask import Flask, render_template, request, send_from_directory
+
+# TODO make lemur pip-installable and reachable from the product
+sys.path.append(os.path.abspath(os.path.join('..', 'lemur')))
+
+from lemur import
 
 app = Flask(__name__)
 
 app.debug = True
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+
 @app.route('/')
 def index():
     return render_template('upload.html')
@@ -13,8 +19,8 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload():
     target = os.path.join(APP_ROOT,'text')
-    print "1"
-    print target
+    print("1")
+    print(target)
 
     if not os.path.isdir(target):
         os.mkdir(target)
@@ -24,8 +30,8 @@ def upload():
         filename = file.filename
         destination = "/".join([target,filename])
         file.save(destination)
-        print ("Accept incoming file:", filename)
-        print ("Save it to:", destination)
+        print("Accept incoming file:", filename)
+        print("Save it to:", destination)
     return render_template("complete.html", file_name=filename)
 
 @app.route('/upload/<filename>')
@@ -37,9 +43,8 @@ def display_file(filename):
     target = os.path.join(APP_ROOT,'text')
     destination = "/".join([target, filename])
     s = open(destination, 'r')
-    print s.read()
+    print(s.read())
     return render_template("home.html", file_name=filename)
-
 
 if __name__ == '__main__':
     app.run()

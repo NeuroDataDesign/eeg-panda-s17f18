@@ -1,4 +1,5 @@
 data/*
+app/data/*
 credentials/*
 *.swp
 *.pyc
