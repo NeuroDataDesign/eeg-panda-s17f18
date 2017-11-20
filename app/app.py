@@ -23,21 +23,22 @@ def upload():
         # print file
         filename = file.filename
         destination = "/".join([target,filename])
+        file.save(destination)
         print ("Accept incoming file:", filename)
         print ("Save it to:", destination)
-    return render_template("complete.html",file_name = filename)
+    return render_template("complete.html", file_name=filename)
 
 @app.route('/upload/<filename>')
 def send_image(filename):
     return send_from_directory("text", filename)
 
+@app.route('/display/<filename>')
 def display_file(filename):
     target = os.path.join(APP_ROOT,'text')
     destination = "/".join([target, filename])
-    file.save(destination)
     s = open(destination, 'r')
     print s.read()
-    return render_template("home.html",file_name = filename)
+    return render_template("home.html", file_name=filename)
 
 
 if __name__ == '__main__':

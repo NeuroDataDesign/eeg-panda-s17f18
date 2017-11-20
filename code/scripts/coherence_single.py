@@ -3,6 +3,7 @@ import scipy.signal as signal
 import time
 import matplotlib.pyplot as plt
 import pickle
+import argparse
 
 NDARAA075AMK = {}
 NDARAA075AMK['video1'] = pickle.load( open( "../../data/NDARAA075AMK/EEG/raw/PANDA/NDARAA075AMK_Video1_data.pkl", "rb" ) )
@@ -19,4 +20,13 @@ def orig_coherence(D, F_s=500):
             times.append(end - start)
     return np.nan_to_num(coherence), times
 
-plt.imsave( './coherence_single_core.png', orig_coherence(NDARAA075AMK['video1'])[0])
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('data', help='the input file')
+    parser.add_argument('output', help='the input file')
+    args = parser.parse_args()
+    plt.imsave(args.output, orig_coherence(pickle.load(open(args.data, "rb")))[0])
+
+if __name__ == "__main__":
+    main()
