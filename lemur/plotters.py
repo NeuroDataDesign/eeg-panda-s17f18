@@ -10,6 +10,7 @@ import numpy as np
 import hashlib
 from ipywidgets import interact
 import random
+import scipy.signal as signal
 
 
 class CSVPlotter:
@@ -143,11 +144,6 @@ class DistanceMatrixPlotter:
     def __init__(self, dm, mode = "notebook", primary_label = "resource_path"):
         self.dataset_name = dm.dataset.name
         self.dm = dm.getMatrix()
-        self.label_name = primary_label
-        if type(dm.dataset).__name__ == 'DFDataSet' or type(dm.dataset).__name__ == 'CSVDataSet':
-            self.label = dm.dataset.D.index
-        elif type(dm.dataset).__name__ == 'DiskDataSet':
-            self.label = dm.dataset.D[primary_label]
         self.metric_name = dm.metric.__name__
         self.plot_mode = mode
 
@@ -511,3 +507,92 @@ class SparkLinePlotter(TimeSeriesPlotter):
                          y=downsampled_data[i, :]) for i in range(downsampled_data.shape[0])]
         fig = dict(data=data, layout=layout)
         self.makeplot(fig)
+
+class CorrelationMatrixPlotter(TimeSeriesPlotter):
+    titlestring = "Correlation Matrix for %s"
+
+    def plot(self):
+        title = self.titlestring % (self.resource_name)
+        xaxis = dict(
+            title = "Channels"
+        )
+        yaxis = dict(
+                scaleanchor="x",
+            title = "Channels"
+        )
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        with np.errstate(divide = 'ignore', invalid = 'ignore'):
+            C = np.nan_to_num(np.corrcoef(self.data))
+
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        trace = go.Heatmap(z = C)
+        fig = dict(data=[trace], layout=layout)
+        self.makeplot(fig)
+
+class CoherenceMatrixPlotter(TimeSeriesPlotter):
+    titlestring = "Coherence Matrix for %s"
+
+    def plot(self, samp_freq = 500):
+        title = self.titlestring % (self.resource_name)
+        xaxis = dict(
+            title = "Channels"
+        )
+        yaxis = dict(
+                scaleanchor="x",
+            title = "Channels"
+        )
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        C = np.zeros([self.d, self.d])
+        for i in range(self.d):
+            for j in range(i + 1):
+                C[i, j] = np.mean(np.nan_to_num(signal.coherence(self.data[i, :],
+                                                              self.data[j, :],
+                                                              fs=samp_freq)[1]))
+                C[j, i] = C[i, j]
+
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        trace = go.Heatmap(z = C)
+        fig = dict(data=[trace], layout=layout)
+        self.makeplot(fig)
+
+class SpectrogramPlotter(TimeSeriesPlotter):
+    titlestring = "Spectrograms for %s"
+
+    def plot(self, channel = 0, sample_freq = 500):
+        """Constructs a spectrogram plot of the time series.
+
+
+        Parameters
+        ----------
+        sample_freq : int
+            The sampling frequency (how many times sampled per second).
+
+        """
+        title = self.titlestring % (self.resource_name)
+        xaxis = dict(
+            title = "Hz",
+            range = [0, 10]
+        )
+        yaxis = dict(
+            title = "Intensity",
+            range = [0, 1000]
+        )
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+
+        dt = 1./sample_freq
+        sample_points = np.arange(self.data.T.shape[1]) * dt
+        signal = self.data.T[channel, :]
+        ft = np.fft.fft(signal) * dt
+        ft = ft[: len(sample_points)//2]
+        freq = np.fft.fftfreq(len(sample_points), dt)
+        freq = freq[:len(sample_points)//2]
+
+        trace = go.Scatter(
+            x = freq[:2000],
+            y = np.abs(ft)[:2000],
+            mode = 'markers'
+        )
+
+        fig= dict(data=[trace], layout=layout)
+        iplot(fig)
+
