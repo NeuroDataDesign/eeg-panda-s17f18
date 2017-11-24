@@ -144,6 +144,8 @@ class DistanceMatrixPlotter:
     def __init__(self, dm, mode = "notebook", primary_label = "resource_path"):
         self.dataset_name = dm.dataset.name
         self.dm = dm.getMatrix()
+        self.labels = dm.labels
+        self.label_name = dm.label_name
         self.metric_name = dm.metric.__name__
         self.plot_mode = mode
 
@@ -177,21 +179,21 @@ class DistanceMatrixHeatmap(DistanceMatrixPlotter):
         title = self.titlestring % (self.dataset_name, self.metric_name)
         xaxis = go.XAxis(
                 title="data points",
-                ticktext = self.label,
+                ticktext = self.labels,
                 ticks = "",
                 showticklabels=False,
                 showgrid=False,
                 mirror=True,
-                tickvals = [i for i in range(len(self.label))])
+                tickvals = [i for i in range(len(self.labels))])
         yaxis = go.YAxis(
                 scaleanchor="x",
                 title="data points",
-                ticktext = self.label,
+                ticktext = self.labels,
                 showgrid=False,
                 ticks = "",
                 showticklabels=False,
                 mirror=True,
-                tickvals = [i for i in range(len(self.label))])
+                tickvals = [i for i in range(len(self.labels))])
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         trace = go.Heatmap(z = self.dm)
         data = [trace]
@@ -211,21 +213,21 @@ class DistanceMatrixEigenvectorHeatmap(DistanceMatrixPlotter):
         U, _, _ = np.linalg.svd(self.dm, full_matrices=False)
         xaxis = go.XAxis(
                 title="eigenvectors",
-                ticktext = ["Eigenvector %s"%i for i in range(1, len(self.label) + 1)],
+                ticktext = ["Eigenvector %s"%i for i in range(1, len(self.labels) + 1)],
                 ticks = "",
                 showgrid=False,
                 showticklabels=False,
                 mirror=True,
-                tickvals = [i for i in range(len(self.label))])
+                tickvals = [i for i in range(len(self.labels))])
         yaxis = go.YAxis(
                 title="eigenvector components",
                 scaleanchor="x",
                 showgrid=False,
-                ticktext = ["Component %s"%i for i in range(1, len(self.label) + 1)],
+                ticktext = ["Component %s"%i for i in range(1, len(self.labels) + 1)],
                 ticks = "",
                 showticklabels=False,
                 mirror=True,
-                tickvals = [i for i in range(len(self.label))])
+                tickvals = [i for i in range(len(self.labels))])
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         trace = go.Heatmap(z = U)
         data = [trace]
@@ -281,7 +283,7 @@ class Embedding2DScatter(DistanceMatrixPlotter):
         d = {
             'factor 1': emb[:, 0],
             'factor 2': emb[:, 1],
-            self.label_name: self.label
+            self.label_name: self.labels
         }
         D = pd.DataFrame(d)
         sns.lmplot('factor 1',
@@ -308,18 +310,18 @@ class EmbeddingHeatmap(DistanceMatrixPlotter):
         emb = embedder.embed(self.dm).T
         xaxis = go.XAxis(
                 title="data points",
-                ticktext = self.label,
+                ticktext = self.labels,
                 ticks = "",
                 showticklabels=False,
                 mirror=True,
-                tickvals = [i for i in range(len(self.label))])
+                tickvals = [i for i in range(len(self.labels))])
         yaxis = go.YAxis(
                 title="embedding dimensions",
-                ticktext = ["factor %s"%i for i in range(1, len(self.label) + 1)],
+                ticktext = ["factor %s"%i for i in range(1, len(self.labels) + 1)],
                 ticks = "",
                 showticklabels=False,
                 mirror=True,
-                tickvals = [i for i in range(len(self.label))])
+                tickvals = [i for i in range(len(self.labels))])
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         trace = go.Heatmap(z = emb)
         data = [trace]
@@ -341,7 +343,7 @@ class EmbeddingPairsPlotter(DistanceMatrixPlotter):
         title = self.titlestring % (self.dataset_name, embedder.embedding_name, self.metric_name)
         emb = embedder.embed(self.dm)
         Pdf = pd.DataFrame(emb, columns = ["factor %s"%x for x in range(1, emb.shape[1] + 1)])
-        Pdf[self.label_name] = self.label
+        Pdf[self.label_name] = self.labels
         sns.pairplot(data=Pdf, hue=self.label_name, diag_kind="hist")
         plt.subplots_adjust(top=0.9)
         plt.suptitle(title)
@@ -365,11 +367,11 @@ class EmbeddingParallelCoordinatePlotter(DistanceMatrixPlotter):
         d, n = D.shape
         D = D - np.min(D, axis=1).reshape(d, 1)
         D = D / np.max(D, axis=1).reshape(d, 1)
-        unique_labels = np.unique(self.label)
+        unique_labels = np.unique(self.labels)
         label_to_number = dict(zip(unique_labels, range(1, len(unique_labels) + 1)))
         dims = [dict(label = "factor %s"%(x + 1),
                 values = D[x, :]) for x in range(embedder.num_components)]
-        line = dict(color = [label_to_number[x] for x in self.label],
+        line = dict(color = [label_to_number[x] for x in self.labels],
                     cmin = 0,
                     cmax = len(unique_labels),
                     colorscale = "Jet",
@@ -385,6 +387,49 @@ class EmbeddingParallelCoordinatePlotter(DistanceMatrixPlotter):
         fig = dict(data = data, layout = layout)
         self.makeplot(fig)
 
+class Embedding1DHeatmap(DistanceMatrixPlotter):
+    titlestring = "%s %s Embedding 1D Heatmap under %s metric"
+
+    def plot(self, embedder):
+        """Constructs an embedding 1d heatmzp of the embedded :obj:`DistanceMatrix` object.
+
+        Parameters
+        ----------
+        embedder : :obj:`BaseEmbedder`
+            
+
+        """
+        title = self.titlestring % (self.dataset_name, embedder.embedding_name, self.metric_name)
+        emb = embedder.embed(self.dm)
+        D = emb.T
+        d, n = D.shape
+        D = (D - np.mean(D, axis=1).reshape(d, 1)) / np.std(D, axis=1).reshape(d, 1)
+        num_bins = int(np.sqrt(n))
+        bins = np.linspace(-5, 5, num_bins + 1)
+        bin_centers = (bins[1:] + bins[:-1]) / 2
+        H = []
+        for i in range(D.shape[0]):
+            hist = np.histogram(D[i, :], bins = bins)[0]
+            H.append(hist)
+        z = np.vstack(H)
+        trace = go.Heatmap(z = z)
+        data = [trace]
+        xaxis = go.XAxis(
+                title="normalized value",
+                ticktext = list(map(lambda x: "%0.4f"%x, bin_centers)),
+                ticks = "",
+                showticklabels=True,
+                mirror=True,
+                tickvals = [i for i in range(len(bin_centers))])
+        yaxis = go.YAxis(
+                title="embedding dimensions",
+                ticks = "",
+                showticklabels=False,
+                mirror=True)
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        fig = dict(data = data, layout = layout)
+        self.makeplot(fig)
+
 class DendrogramPlotter(DistanceMatrixPlotter):
     titlestring = "%s Dendrogram under %s metric"
 
@@ -394,9 +439,9 @@ class DendrogramPlotter(DistanceMatrixPlotter):
         """
         title = self.titlestring % (self.dataset_name, self.metric_name)
         observations = np.zeros([2, 2])
-        unique_labels = np.unique(self.label)
+        unique_labels = np.unique(self.labels)
         label_to_number = dict(zip(unique_labels, range(1, len(unique_labels) + 1)))
-        number_labels = [label_to_number[l] for l in self.label]
+        number_labels = [label_to_number[l] for l in self.labels]
         def distance_function(x):
             flattened = self.dm[np.triu_indices(self.dm.shape[0], k=1)].flatten()
             return [f for f in flattened] 
@@ -404,7 +449,7 @@ class DendrogramPlotter(DistanceMatrixPlotter):
                                       distfun = distance_function,
                                       labels=number_labels)
         dendro.layout.update(dict(title=title))
-        dendro.layout.xaxis.update(dict(ticktext=self.label,
+        dendro.layout.xaxis.update(dict(ticktext=self.labels,
                                         title=self.label_name,
                                         ticklen=1))
         dendro.layout.xaxis.tickfont.update(dict(size=12))
