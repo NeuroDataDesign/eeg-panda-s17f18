@@ -11,6 +11,14 @@ import hashlib
 from ipywidgets import interact
 import random
 import scipy.signal as signal
+from sklearn.mixture import GaussianMixture
+import colorlover as cl
+
+def get_spaced_colors(n):
+    max_value = 255
+    interval = int(max_value / n)
+    hues = range(0, max_value, interval)
+    return cl.to_rgb(["hsl(%d,100%%,40%%)"%i for i in hues])
 
 
 class CSVPlotter:
@@ -166,8 +174,129 @@ class DistanceMatrixPlotter:
             h = random.getrandbits(128)
             fname = "%032x.html"%h
             plot(fig, output_type='file', filename=fname)
-            
 
+class HGMMPlotter(DistanceMatrixPlotter):
+    def __init__(self, *args, embedder, **kwargs):
+        super(HGMMPlotter, self).__init__(*args, **kwargs)
+        self.embedder = embedder
+        X = embedder.embed(self.dm)
+        levels = []
+        n = X.shape[0]
+        l0 = HGMMPlotter.hgmml0(X)
+        levels.append(l0)
+        li = HGMMPlotter.gmmBranch(l0[0])
+        levels.append(li)
+        while len(li) < n:
+            lip = []
+            for c in li:
+                lip.extend(HGMMPlotter.gmmBranch(c))
+            levels.append(lip)
+            li = lip
+        self.levels = levels 
+
+    def gmmBranch(level):
+        X, p, mu = level
+        if X.shape[0] >= 2:
+            gmm = GaussianMixture(n_components=2)
+            gmm.fit(X)
+            X0 = X[gmm.predict(X) == 0, :]
+            X1 = X[gmm.predict(X) == 1, :]
+            mypro = np.rint(gmm.weights_ * p)
+            return [(X0, int(mypro[0]), gmm.means_[0, :]),
+                    (X1, int(mypro[1]), gmm.means_[1, :])]
+        elif X.shape[0] == 1:
+            gmm = GaussianMixture(n_components=1)
+            gmm.fit(X)
+            return [(X, int(np.rint(p * gmm.weights_[0])), gmm.means_[0, :],)] 
+
+    def hgmml0(X):
+        gmm = GaussianMixture(n_components=1)
+        gmm.fit(X)
+        return [(X, int(np.rint(X.shape[0] * gmm.weights_[0])), gmm.means_[0, :],)]
+
+class HGMMClusterMeansLevelHeatmap(HGMMPlotter):
+    titlestring = "%s HGMM Cluster Means level %d, %s embedding"
+
+    def plot(self, level=0):
+        title = self.titlestring % (self.dataset_name, level, self.embedder.embedding_name)
+        means = []
+        for c in self.levels[level]:
+            for _ in range(c[1]):
+                means.append(c[2])
+        X = np.column_stack(means)
+        trace = go.Heatmap(z = X)
+        data = [trace]
+        xaxis = go.XAxis(
+                title="clusters",
+                showticklabels=False,
+                mirror=True,
+                tickvals = [i for i in range(X.shape[1])])
+        yaxis = go.YAxis(
+                title="embedding dimensions",
+                showticklabels=False,
+                mirror=True,
+                tickvals = [i for i in range(X.shape[0])])
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        fig = dict(data=data, layout=layout)
+        iplot(fig)
+
+class StackedClusterMeansHeatmap(HGMMPlotter):
+    titlestring = "%s HGMM Stacked Cluster Means up to level %d, %s embedding"
+
+    def plot(self, level=2):
+        title = self.titlestring % (self.dataset_name, level, self.embedder.embedding_name)
+        Xs = []
+        for l in self.levels[:level]:
+            means = []
+            for c in l:
+                for _ in range(c[1]):
+                    means.append(c[2])
+            X = np.column_stack(means)
+            Xs.append(X)
+        X = np.vstack(Xs)[::-1, :]
+        trace = go.Heatmap(z = X)
+        data = [trace]
+        xaxis = go.XAxis(
+                title="clusters",
+                showticklabels=False,
+                mirror=True,
+                tickvals = [i for i in range(X.shape[1])])
+        yaxis = go.YAxis(
+                title="embedding dimensions",
+                showticklabels=False,
+                mirror=True,
+                tickvals = [i for i in range(X.shape[0])])
+        emb_size = len(self.levels[0][0][2])
+        bar_locations = np.arange(0, X.shape[0]  + emb_size - 1, emb_size) - 0.5
+        shapes = [dict(type="line",x0=-0.5, x1=X.shape[1] - 0.5, y0=b, y1=b) for b in bar_locations]
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis, shapes=shapes)
+        fig = dict(data=data, layout=layout)
+        iplot(fig)
+
+class HGMMClusterMeansLevelLines(HGMMPlotter):
+    titlestring = "%s HGMM Cluster Means level %d, %s embedding"
+
+    def plot(self, level=0):
+        title = self.titlestring % (self.dataset_name, level, self.embedder.embedding_name)
+        data = []
+        colors = get_spaced_colors(len(self.levels[level]))
+        for i, c in enumerate(self.levels[level]):
+            data.append(go.Scatter(x = c[2],
+                                   y = list(range(len(c[2]))),
+                                   mode="lines",
+                                   line=dict(width=c[1], color=colors[i]),
+                                   name="cluster " + str(i)))
+        xaxis = go.XAxis(
+                title="mean values",
+                showticklabels=False,
+                mirror=True)
+        yaxis = go.YAxis(
+                title="embedding dimensions",
+                showticklabels=False,
+                mirror=True)
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        fig = dict(data=data, layout=layout)
+        iplot(fig)
 
 class DistanceMatrixHeatmap(DistanceMatrixPlotter):
     titlestring = "%s Distance Matrix Heatmap under %s metric"
