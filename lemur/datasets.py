@@ -3,6 +3,15 @@ import pandas as pd
 import numpy as np
 import pickle as pkl
 
+class DataSet:
+    def __init__(self, D, name="default"):
+        self.D = D
+        self.N = self.D.shape[0]
+        self.name = name
+
+    def getResource(self, index):
+        return self.D.iloc[index, :]
+
 class DiskDataSet:
     """A dataset living locally on the hard disk.
 
@@ -26,8 +35,11 @@ class DiskDataSet:
 
     """
 
-    def __init__(self, df_path):
+    def __init__(self, df_path, index_column = None):
         self.D = pd.read_csv(df_path)
+        if index_column is not None:
+            self.D.index = self.D[index_column]
+            self.D.index.name = index_column
         self.N = self.D.shape[0]
         self.name = df_path.split("/")[-1].split(".")[0].split("_")[0]
 
@@ -305,6 +317,7 @@ class DistanceMatrix:
         self.labels = self.dataset.D.index.get_level_values(index_level)
         self.label_name = self.dataset.D.index.names[index_level]
         self.metric = metric
+        self.metric_name = metric.__name__
         self.N = self.dataset.N
         parameterization = self.metric.parameterize(self.dataset)
         self.matrix = np.zeros([self.N, self.N])
