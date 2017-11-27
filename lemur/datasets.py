@@ -123,7 +123,6 @@ class CSVDataSet:
         keep = self.D.columns[~allnull]
         self.D = self.D[keep]
         keep = (self.D.dtypes == "float64").as_matrix()
-        print(keep)
         self.D = self.D[self.D.columns[keep]]
         cmean = self.D.mean(axis=0)
         values = dict(list(zip(self.D.columns, cmean.as_matrix())))
