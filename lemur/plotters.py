@@ -192,7 +192,7 @@ class HGMMPlotter(DistanceMatrixPlotter):
                 lip.extend(HGMMPlotter.gmmBranch(c))
             levels.append(lip)
             li = lip
-        self.levels = levels 
+        self.levels = levels
 
     def gmmBranch(level):
         X, p, mu = level
@@ -202,8 +202,8 @@ class HGMMPlotter(DistanceMatrixPlotter):
             X0 = X[gmm.predict(X) == 0, :]
             X1 = X[gmm.predict(X) == 1, :]
             mypro = np.rint(gmm.weights_ * p)
-            return [(X0, int(mypro[0]), gmm.means_[0, :]),
-                    (X1, int(mypro[1]), gmm.means_[1, :])]
+            return [(X0, int(mypro[0]), gmm.means_[0, :],),
+                    (X1, int(mypro[1]), gmm.means_[1, :],)]
         elif X.shape[0] == 1:
             gmm = GaussianMixture(n_components=1)
             gmm.fit(X)
@@ -296,6 +296,26 @@ class HGMMClusterMeansLevelLines(HGMMPlotter):
                 mirror=True)
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data=data, layout=layout)
+        iplot(fig)
+
+class HGMMPairsPlot(HGMMPlotter):
+    titlestring = "%s HGMM Classification Pairs Plot lev. %d, %s embedding"
+
+    def plot(self, level=0):
+        title = self.titlestring % (self.dataset_name, level, self.embedder.embedding_name)
+        data = []
+        colors = get_spaced_colors(len(self.levels[level]))
+        samples = []
+        labels = []
+        for i, c in enumerate(self.levels[level]):
+            samples.append(c[0].T)
+            labels.append(c[0].shape[0] * [i])
+        samples = np.hstack(samples)
+        labels = np.hstack(labels)
+        df = pd.DataFrame(samples.T, columns=["Dim %d"%i for i in range(samples.shape[0])])
+        df["label"] = ["Cluster %d"%i for i in labels]
+        fig = ff.create_scatterplotmatrix(df, diag='box', index="label", colormap=colors)
+        fig["layout"]["title"] = title
         iplot(fig)
 
 class DistanceMatrixHeatmap(DistanceMatrixPlotter):
@@ -514,6 +534,31 @@ class EmbeddingParallelCoordinatePlotter(DistanceMatrixPlotter):
             title=title
         )
         fig = dict(data = data, layout = layout)
+        self.makeplot(fig)
+
+class EmbeddingCorrelationMatrix(DistanceMatrixPlotter):
+    titlestring = "%s %s Embedding Correlation Matrix under %s metric"
+
+    def plot(self, embedder):
+        title = self.titlestring % (self.dataset_name, embedder.embedding_name, self.metric_name)
+        emb = embedder.embed(self.dm)
+        D = emb.T
+        xaxis = dict(
+            title = "Embedding Dimensions",
+            showticklabels=False
+        )
+        yaxis = dict(
+            scaleanchor="x",
+            title = "Embedding Dimensions",
+            showticklabels=False
+        )
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        with np.errstate(divide = 'ignore', invalid = 'ignore'):
+            C = np.nan_to_num(np.corrcoef(D))
+
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        trace = go.Heatmap(z = C)
+        fig = dict(data=[trace], layout=layout)
         self.makeplot(fig)
 
 class Embedding1DHeatmap(DistanceMatrixPlotter):
