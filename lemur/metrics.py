@@ -133,9 +133,6 @@ class NanNorm:
         return np.nansum((x - y) * (x - y))
 
 class VectorDifferenceNorm:
-    """The dot product between two vectors, except nans are just treated as 0.
-
-    """
         
     def parameterize(D):
         """Identity function.
