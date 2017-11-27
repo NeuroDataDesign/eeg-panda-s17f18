@@ -61,7 +61,7 @@ class Heatmap(MatrixPlotter):
                 tickvals = [i for i in range(len(self.DS.D.index))])
         yaxis = go.YAxis(
                 title="dimensions",
-                ticktext = ["factor %s"%i for i in range(1, len(self.DS.D.index) + 1)],
+                ticktext = self.DS.D.columns,
                 ticks = "",
                 showticklabels=False,
                 mirror=True,
@@ -246,7 +246,9 @@ class HGMMPlotter(MatrixPlotter):
         while len(li) < n:
             lip = []
             for c in li:
-                lip.extend(HGMMPlotter.gmmBranch(c))
+                q = HGMMPlotter.gmmBranch(c)
+                if q is not None:
+                    lip.extend(q)
             levels.append(lip)
             li = lip
         self.levels = levels
