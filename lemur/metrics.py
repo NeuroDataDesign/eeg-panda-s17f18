@@ -92,7 +92,7 @@ class DiffAve:
         """
         return np.linalg.norm(x - y)
 
-class NanDotProduct:
+class NanNorm:
     """The dot product between two vectors, except nans are just treated as 0.
 
     """
@@ -132,6 +132,42 @@ class NanDotProduct:
         """
         return np.nansum((x - y) * (x - y))
 
+class VectorDifferenceNorm:
+        
+    def parameterize(D):
+        """Identity function.
+
+        Parameters
+        ----------
+        D : :obj:`DataSet`
+            A dataset.
+
+        Returns
+        -------
+        :obj:`list` of :obj:`ndarray`
+            The a list of each vector in the dataset.
+
+        """
+
+        return list(map(lambda j: D.getResource(j), range(D.N)))
+
+    def compare(x, y):
+        """Compute the euclidian distance of two correlation matricies.
+
+        Parameters
+        ----------
+        x : :obj:`ndarray`
+            The left vector argument.
+        y : :obj:`ndarray`
+            The left vector argument.
+
+        Returns
+        -------
+        float
+            The distance.
+
+        """
+        return np.linalg.norm((x - y))
 
 class Coh:
     """An implementation of the coherence metric.

@@ -1,5 +1,8 @@
 from sklearn.manifold import TSNE, MDS
+import pandas as pd
 import numpy as np
+
+import lemur.datasets as lds
 
 class BaseEmbedder:
     """A generic embedder object to be extended.
@@ -19,19 +22,8 @@ class BaseEmbedder:
         self.num_components = num_components
 
 class MDSEmbedder(BaseEmbedder):
-    """A MultiDimensional Scaling embedder.
-
-    This uses the sklearn.manifold.MDS function.
-
-    Attributes
-    ----------
-    embedding_name : str
-        The name of this embedding (default is `MDS`)
-
-    """
-
     embedding_name = "MDS"
-    def embed(self, M):
+    def embed(self, DM):
         """Embed a distance matrix using MDS.
 
         Parameters
@@ -46,9 +38,16 @@ class MDSEmbedder(BaseEmbedder):
 
         """
         mds = MDS(n_components = self.num_components, dissimilarity="precomputed")
-        mds.fit(M)
+        mds.fit(DM.getMatrix())
         emb = mds.embedding_
-        return emb
+        emb = pd.DataFrame(emb)
+        emb.index = DM.labels
+        emb.index.name = DM.label_name
+        name = DM.dataset.name + " " + \
+               DM.metric_name + " " + \
+               self.embedding_name
+        EDS = lds.DataSet(emb, name)
+        return EDS
 
 class TSNEEmbedder(BaseEmbedder):
     """A TSNE embedder.
