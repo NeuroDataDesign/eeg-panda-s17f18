@@ -3,6 +3,15 @@ import pandas as pd
 import numpy as np
 import pickle as pkl
 
+class DataSet:
+    def __init__(self, D, name="default"):
+        self.D = D
+        self.N = self.D.shape[0]
+        self.name = name
+
+    def getResource(self, index):
+        return self.D.iloc[index, :]
+
 class DiskDataSet:
     """A dataset living locally on the hard disk.
 
@@ -26,8 +35,11 @@ class DiskDataSet:
 
     """
 
-    def __init__(self, df_path):
+    def __init__(self, df_path, index_column = None):
         self.D = pd.read_csv(df_path)
+        if index_column is not None:
+            self.D.index = self.D[index_column]
+            self.D.index.name = index_column
         self.N = self.D.shape[0]
         self.name = df_path.split("/")[-1].split(".")[0].split("_")[0]
 
@@ -65,25 +77,12 @@ class CSVDataSet:
     """ A dataset living locally in a .csv file
 
     """
-    def __init__(self, csv_path, index_column = None, column_level_names = None,
-                 heirarchy_separator = ",", NA_val = ".", name = "mydataset"):
+    def __init__(self, csv_path, index_columns = None, column_level_names = None,
+                 row_level_names = None, heirarchy_separator = ",", NA_val = ".", name = "mydataset"):
         self.name = name
-
+        
         # Load the data set
         D = pd.read_csv(csv_path, dtype="unicode")
-
-        # Set the index column as specified
-        if index_column is not None:
-            D[index_column] = list(map(str, D[index_column]))
-            D.index = D[index_column]
-            del D[index_column]
-
-        # Set the column multi index
-        column_tuples = list(map(lambda x: tuple(x.split(heirarchy_separator)), D.columns))
-        D.columns = pd.MultiIndex.from_tuples(column_tuples)
-        for c in column_tuples:
-            if c[0] == "Unnamed: 0":
-                del D[c]
 
         # Convert to numeric all numeric rows
         D = D.replace(NA_val, "nan")
@@ -92,10 +91,51 @@ class CSVDataSet:
         newindex = D.index
         D = list(d)
         D = pd.DataFrame(dict(zip(newcolumns, D)), index = newindex)
+
+
+        # Set the index column as specified
+        if index_columns is not None:
+            indexes = []
+            for ic in index_columns:
+                raw_idx = heirarchy_separator.join(ic)
+                D[raw_idx] = list(map(str, D[raw_idx]))
+                indexes.append(D[raw_idx].as_matrix())
+                del D[raw_idx]
+            D.index = pd.MultiIndex.from_tuples(list(zip(*indexes)))
+
+        # Set the column multi index
+        column_tuples = list(map(lambda x: tuple(x.split(heirarchy_separator)), D.columns))
+        D.columns = pd.MultiIndex.from_tuples(column_tuples)
+        for c in column_tuples:
+            if c[0] == "Unnamed: 0":
+                del D[c]
+
         if column_level_names is not None:
             D.columns.names = column_level_names
+        if row_level_names is not None:
+            D.index.names = row_level_names
         self.D = D
         self.N = self.D.shape[0]
+
+    def imputeColumns(self, numeric):
+        keep = []
+        allnull = self.D.isnull().all(axis=0)
+        keep = self.D.columns[~allnull]
+        self.D = self.D[keep]
+        keep = (self.D.dtypes == "float64").as_matrix()
+        self.D = self.D[self.D.columns[keep]]
+        cmean = self.D.mean(axis=0)
+        values = dict(list(zip(self.D.columns, cmean.as_matrix())))
+        #self.D.fillna(value=values, inplace=True)
+        d = self.D.as_matrix()
+        for i, c in enumerate(self.D.columns):
+            d[:, i][np.isnan(d[:, i])] = values[c]
+        D = pd.DataFrame(d)
+        D.index = self.D.index
+        D.index.names = self.D.index.names
+        D.columns = self.D.columns
+        D.columns.names = self.D.columns.names
+        self.D = D
 
     def getResource(self, index):
         """Get a specific data point from the data set.
@@ -271,9 +311,12 @@ class DistanceMatrix:
 
     """
 
-    def __init__(self, dataset, metric):
+    def __init__(self, dataset, metric, index_level = 0):
         self.dataset = dataset
+        self.labels = self.dataset.D.index.get_level_values(index_level)
+        self.label_name = self.dataset.D.index.names[index_level]
         self.metric = metric
+        self.metric_name = metric.__name__
         self.N = self.dataset.N
         parameterization = self.metric.parameterize(self.dataset)
         self.matrix = np.zeros([self.N, self.N])
