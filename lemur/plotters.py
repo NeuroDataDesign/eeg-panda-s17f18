@@ -114,7 +114,7 @@ class EverythingPlotter(CSVPlotter):
             os.makedirs(path, exist_ok=True)
             div = cp.plot(c)
             with open(os.path.join(path, plotter.__name__ + ".html"), "w") as f:
-                    f.write(self.html_data%(plotter.__name__, div))
+                f.write(self.html_data%(plotter.__name__, div))
 
 class DistanceMatrixPlotter:
     """A generic aggregate plotter acting on a distance matrix to be extended.

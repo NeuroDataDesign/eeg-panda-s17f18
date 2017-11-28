@@ -1,12 +1,10 @@
-import sys, os
+import os
 import boto3
 import botocore
 from flask import Flask, render_template, request, send_from_directory
 import logging
 from logging.handlers import RotatingFileHandler
-
-
-# from lemur import datasets as lds, metrics as lms, plotters as lpl, embedders as leb
+from runner import get_pheno_plots
 
 app = Flask(__name__)
 
@@ -20,7 +18,8 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    target = os.path.join(APP_ROOT,'text')
+    target = os.path.join(APP_ROOT,'data')
+    # target = "/home/nitin/hopkins/fall2017/ndd/kpfv2/"
     app.logger.info('Target route: %s', target)
 
     if not os.path.isdir(target):
@@ -33,6 +32,9 @@ def upload():
         file.save(destination)
         app.logger.info('Accept incoming file: %s', filename)
         app.logger.info('Save it to: %s', destination)
+        app.logger.info('Starting phenotypic plots...')
+        get_pheno_plots(target, destination)
+        app.logger.info('... finishing phenotypic plots')
     return render_template("complete.html", file_name=filename)
 
 @app.route('/s3upload', methods=['POST'])
