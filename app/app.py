@@ -1,14 +1,19 @@
-import os
+import sys, os
 import boto3
 import botocore
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, session, render_template, request, send_from_directory, url_for, redirect
 import logging
 from logging.handlers import RotatingFileHandler
 from runner import get_pheno_plots
 
+sys.path.append(os.path.abspath(os.path.join('..')))
+from lemur import datasets as lds, metrics as lms, plotters as lpl, embedders as leb
+
 app = Flask(__name__)
 
 app.debug = True
+
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -16,26 +21,60 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 def index():
     return render_template('upload.html')
 
+
+@app.route('/MEDA/<plot_name>')
+def meda(plot_name=None):
+    app.logger.info('Plot Name is: %s', plot_name)
+    app.logger.info('CSV File is: %s', session['data'])
+    pheno = lds.CSVDataSet(session['data'], name = "HBN Phenotypic")
+    pheno.imputeColumns("mean")
+
+    options = {
+        'Heatmap': 'heatmap',
+        'Location Heatmap': 'locheat',
+        'Location Lines': 'loclines',
+        'Histogram Heatmap': 'histheat',
+        'Correlation Matrix': 'corr',
+        'Scree Plot': 'scree',
+        'Eigenvector Heatmap': 'eigen'
+    }
+
+    if plot_name == 'heatmap':
+        todisp = lpl.Heatmap(pheno, mode='div').plot()
+    elif plot_name == 'locheat':
+        todisp = lpl.LocationHeatmap(pheno, mode='div').plot()
+    elif plot_name == 'loclines':
+        todisp = lpl.LocationLines(pheno, mode='div').plot()
+    elif plot_name == 'histheat':
+        todisp = lpl.HistogramHeatmap(pheno, mode='div').plot()
+    elif plot_name == 'corr':
+        todisp = lpl.CorrelationMatrix(pheno, mode='div').plot()
+    elif plot_name == 'scree':
+        todisp = lpl.ScreePlotter(pheno, mode='div').plot()
+    elif plot_name == 'eigen':
+        todisp = lpl.EigenvectorHeatmap(pheno, mode='div').plot()
+    else:
+        todisp = "<h1> Choose a plot! </h1>"
+    return render_template('meda.html', plot=todisp, options=options)
+
+
 @app.route('/upload', methods=['POST'])
 def upload():
     target = os.path.join(APP_ROOT,'data')
-    # target = "/home/nitin/hopkins/fall2017/ndd/kpfv2/"
     app.logger.info('Target route: %s', target)
 
     if not os.path.isdir(target):
         os.mkdir(target)
 
-    for file in request.files.getlist("file"):
-        # print file
-        filename = file.filename
-        destination = "/".join([target,filename])
-        file.save(destination)
-        app.logger.info('Accept incoming file: %s', filename)
-        app.logger.info('Save it to: %s', destination)
-        app.logger.info('Starting phenotypic plots...')
-        get_pheno_plots(target, destination)
-        app.logger.info('... finishing phenotypic plots')
-    return render_template("complete.html", file_name=filename)
+    file = request.files.getlist("file")[0]
+    # print file
+    filename = file.filename
+    destination = "/".join([target,filename])
+    app.logger.info('Accept incoming file: %s', filename)
+    app.logger.info('Save it to: %s', destination)
+    file.save(destination)
+    session['data'] = destination
+    return redirect(url_for('meda', plot_name='heatmap'))
 
 @app.route('/s3upload', methods=['POST'])
 def s3upload():
