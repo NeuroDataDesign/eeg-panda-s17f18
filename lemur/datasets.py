@@ -77,16 +77,22 @@ class CSVDataSet:
     """ A dataset living locally in a .csv file
 
     """
-    def __init__(self, csv_path, index_columns = None, column_level_names = None,
+    def __init__(self, csv_path, index_column = None, column_level_names = None,
                  row_level_names = None, heirarchy_separator = ",", NA_val = ".", name = "mydataset"):
         self.name = name
         
         # Load the data set
         D = pd.read_csv(csv_path, dtype="unicode")
+        n, d = D.shape
+        print("Dataset of size", n, "samples", d, "dimensions", "Loaded")
 
         # Convert to numeric all numeric rows
         D = D.replace(NA_val, "nan")
-        d = list(map(lambda c: convertDtype(list(D[c])), D.columns))
+        print("Replacing all", NA_val, "with nan")
+        d = []
+        for c in D.columns:
+            d.append(convertDtype(list(D[c])))
+            print("Converting", c, end="\r") 
         newcolumns = D.columns
         newindex = D.index
         D = list(d)
@@ -94,20 +100,18 @@ class CSVDataSet:
 
 
         # Set the index column as specified
-        if index_columns is not None:
-            indexes = []
-            for ic in index_columns:
-                raw_idx = heirarchy_separator.join(ic)
-                D[raw_idx] = list(map(str, D[raw_idx]))
-                indexes.append(D[raw_idx].as_matrix())
-                del D[raw_idx]
-            D.index = pd.MultiIndex.from_tuples(list(zip(*indexes)))
+        if index_column is not None:
+            print("Setting index column as", index_column)
+            D.index = D[index_column]
+            print("Deleting", index_column, "from dataset")
+            del D[index_column]
 
         # Set the column multi index
         column_tuples = list(map(lambda x: tuple(x.split(heirarchy_separator)), D.columns))
         D.columns = pd.MultiIndex.from_tuples(column_tuples)
         for c in column_tuples:
             if c[0] == "Unnamed: 0":
+                print("Deleting column named", c[0])
                 del D[c]
 
         if column_level_names is not None:
@@ -115,20 +119,37 @@ class CSVDataSet:
         if row_level_names is not None:
             D.index.names = row_level_names
         self.D = D
+
+        # Remove all columns which have all null values
+        keep = []
+        allnull = self.D.isnull().all(axis=0)
+        for c in self.D.columns[allnull]:
+            print("Removing column", c, "because it has all null values")
+        keep = self.D.columns[~allnull]
+        self.D = self.D[keep]
+
+        # Remove all rows which have all null values
+        allnull = self.D.isnull().all(axis=1)
+        for r in self.D.index[allnull]:
+            print("Removing row", r, "because it has all null values")
+        keep = self.D.index[~allnull]
+        self.D = self.D.loc[keep]
+        n, d = self.D.shape
+        print("Dataset of size", n, "samples", d, "dimensions", "Resulting")
         self.N = self.D.shape[0]
 
     def imputeColumns(self, numeric):
         keep = []
-        allnull = self.D.isnull().all(axis=0)
-        keep = self.D.columns[~allnull]
-        self.D = self.D[keep]
         keep = (self.D.dtypes == "float64").as_matrix()
+        for c in self.D.columns[~keep]:
+            print("Removing column", c, "because it is not numeric")
         self.D = self.D[self.D.columns[keep]]
         cmean = self.D.mean(axis=0)
         values = dict(list(zip(self.D.columns, cmean.as_matrix())))
         #self.D.fillna(value=values, inplace=True)
         d = self.D.as_matrix()
         for i, c in enumerate(self.D.columns):
+            print("Imputing column", c, "with value", values[c])
             d[:, i][np.isnan(d[:, i])] = values[c]
         D = pd.DataFrame(d)
         D.index = self.D.index
@@ -136,6 +157,19 @@ class CSVDataSet:
         D.columns = self.D.columns
         D.columns.names = self.D.columns.names
         self.D = D
+        allzero = np.all(self.D.as_matrix() == 0, axis=0)
+        for c in self.D.columns[allzero]:
+            print("Removing column", c, "because it has all zero values")
+        keep = self.D.columns[~allzero]
+        allsame = np.std(self.D.as_matrix(), axis=0) == 0
+        for c in self.D.columns[allsame]:
+            print("Removing column", c, "because it has all zero standard deviation (all values same)")
+        keep = self.D.columns[~allsame]
+        self.D = self.D[keep]
+        n, d = self.D.shape
+        print("Dataset of size", n, "samples", d, "dimensions", "Resulting")
+        print("Dataset has", self.D.isnull().sum().sum(), "nans")
+        print("Dataset has", np.sum(np.isinf(self.D.as_matrix())), "infs")
 
     def getResource(self, index):
         """Get a specific data point from the data set.
@@ -240,52 +274,6 @@ class CSVDataSet:
 
     def getLevelValues(self, index):
         return np.unique(self.D.columns.get_level_values(index))
-
-
-
-class DFDataSet:
-    """A dataset living locally in a Pandas data frame.
-
-    Columns of the Pandas data frame hold vectors of the same variable for all subjets, while
-    rows of the Pandas data frame hold vectors of the same subject for all variables.
-
-    The index of the dataframe should be whatever label you would like to appear on plots.
-
-    Parameters
-    ----------
-    df_path : str
-	Path to the .csv file describing the DiskDataSet.
-
-    Attributes
-    ----------
-    dataframe : pandas DataFrame
-        A DataFrame object describing the dataset.
-    N : int
-        The number of observations in the dataset.
-    name : string
-        A descriptive name for the dataset.
-
-    """
-    def __init__(self, dataframe, name = "mydataset"):
-        self.D = dataframe
-        self.N = dataframe.shape[0]
-        self.name = name
-
-    def getResource(self, index):
-        """Get a specific data point from the data set.
-
-        Parameters
-        ----------
-        index : int
-            The index of the data point in `D`.
-
-        Returns
-        -------
-        :obj:`ndarray`
-            A ndarray of the data point.
-
-        """
-        return self.D.iloc[index].as_matrix().astype(float)
 
 
 class DistanceMatrix:

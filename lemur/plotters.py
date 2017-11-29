@@ -55,17 +55,13 @@ class Heatmap(MatrixPlotter):
         xaxis = go.XAxis(
                 title="observaions",
                 ticktext = self.DS.D.index,
-                ticks = "",
                 showticklabels=False,
-                mirror=True,
                 tickvals = [i for i in range(len(self.DS.D.index))])
         yaxis = go.YAxis(
                 title="dimensions",
                 ticktext = self.DS.D.columns,
-                ticks = "",
                 showticklabels=False,
-                mirror=True,
-                tickvals = [i for i in range(len(self.DS.D.index))])
+                tickvals = [i for i in range(len(self.DS.D.columns))])
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         trace = go.Heatmap(z = self.DS.D.as_matrix().T)
         data = [trace]
@@ -86,7 +82,10 @@ class LocationHeatmap(MatrixPlotter):
                 showticklabels=True,
                 tickvals = [0, 1])
         xaxis = go.XAxis(
-                title="dimensions")
+                title="dimensions",
+                ticktext = self.DS.D.columns,
+                showticklabels=False,
+                tickvals = [i for i in range(len(self.DS.D.columns))])
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         trace = go.Heatmap(z = z)
         data = [trace]
@@ -104,7 +103,10 @@ class LocationLines(MatrixPlotter):
         trace0 = go.Scatter(x = np.arange(len(means)), y = means, name="means")
         trace1 = go.Scatter(x = np.arange(len(medians)), y = medians, name="medians")
         layout = dict(title=title,
-                      xaxis=dict(title="Dimensions"),
+                      xaxis=dict(title="Dimensions",
+                                 ticktext = self.DS.D.columns,
+                                 showticklabels=False,
+                                 tickvals = [i for i in range(len(self.DS.D.columns))]),
                       yaxis=dict(title="Mean or Median Value"))
         data = [trace0, trace1]
         fig = dict(data=data, layout=layout)
@@ -118,6 +120,7 @@ class HistogramHeatmap(MatrixPlotter):
         D = self.DS.D.as_matrix().T
         d, n = D.shape
         D = (D - np.mean(D, axis=1).reshape(d, 1)) / np.std(D, axis=1).reshape(d, 1)
+        D = np.nan_to_num(D) # only nan if std all 0 -> all values 0
         num_bins = int(np.sqrt(n))
         bins = np.linspace(-5, 5, num_bins + 1)
         bin_centers = (bins[1:] + bins[:-1]) / 2
@@ -153,15 +156,19 @@ class CorrelationMatrix(MatrixPlotter):
         xaxis = dict(
             title = "Dimensions",
             ticks = "",
+            ticktext = self.DS.D.columns,
             showgrid=False,
-            showticklabels=False
+            showticklabels=False,
+            tickvals = [i for i in range(len(self.DS.D.columns))]
         )
         yaxis = dict(
             scaleanchor="x",
             title = "Dimensions",
             ticks = "",
+            ticktext = self.DS.D.columns,
             showgrid=False,
-            showticklabels=False
+            showticklabels=False,
+            tickvals = [i for i in range(len(self.DS.D.columns))]
         )
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         with np.errstate(divide = 'ignore', invalid = 'ignore'):
@@ -243,7 +250,8 @@ class HGMMPlotter(MatrixPlotter):
         levels.append(l0)
         li = HGMMPlotter.gmmBranch(l0[0])
         levels.append(li)
-        while len(li) < n:
+        while (len(li) < n) and (len(levels) < 5):
+            print("Starting level", len(levels))
             lip = []
             for c in li:
                 q = HGMMPlotter.gmmBranch(c)
@@ -307,11 +315,13 @@ class HGMMStackedClusterMeansHeatmap(HGMMPlotter):
         xaxis = go.XAxis(
                 title="Clusters",
                 showticklabels=False,
+                ticks="",
                 mirror=True,
                 tickvals = [i for i in range(X.shape[1])])
         yaxis = go.YAxis(
                 title="Dimensions",
                 showticklabels=False,
+                ticks="",
                 mirror=True,
                 tickvals = [i for i in range(X.shape[0])])
         emb_size = len(self.levels[0][0][2])
@@ -336,11 +346,13 @@ class HGMMClusterMeansLevelHeatmap(HGMMPlotter):
         xaxis = go.XAxis(
                 title="clusters",
                 showticklabels=False,
+                ticks="",
                 mirror=True,
                 tickvals = [i for i in range(X.shape[1])])
         yaxis = go.YAxis(
                 title="embedding dimensions",
                 showticklabels=False,
+                ticks="",
                 mirror=True,
                 tickvals = [i for i in range(X.shape[0])])
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
@@ -358,7 +370,7 @@ class HGMMClusterMeansLevelLines(HGMMPlotter):
             data.append(go.Scatter(x = c[2],
                                    y = list(range(len(c[2]))),
                                    mode="lines",
-                                   line=dict(width=c[1], color=colors[i]),
+                                   line=dict(width=np.sqrt(c[1]), color=colors[i]),
                                    name="cluster " + str(i)))
         xaxis = go.XAxis(
                 title="mean values",
