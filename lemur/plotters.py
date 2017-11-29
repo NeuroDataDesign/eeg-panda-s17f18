@@ -66,7 +66,7 @@ class Heatmap(MatrixPlotter):
         trace = go.Heatmap(z = self.DS.D.as_matrix().T)
         data = [trace]
         fig = dict(data=data, layout=layout)
-        self.makeplot(fig)
+        return self.makeplot(fig)
 
 class LocationHeatmap(MatrixPlotter):
     titlestring = "%s Location Heatmap"
@@ -90,7 +90,7 @@ class LocationHeatmap(MatrixPlotter):
         trace = go.Heatmap(z = z)
         data = [trace]
         fig = dict(data=data, layout=layout)
-        self.makeplot(fig)
+        return self.makeplot(fig)
 
 class LocationLines(MatrixPlotter):
     titlestring = "%s Embedding Location Lines"
@@ -110,7 +110,7 @@ class LocationLines(MatrixPlotter):
                       yaxis=dict(title="Mean or Median Value"))
         data = [trace0, trace1]
         fig = dict(data=data, layout=layout)
-        self.makeplot(fig)
+        return self.makeplot(fig)
 
 class HistogramHeatmap(MatrixPlotter):
     titlestring = "%s Histogram Heatmap"
@@ -145,7 +145,7 @@ class HistogramHeatmap(MatrixPlotter):
                 mirror=True)
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data = data, layout = layout)
-        self.makeplot(fig)
+        return self.makeplot(fig)
 
 class CorrelationMatrix(MatrixPlotter):
     titlestring = "%s Correlation Matrix"
@@ -177,7 +177,7 @@ class CorrelationMatrix(MatrixPlotter):
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         trace = go.Heatmap(z = C)
         fig = dict(data=[trace], layout=layout)
-        self.makeplot(fig)
+        return self.makeplot(fig)
 
 class ScreePlotter(MatrixPlotter): 
     titlestring = "%s Scree Plot"
@@ -207,7 +207,7 @@ class ScreePlotter(MatrixPlotter):
         data = [var, cumvar]
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data=data, layout=layout)
-        self.makeplot(fig)
+        return self.makeplot(fig)
 
 class EigenvectorHeatmap(MatrixPlotter):
     titlestring = "%s Eigenvector Heatmap"
@@ -238,7 +238,7 @@ class EigenvectorHeatmap(MatrixPlotter):
         trace = go.Heatmap(z = U)
         data = [trace]
         fig = dict(data=data, layout=layout)
-        self.makeplot(fig)
+        return self.makeplot(fig)
 
 class HGMMPlotter(MatrixPlotter):
     def __init__(self, *args, **kwargs):
@@ -294,7 +294,7 @@ class HGMMClusterMeansDendrogram(HGMMPlotter):
         fig["layout"]["title"] = title
         fig["layout"]["xaxis"]["title"] = "Cluster Labels"
         fig["layout"]["yaxis"]["title"] = "Cluster Mean Distances"
-        self.makeplot(fig)
+        return self.makeplot(fig)
 
 class HGMMStackedClusterMeansHeatmap(HGMMPlotter):
     titlestring = "%s HGMM Stacked Cluster Means up to Level %d"
@@ -329,7 +329,7 @@ class HGMMStackedClusterMeansHeatmap(HGMMPlotter):
         shapes = [dict(type="line",x0=-0.5, x1=X.shape[1] - 0.5, y0=b, y1=b) for b in bar_locations]
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis, shapes=shapes)
         fig = dict(data=data, layout=layout)
-        self.makeplot(fig)
+        return self.makeplot(fig)
 
 class HGMMClusterMeansLevelHeatmap(HGMMPlotter):
     titlestring = "%s HGMM Cluster Means, Level %d"
@@ -357,7 +357,7 @@ class HGMMClusterMeansLevelHeatmap(HGMMPlotter):
                 tickvals = [i for i in range(X.shape[0])])
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data=data, layout=layout)
-        self.makeplot(fig)
+        return self.makeplot(fig)
 
 class HGMMClusterMeansLevelLines(HGMMPlotter):
     titlestring = "%s HGMM Cluster Means Level %d"
@@ -382,7 +382,7 @@ class HGMMClusterMeansLevelLines(HGMMPlotter):
                 mirror=True)
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data=data, layout=layout)
-        self.makeplot(fig)
+        return self.makeplot(fig)
 
 class HGMMPairsPlot(HGMMPlotter):
     titlestring = "%s HGMM Classification Pairs Plot Level %d"
@@ -402,7 +402,7 @@ class HGMMPairsPlot(HGMMPlotter):
         df["label"] = ["Cluster %d"%i for i in labels]
         fig = ff.create_scatterplotmatrix(df, diag='box', index="label", colormap=colors)
         fig["layout"]["title"] = title
-        self.makeplot(fig)
+        return self.makeplot(fig)
 
 class DistanceMatrixPlotter:
     """A generic aggregate plotter acting on a distance matrix to be extended.
@@ -485,7 +485,8 @@ class ColumnDistributionPlotter(CSVPlotter):
     def plot(self, column):
         x, y = self.ds.getColumnDistribution(column)
         yn = y / np.nansum(y)
-        title = "Column Distribution Plot<br>" + self.ds.getColumnDescription(column, sep="<br>")
+        # title = "Column Distribution Plot<br>" + self.ds.getColumnDescription(column, sep="<br>")
+        title = "Column Distribution Plot<br>"
         trace_frequency = go.Bar(
             x = x,
             y = y,
@@ -556,7 +557,7 @@ class EverythingPlotter(CSVPlotter):
             os.makedirs(path, exist_ok=True)
             div = cp.plot(c)
             with open(os.path.join(path, plotter.__name__ + ".html"), "w") as f:
-                    f.write(self.html_data%(plotter.__name__, div))
+                f.write(self.html_data%(plotter.__name__, div))
 
 
 
@@ -770,6 +771,7 @@ class TimeSeriesPlotter:
             h = random.getrandbits(128)
             fname = "%032x.html"%h
             plot(fig, output_type='file', filename=fname)
+
 
 class SparkLinePlotter(TimeSeriesPlotter):
     titlestring = "Sparklines for %s"
