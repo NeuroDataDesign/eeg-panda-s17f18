@@ -3,15 +3,23 @@ import pandas as pd
 import numpy as np
 import pickle as pkl
 import logging
+import json
 
 class DataSet:
     def __init__(self, D, name="default"):
         self.D = D
-        self.N = self.D.shape[0]
+        self.n, self.d = self.D.shape
         self.name = name
 
     def getResource(self, index):
         return self.D.iloc[index, :]
+
+    def saveMetaData(self, filepath):
+        metadata = dict(d=self.d, n=self.n, name=self.name)
+        string = json.dumps(metadata, indent=2)
+        with open(filepath, 'w') as f:
+            f.write(string)
+        return string
 
 class DiskDataSet:
     """A dataset living locally on the hard disk.
@@ -65,6 +73,13 @@ class DiskDataSet:
                 return pkl.load(f).T
             return pkl.load(f)
 
+    def getResourceDS(self, index):
+        D = pd.DataFrame(self.getResource(index).T)
+        name = self.name + " " + \
+               str(index) + " "
+        DS = DataSet(D, name)
+        return DS
+
 def convertDtype(l):
     try:
         return np.array(l, dtype="float")
@@ -74,18 +89,17 @@ def convertDtype(l):
     l[l == 'nan'] = 'NA'
     return l
 
-class CSVDataSet:
+class CSVDataSet(DataSet):
     """ A dataset living locally in a .csv file
 
     """
-    def __init__(self, csv_path, index_column = None, column_level_names = None,
-                 row_level_names = None, heirarchy_separator = ",", NA_val = ".", name = "mydataset"):
+    def __init__(self, csv_path, index_column = None,  NA_val = ".", name = "mydataset"):
         self.name = name
         
         # Load the data set
         D = pd.read_csv(csv_path, dtype="unicode")
-        n, d = D.shape
-        print("Dataset of size", n, "samples", d, "dimensions", "Loaded")
+        self.n, self.d = D.shape
+        print("Dataset of size", self.n, "samples", self.d, "dimensions", "Loaded")
 
         # Convert to numeric all numeric rows
         D = D.replace(NA_val, "nan")
@@ -93,7 +107,7 @@ class CSVDataSet:
         d = []
         for c in D.columns:
             d.append(convertDtype(list(D[c])))
-            print("Converting", c, end="\r") 
+            print("Converting", c, end="\r\r") 
         newcolumns = D.columns
         newindex = D.index
         D = list(d)
@@ -107,18 +121,6 @@ class CSVDataSet:
             print("Deleting", index_column, "from dataset")
             del D[index_column]
 
-        # Set the column multi index
-        column_tuples = list(map(lambda x: tuple(x.split(heirarchy_separator)), D.columns))
-        D.columns = pd.MultiIndex.from_tuples(column_tuples)
-        for c in column_tuples:
-            if c[0] == "Unnamed: 0":
-                print("Deleting column named", c[0])
-                del D[c]
-
-        if column_level_names is not None:
-            D.columns.names = column_level_names
-        if row_level_names is not None:
-            D.index.names = row_level_names
         self.D = D
 
         # Remove all columns which have all null values
