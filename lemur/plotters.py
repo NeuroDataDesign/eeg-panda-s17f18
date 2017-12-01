@@ -216,7 +216,9 @@ class EigenvectorHeatmap(MatrixPlotter):
         title = self.titlestring % (self.DS.name)
         D = self.DS.D.as_matrix().T
         d, n = D.shape
+        print(D.shape)
         U, _, _ = np.linalg.svd(D, full_matrices=False)
+        print(U.shape)
         xaxis = go.XAxis(
                 title="Eigenvectors",
                 ticktext = ["Eigenvector %s"%i for i in range(1, d + 1)],
@@ -284,7 +286,7 @@ class HGMMPlotter(MatrixPlotter):
 class HGMMClusterMeansDendrogram(HGMMPlotter):
     titlestring = "%s HGMM Cluster Means Dendrogram to Lev. %d"
 
-    def plot(self, level=0):
+    def plot(self, level=4):
         title = self.titlestring % (self.DS.name, level)
         means = []
         for c in self.levels[level]:
@@ -294,15 +296,17 @@ class HGMMClusterMeansDendrogram(HGMMPlotter):
         fig["layout"]["title"] = title
         fig["layout"]["xaxis"]["title"] = "Cluster Labels"
         fig["layout"]["yaxis"]["title"] = "Cluster Mean Distances"
+        del fig.layout["width"]
+        del fig.layout["height"]
         return self.makeplot(fig)
 
 class HGMMStackedClusterMeansHeatmap(HGMMPlotter):
     titlestring = "%s HGMM Stacked Cluster Means up to Level %d"
 
-    def plot(self, level=2):
+    def plot(self, level=4):
         title = self.titlestring % (self.DS.name, level)
         Xs = []
-        for l in self.levels[:level]:
+        for l in self.levels[1:level]:
             means = []
             for c in l:
                 for _ in range(c[1]):
@@ -334,7 +338,7 @@ class HGMMStackedClusterMeansHeatmap(HGMMPlotter):
 class HGMMClusterMeansLevelHeatmap(HGMMPlotter):
     titlestring = "%s HGMM Cluster Means, Level %d"
 
-    def plot(self, level=0):
+    def plot(self, level=4):
         title = self.titlestring % (self.DS.name, level)
         means = []
         for c in self.levels[level]:
@@ -362,7 +366,7 @@ class HGMMClusterMeansLevelHeatmap(HGMMPlotter):
 class HGMMClusterMeansLevelLines(HGMMPlotter):
     titlestring = "%s HGMM Cluster Means Level %d"
 
-    def plot(self, level=0):
+    def plot(self, level=4):
         title = self.titlestring % (self.DS.name, level)
         data = []
         colors = get_spaced_colors(len(self.levels[level]))
@@ -387,7 +391,7 @@ class HGMMClusterMeansLevelLines(HGMMPlotter):
 class HGMMPairsPlot(HGMMPlotter):
     titlestring = "%s HGMM Classification Pairs Plot Level %d"
 
-    def plot(self, level=0):
+    def plot(self, level=2):
         title = self.titlestring % (self.DS.name, level)
         data = []
         colors = get_spaced_colors(len(self.levels[level]))
@@ -402,6 +406,8 @@ class HGMMPairsPlot(HGMMPlotter):
         df["label"] = ["Cluster %d"%i for i in labels]
         fig = ff.create_scatterplotmatrix(df, diag='box', index="label", colormap=colors)
         fig["layout"]["title"] = title
+        del fig.layout["width"]
+        del fig.layout["height"]
         return self.makeplot(fig)
 
 class DistanceMatrixPlotter:
