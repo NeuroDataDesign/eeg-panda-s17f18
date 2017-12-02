@@ -7,6 +7,7 @@ from logging.handlers import RotatingFileHandler
 import json
 
 sys.path.append(os.path.abspath(os.path.join('..')))
+print sys.path
 from lemur import datasets as lds, metrics as lms, plotters as lpl, embedders as leb
 
 app = Flask(__name__)
