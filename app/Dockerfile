@@ -3,7 +3,7 @@ FROM ubuntu:latest
 MAINTAINER Yujia Liu "sophialyj07@gmail.com"
 
 RUN apt-get update -y && \
-    apt-get install -y python3-pip python3-dev
+    apt-get install -y python3-pip python3-dev python3-tk
 
 # We copy just the requirements.txt first to leverage Docker cache
 COPY ./ /app
@@ -14,4 +14,4 @@ RUN pip3 install -r requirements.txt
 
 ENTRYPOINT [ "python3" ]
 
-CMD [ "./web_app/app.py" ]
+CMD [ "app.py" ]
