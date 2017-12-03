@@ -6,8 +6,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import json
 
-sys.path.append(os.path.abspath(os.path.join('..')))
-print sys.path
+#sys.path.append(os.path.abspath(os.path.join('..')))
 from lemur import datasets as lds, metrics as lms, plotters as lpl, embedders as leb
 
 app = Flask(__name__)
@@ -204,4 +203,4 @@ if __name__ == '__main__':
     handler = RotatingFileHandler('foo.log', maxBytes=10000, backupCount=1)
     handler.setLevel(logging.INFO)
     app.logger.addHandler(handler)
-    app.run()
+    app.run(host='0.0.0.0')
