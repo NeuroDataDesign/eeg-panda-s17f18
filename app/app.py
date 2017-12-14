@@ -1,4 +1,4 @@
-import sys, os
+import os
 import boto3
 import botocore
 from flask import Flask, session, render_template, request, send_from_directory, url_for, redirect
@@ -148,7 +148,8 @@ def upload():
 
 @app.route('/s3upload', methods=['POST'])
 def s3upload():
-    target = os.path.join(APP_ROOT,'text')
+
+    target = os.path.join(APP_ROOT,'downloads')
     app.logger.info('Target route: %s', target)
 
     if not os.path.isdir(target):
@@ -161,20 +162,40 @@ def s3upload():
         app.logger.info('Accept incoming file: %s', filename)
         app.logger.info('Save it to: %s', destination)
         file.save(destination)
+        credential_info = open(destination, 'r').readlines()
+        # print (credential_info)
+        aws_access_key_id = credential_info[1][:-1]
+        # print (aws_access_key_id)
+        aws_secret_access_key = credential_info[2]
+        # print (aws_secret_access_key)
 
-        s3 = boto3.client('s3')
-        bucket_name = 'lemurndd'
+        # s3 = boto3.client('s3')
+        client = boto3.client(
+            's3',
+            aws_access_key_id=credential_info[1][:-1],
+            aws_secret_access_key=credential_info[2],
+        )
+        bucket_name = credential_info[0][:-1]
 
-        # Uploads the given file using a managed uploader, which will split up large
-        # files automatically and upload parts in parallel.
-        s3.upload_file(destination, bucket_name, filename)
-
-        # Then grab the file from S3 bucket to show connection is established
-        s3 = boto3.resource('s3')
+        # # Uploads the given file using a managed uploader, which will split up large
+        # # files automatically and upload parts in parallel.
+        client.upload_file(destination, bucket_name, filename)
+        #
+        # # Then grab the file from S3 bucket to show connection is established
         KEY = filename  # replace with your object key
 
+        objects = client.list_objects(Bucket = bucket_name)['Contents']
+        for s3_key in objects:
+            s3_object = s3_key['Key']
+            if not s3_object.endswith("/"):
+                client.download_file(bucket_name, s3_object, target+'/'+ s3_object)
+            else:
+                if not os.path.exists(s3_object):
+                    os.makedirs(target+'/'+ s3_object)
+
+
         try:
-            s3.Bucket(bucket_name).download_file(KEY, KEY)
+            client.download_file(bucket_name, KEY, KEY)
             app.logger.info('Downloading file from S3...')
             # s = open(filename, 'r')
             # print s.read()
@@ -183,9 +204,12 @@ def s3upload():
                 app.logger.error('The object does not exist.')
             else:
                 raise
-                # s = open(destination, 'r')
-                # print s.read()
+        #         # s = open(destination, 'r')
+        #         # print s.read()
     return render_template("complete.html",file_name = filename)
+
+
+
 
 @app.route('/upload/<filename>')
 def send_image(filename):
