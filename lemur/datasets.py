@@ -1,4 +1,5 @@
 import os
+import boto3
 import pandas as pd
 import numpy as np
 import pickle as pkl
@@ -103,13 +104,14 @@ class CloudDataSet:
 
     """
 
-    def __init__(self, df_path, index_column = None):
-        self.D = pd.read_csv(df_path)
-        if index_column is not None:
-            self.D.index = self.D[index_column]
-            self.D.index.name = index_column
-        self.N = self.D.shape[0]
-        self.name = df_path.split("/")[-1].split(".")[0].split("_")[0]
+    def __init__(self, df_path):
+        credential_info = open(df_path, 'r').readlines()
+        self.client = boto3.client(
+            's3',
+            aws_access_key_id=credential_info[1][:-1],
+            aws_secret_access_key=credential_info[2],
+        )
+        self.bucket_name = credential_info[0][:-1]
 
     def getResource(self, index):
         """Get a specific data point from the data set.
