@@ -8,6 +8,7 @@
           crossorigin="anonymous">
     <link rel="stylesheet" href="https://getbootstrap.com/docs/4.0/examples/dashboard/dashboard.css">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>.top-buffer { margin-top:20px; } </style>
     <meta charset="UTF-8">
     <title>MEDA</title>
 </head>
@@ -35,7 +36,7 @@
                         <a class="nav-link" href="/MEDA/upload">Upload</a>
                     </li>
                     <li class="nav-item  {{ 'active' if request.path.startswith("/MEDA/plot/") }}">
-                        <a class="nav-link" href="/MEDA/plot">
+                        <a class="nav-link" href="/MEDA/home">
                             Plot Viewer
                         </a>
                     </li>

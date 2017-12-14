@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block head %}
-    <script>
+    <!--<script>
         $("#file-picker").change(function(){
             var input = document.getElementById('file-picker');
             $("#file-val").text(input.files[0].name);
@@ -15,10 +15,10 @@
                 }
             }
         } );
-    </script>
+    </script>-->
 {% endblock %}
 {% block content %}
-    <div class="container">
+    <div class="container top-buffer">
         <h1>
             <center>
                 Welcome to Red Lemur!
@@ -70,40 +70,51 @@
     </div>
 
 
-    <div class="container">
+    <div class="container top-buffer">
         <center>
             <h1>Upload Data</h1>
         </center>
-        <div class="row">
-            <div class="col-xs-12">
-                <h4>Phenotypic:</h4>
-                <strong>Phenotypic data (.csv) </strong><br>
-                <form class="form-inline" id="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+        <form class="form-group" id="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+            <div class="row form-inline">
+                <div class="col-sm-4">
+                    <h4>Phenotypic:</h4>
+                    <strong>Phenotypic data (.csv) </strong><br>
                     <label style="margin-right:20px" class="btn btn-light">
                         <input id="file-picker" type="file" name="file" accept="text/csv">
                     </label>
-                    <input class="btn btn-primary" id="upload-button" type="submit" value="Upload">
                     <div id="msg"></div>
-
-                </form>
+                </div>
+                <div class="col-sm-4">
+                    <h4>EEG:</h4>
+                    <strong>AWS Credentials (.csv)</strong><br>
+                    <label style="margin-right:20px" class="btn btn-light">
+                        <input id="file-picker" type="file" name="file" accept="text/csv">
+                    </label>
+                    <div id="msg"></div>
+                </div>
+                <div class="col-sm-4">
+                    <h4>fMRI:</h4>
+                    <strong>AWS Credentials (.csv)</strong><br>
+                    <label style="margin-right:20px" class="btn btn-light">
+                        <input id="file-picker" type="file" name="file" accept="text/csv">
+                    </label>
+                    <div id="msg"></div>
+                </div>
             </div>
-        </div>
+            <div class="row top-buffer">
+                <div class="col-sm-4 offset-sm-4">
+                    <div class="">
+                        <label>Dataset Name:</label>
+                        <input type="text" id="dataset-name" name="dataset-name">
+                    </div>
+                    <input class="btn btn-primary btn-block" type="submit" value="Upload" id="upload-button">
+                </div>
+            </div>
+        </form>
         <br />
         <br />
 
         <div class="row">
-            <div class="col-xs-12">
-                <h4>EEG and fMRI:</h4>
-                <strong>AWS Credentials (.csv)</strong><br>
-                <form class="form-inline" id="s3-upload-form" action="{{ url_for('s3upload') }}" method="POST" enctype="multipart/form-data">
-                    <label style="margin-right:20px" class="btn btn-light">
-                        <input id="file-picker" type="file" name="file" accept="text/csv">
-                    </label>
-                    <input class="btn btn-primary" type="submit" value="Upload" id="upload-button">
-                    <div id="msg"></div>
-
-                </form>
-            </div>
         </div>
     </div>
 {% endblock %}
