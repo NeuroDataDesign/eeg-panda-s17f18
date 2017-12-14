@@ -43,14 +43,18 @@
     </header>
 
     <div class="container">
+        <center>
+            <h1>Upload Data</h1>
+        </center>
         <div class="row">
             <div class="col-xs-12">
-                <h3>Pipeline Upload</h3>
+                <h4>Phenotypic:</h4>
                 <form id="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
-                    <strong>Files:</strong><br>
+                    <strong>Phenotypic data (.csv) </strong><br>
                     <input id="file-picker" type="file" name="file" accept="text/csv">
-                    <div id="msg"></div>
                     <input type="submit" value="Upload" id="upload-button">
+                    <div id="msg"></div>
+
                 </form>
             </div>
         </div>
@@ -59,12 +63,13 @@
 
         <div class="row">
             <div class="col-xs-12">
-                <h3>S3 Upload</h3>
+                <h4>EEG and fMRI:</h4>
                 <form id="s3-upload-form" action="{{ url_for('s3upload') }}" method="POST" enctype="multipart/form-data">
-                    <strong>Files:</strong><br>
+                    <strong>AWS Credentials (.csv)</strong><br>
                     <input id="file-picker" type="file" name="file" accept="text/csv">
-                    <div id="msg"></div>
                     <input type="submit" value="Upload" id="upload-button">
+                    <div id="msg"></div>
+
                 </form>
             </div>
         </div>
