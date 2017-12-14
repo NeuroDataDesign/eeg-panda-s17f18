@@ -80,6 +80,65 @@ class DiskDataSet:
         DS = DataSet(D, name)
         return DS
 
+class CloudDataSet:
+    """A dataset living in the cloud in S3.
+
+    A cloud data set lives in S3 with a connection defined by a `.csv` file which
+    contains the parameters for a user's bucket.
+
+
+    Parameters
+    ----------
+    df_path : str
+	Path to the .csv file describing the CloudDataSet.
+
+    Attributes
+    ----------
+    D : pandas DataFrame
+        A DataFrame object describing the dataset.
+    N : int
+        The number of observations in the dataset.
+    name : string
+        A descriptive name for the dataset.
+
+    """
+
+    def __init__(self, df_path, index_column = None):
+        self.D = pd.read_csv(df_path)
+        if index_column is not None:
+            self.D.index = self.D[index_column]
+            self.D.index.name = index_column
+        self.N = self.D.shape[0]
+        self.name = df_path.split("/")[-1].split(".")[0].split("_")[0]
+
+    def getResource(self, index):
+        """Get a specific data point from the data set.
+
+        Parameters
+        ----------
+        index : int
+            The index of the data point in `D`.
+
+        Returns
+        -------
+        :obj:`ndarray`
+            A ndarray of the data point.
+
+        """
+        resource_path = self.D["resource_path"].ix[index]
+        dim_column = self.D["dim_column"].ix[index]
+        with open(resource_path, "rb") as f:
+            if dim_column:
+                return pkl.load(f).T
+            return pkl.load(f)
+
+    def getResourceDS(self, index):
+        D = pd.DataFrame(self.getResource(index).T)
+        name = self.name + " " + \
+               str(index) + " "
+        DS = DataSet(D, name)
+        return DS
+
 def convertDtype(l):
     try:
         return np.array(l, dtype="float")
