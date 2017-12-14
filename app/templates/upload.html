@@ -1,47 +1,23 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet"
-          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
-          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
-          crossorigin="anonymous">
-    <link rel="stylesheet"
-          href="https://getbootstrap.com/docs/4.0/examples/dashboard/dashboard.css">
-    <title>Upload Files</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-</head>
-<body>
-
-    <header>
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-            <a class="navbar-brand" href="#">MEDA</a>
-            <button class="navbar-toggler d-lg-none"
-                    type="button" data-toggle="collapse"
-                    data-target="#navbarsExampleDefault"
-                    aria-controls="navbarsExampleDefault"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                      <a class="nav-link" href="/MEDA/home">Home </a>
-                    </li>
-                    <li class="nav-item active">
-                      <a class="nav-link" href="/MEDA/upload">Upload <span class="sr-only">(current)</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link"
-                          href="/MEDA/home">
-                          Plot Viewer</span>
-                      </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    </header>
-
+{% extends "layout.html" %}
+{% block head %}
+    <script>
+        $("#file-picker").change(function(){
+            var input = document.getElementById('file-picker');
+            $("#file-val").text(input.files[0].name);
+            for (var i=0; i<input.files.length; i++)
+            {
+                var ext= input.files[i].name.substring(input.files[i].name.lastIndexOf('.')+1).toLowerCase();
+                if ((ext === 'txt') || (ext === 'csv')) {
+                    $("#msg").text("Files are supported");
+                } else {
+                    $("#msg").text("Files are NOT supported");
+                    document.getElementById("file-picker").value ="";
+                }
+            }
+        } );
+    </script>
+{% endblock %}
+{% block content %}
     <div class="container">
         <h1>
             <center>
@@ -101,10 +77,12 @@
         <div class="row">
             <div class="col-xs-12">
                 <h4>Phenotypic:</h4>
-                <form id="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
-                    <strong>Phenotypic data (.csv) </strong><br>
-                    <input id="file-picker" type="file" name="file" accept="text/csv">
-                    <input type="submit" value="Upload" id="upload-button">
+                <strong>Phenotypic data (.csv) </strong><br>
+                <form class="form-inline" id="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+                    <label style="margin-right:20px" class="btn btn-light">
+                        <input id="file-picker" type="file" name="file" accept="text/csv">
+                    </label>
+                    <input class="btn btn-primary" id="upload-button" type="submit" value="Upload">
                     <div id="msg"></div>
 
                 </form>
@@ -116,31 +94,17 @@
         <div class="row">
             <div class="col-xs-12">
                 <h4>EEG and fMRI:</h4>
-                <form id="s3-upload-form" action="{{ url_for('s3upload') }}" method="POST" enctype="multipart/form-data">
-                    <strong>AWS Credentials (.csv)</strong><br>
-                    <input id="file-picker" type="file" name="file" accept="text/csv">
-                    <input type="submit" value="Upload" id="upload-button">
+                <strong>AWS Credentials (.csv)</strong><br>
+                <form class="form-inline" id="s3-upload-form" action="{{ url_for('s3upload') }}" method="POST" enctype="multipart/form-data">
+                    <label style="margin-right:20px" class="btn btn-light">
+                        <input id="file-picker" type="file" name="file" accept="text/csv">
+                    </label>
+                    <input class="btn btn-primary" type="submit" value="Upload" id="upload-button">
                     <div id="msg"></div>
 
                 </form>
             </div>
         </div>
     </div>
-</body>
+{% endblock %}
 
-<script>
-    $("#file-picker").change(function(){
-        var input = document.getElementById('file-picker');
-        for (var i=0; i<input.files.length; i++)
-        {
-            var ext= input.files[i].name.substring(input.files[i].name.lastIndexOf('.')+1).toLowerCase();
-            if ((ext === 'txt') || (ext === 'csv')) {
-                $("#msg").text("Files are supported");
-            } else {
-                $("#msg").text("Files are NOT supported");
-                document.getElementById("file-picker").value ="";
-            }
-        }
-    } );
-</script>
-</html>

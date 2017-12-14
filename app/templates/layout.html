@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {%  block head %}{% endblock %}
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://getbootstrap.com/docs/4.0/examples/dashboard/dashboard.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <meta charset="UTF-8">
+    <title>MEDA</title>
+</head>
+<body>
+    <!-- Navabr -->
+    <header>
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+            <a class="navbar-brand" href="#">MEDA</a>
+            <button class="navbar-toggler d-lg-none"
+                    type="button"
+                    data-toggle="collapse"
+                    data-target="#navbarsExampleDefault"
+                    aria-controls="navbarsExampleDefault"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item {{ 'active' if request.path == "/MEDA/home" }}">
+                        <a class="nav-link" href="/MEDA/home">Home<span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item {{ 'active' if request.path == "/MEDA/upload" }}">
+                        <a class="nav-link" href="/MEDA/upload">Upload</a>
+                    </li>
+                    <li class="nav-item  {{ 'active' if request.path.startswith("/MEDA/plot/") }}">
+                        <a class="nav-link" href="/MEDA/plot">
+                            Plot Viewer
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <div id="content">{% block content %}{% endblock %}</div>
+    <div id="footer">{% block footer %}{% endblock %}</div>
+</body>
+</html>

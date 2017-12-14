@@ -71,7 +71,7 @@ def medahome():
 def uploadrender():
     return render_template("upload.html")
 
-@app.route('/MEDA/<ds_name>/<plot_name>')
+@app.route('/MEDA/plot/<ds_name>/<plot_name>')
 def meda(ds_name=None, plot_name=None):
     app.logger.info('DS Name is: %s', ds_name)
     app.logger.info('Plot Name is: %s', plot_name)
