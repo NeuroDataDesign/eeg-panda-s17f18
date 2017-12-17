@@ -21,6 +21,8 @@ class DataSet:
             f.write(string)
         return string
 
+    def getMatrix(self):
+        return self.D.as_matrix()
 class DiskDataSet:
     """A dataset living locally on the hard disk.
 
@@ -49,7 +51,7 @@ class DiskDataSet:
         if index_column is not None:
             self.D.index = self.D[index_column]
             self.D.index.name = index_column
-        self.N = self.D.shape[0]
+        self.n = self.D.shape[0]
         self.name = df_path.split("/")[-1].split(".")[0].split("_")[0]
 
     def getResource(self, index):
@@ -302,21 +304,25 @@ class DistanceMatrix:
 
     """
 
-    def __init__(self, dataset, metric, index_level = 0):
+    def __init__(self, dataset, metric):
         self.dataset = dataset
-        self.labels = self.dataset.D.index.get_level_values(index_level)
-        self.label_name = self.dataset.D.index.names[index_level]
+        self.name = self.dataset.name
+        self.labels = self.dataset.D.index.values
+        self.label_name = self.dataset.D.index.name
         self.metric = metric
         self.metric_name = metric.__name__
-        self.N = self.dataset.N
+        self.n = self.dataset.n
         parameterization = self.metric.parameterize(self.dataset)
-        self.matrix = np.zeros([self.N, self.N])
-        for i in range(self.N):
+        self.D = np.zeros([self.n, self.n])
+        for i in range(self.n):
             I = parameterization[i]
             for j in range(i + 1):
                 J = parameterization[j]
-                self.matrix[i, j] = self.metric.compare(I, J)
-                self.matrix[j, i] = self.matrix[i, j]
+                self.D[i, j] = self.metric.compare(I, J)
+                self.D[j, i] = self.D[i, j]
+        self.D = pd.DataFrame(self.D)
+        self.D.index = self.dataset.D.index
+        self.D.index.name = self.dataset.D.index.name
 
     def getMatrix(self):
         """Get the distance matrix.
@@ -327,4 +333,34 @@ class DistanceMatrix:
             The distance matrix.
 
         """
-        return self.matrix
+        return self.D
+
+class InterpointMatrix:
+
+    def __init__(self, dataset, metric):
+        self.dataset = dataset
+        self.name = self.dataset.name
+        self.metric = metric
+        self.metric_name = metric.__name__
+        self.d = self.dataset.d
+        self.D = np.zeros([self.d, self.d])
+        for i in range(self.d):
+            I = self.dataset.D.iloc[:, i]
+            for j in range(i + 1):
+                J = self.dataset.D.iloc[:, j]
+                self.D[i, j] = self.metric.compare(I, J)
+                self.D[j, i] = self.D[i, j]
+        self.D = pd.DataFrame(self.D)
+        self.D.index = self.dataset.D.columns
+        self.D.index.name = self.dataset.D.index.name
+
+    def getMatrix(self):
+        """Get the distance matrix.
+
+        Returns
+        -------
+        :obj:`ndarray`
+            The distance matrix.
+
+        """
+        return self.D
