@@ -22,7 +22,7 @@ def get_spaced_colors(n):
     return cl.to_rgb(["hsl(%d,100%%,40%%)"%i for i in hues])
 
 class MatrixPlotter:
-    def __init__(self, DS, mode="notebook"):
+    def __init__(self, DS, mode="notebook", *args, **kwargs):
         self.DS = DS
         self.plot_mode = mode
 
@@ -247,28 +247,32 @@ class EigenvectorHeatmap(MatrixPlotter):
 class HGMMPlotter(MatrixPlotter):
     def __init__(self, *args, **kwargs):
         super(HGMMPlotter, self).__init__(*args, **kwargs)
+        if 'random_state' in kwargs.keys():
+            random_state = kwargs['random_state']
+        else:
+            random_state = None
         X = self.DS.D.as_matrix()
         levels = []
         n = X.shape[0]
-        l0 = HGMMPlotter.hgmml0(X)
+        l0 = HGMMPlotter.hgmml0(X, random_state)
         levels.append(l0)
-        li = HGMMPlotter.gmmBranch(l0[0])
+        li = HGMMPlotter.gmmBranch(l0[0], random_state)
         levels.append(li)
         while (len(li) < n) and (len(levels) < 5):
             print("Starting level", len(levels))
             lip = []
             for c in li:
-                q = HGMMPlotter.gmmBranch(c)
+                q = HGMMPlotter.gmmBranch(c, random_state)
                 if q is not None:
                     lip.extend(q)
             levels.append(lip)
             li = lip
         self.levels = levels
 
-    def gmmBranch(level):
+    def gmmBranch(level, random_state):
         X, p, mu = level
         if X.shape[0] >= 2:
-            gmm = GaussianMixture(n_components=2)
+            gmm = GaussianMixture(n_components=2, random_state=random_state)
             gmm.fit(X)
             X0 = X[gmm.predict(X) == 0, :]
             X1 = X[gmm.predict(X) == 1, :]
@@ -276,12 +280,12 @@ class HGMMPlotter(MatrixPlotter):
             return [(X0, int(mypro[0]), gmm.means_[0, :],),
                     (X1, int(mypro[1]), gmm.means_[1, :],)]
         elif X.shape[0] == 1:
-            gmm = GaussianMixture(n_components=1)
+            gmm = GaussianMixture(n_components=1, random_state=random_state)
             gmm.fit(X)
             return [(X, int(np.rint(p * gmm.weights_[0])), gmm.means_[0, :],)] 
 
-    def hgmml0(X):
-        gmm = GaussianMixture(n_components=1)
+    def hgmml0(X, random_state):
+        gmm = GaussianMixture(n_components=1, random_state=random_state)
         gmm.fit(X)
         return [(X, int(np.rint(X.shape[0] * gmm.weights_[0])), gmm.means_[0, :],)]
 
