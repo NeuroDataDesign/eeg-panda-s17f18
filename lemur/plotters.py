@@ -1,4 +1,6 @@
 import os
+import imageio
+from PIL import ImageDraw, Image, ImageFont
 
 from plotly.offline import iplot, plot
 import plotly.graph_objs as go
@@ -13,9 +15,19 @@ import random
 import scipy.signal as signal
 from sklearn.mixture import GaussianMixture
 import colorlover as cl
-from sklearn.ensemble import RandomForestRegressor
+
+from nilearn import image as nimage
+from nilearn import plotting as nilplot
+import nibabel as nib
+
+from lemur import embedders as leb
 
 def get_spaced_colors(n):
+    max_value = 255
+    interval = int(max_value / n)
+    hues = range(0, max_value, interval)
+
+def get_heat_colors(n):
     max_value = 255
     interval = int(max_value / n)
     hues = range(0, max_value, interval)
@@ -46,6 +58,158 @@ class MatrixPlotter:
         if self.plot_mode == "div":
             fig["layout"]["autosize"] = True
             return plot(fig, output_type='div', include_plotlyjs=False)
+
+class SquareHeatmap(MatrixPlotter):
+    titlestring = "%s Heatmap"
+
+    def plot(self):
+        """Constructs a distance matrix heatmap using the :obj:`DistanceMatrix` object, in plotly.
+
+        """
+        title = self.titlestring % (self.DS.name)
+        xaxis = go.XAxis(
+                title=self.DS.D.index.name,
+                ticktext = self.DS.D.index,
+                ticks = "",
+                showticklabels=False,
+                showgrid=False,
+                mirror=True,
+                tickvals = [i for i in range(len(self.DS.D.index))])
+        yaxis = go.YAxis(
+                scaleanchor="x",
+                title=self.DS.D.index.name,
+                ticktext = self.DS.D.index,
+                showgrid=False,
+                ticks = "",
+                showticklabels=False,
+                mirror=True,
+                tickvals = [i for i in range(len(self.DS.D.index))])
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        trace = go.Heatmap(z = self.DS.D.as_matrix().T)
+        data = [trace]
+        fig = dict(data=data, layout=layout)
+        self.makeplot(fig)
+
+class Scatterplot(MatrixPlotter):
+    titlestring = "%s Scatterplot"
+
+    def plot(self):
+        """Constructs a distance matrix heatmap using the :obj:`DistanceMatrix` object, in plotly.
+
+        """
+        title = self.titlestring % (self.DS.name)
+        if self.DS.d != 2:
+            print("Scatter plot must get 2 dimensional dataset")
+            return
+        xaxis = go.XAxis(title=self.DS.D.index.name)
+        yaxis = go.YAxis(scaleanchor="x", title=self.DS.D.index.name)
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        trace = go.Scatter(x = self.DS.D.as_matrix()[:, 0],
+                           y = self.DS.D.as_matrix()[:, 1],
+                           mode = "markers")
+        data = [trace]
+        fig = dict(data=data, layout=layout)
+        self.makeplot(fig)
+
+class SpatialConnectivity(MatrixPlotter):
+    titlestring = "%s Spatial Connectivity"
+
+    def plot(self, spatial):
+        title = self.titlestring % (self.DS.name)
+        DM = self.DS.D.as_matrix()
+        sp = spatial.D.as_matrix()
+        trace1 = go.Scatter3d(
+            x=sp[:, 0],
+            y=sp[:, 1],
+            z=sp[:, 2],
+            mode='markers',
+            marker=dict(
+                size=12,
+                opacity=0
+            )
+        )
+        med = np.median(DM)
+        mask = DM < (med / 4)
+        Xe = []
+        Ye = []
+        Ze = []
+        for i in range(DM.shape[0]):
+            for j in range(DM.shape[1]):
+                if mask[i, j]:
+                    Xe += [sp[i, 0], sp[j, 0], None]
+                    Ye += [sp[i, 1], sp[j, 1], None]
+                    Ze += [sp[i, 2], sp[j, 2], None]
+        trace2 = go.Scatter(x=Xe,
+                            y=Ye,
+                            mode='lines',
+                            line=go.Line(color='rgb(125,125,125)', width=1),
+                            hoverinfo='none')
+        data = [trace1, trace2]
+        fig = dict(data=data)
+        self.makeplot(fig)
+
+class ConnectedScatterplot(MatrixPlotter):
+    titlestring = "%s Scatterplot"
+
+    def plot(self, spatialDM):
+        """Constructs a distance matrix heatmap using the :obj:`DistanceMatrix` object, in plotly.
+
+        """
+        title = self.titlestring % (self.DS.name)
+        DM = self.DS.D.as_matrix()
+        sDM = spatialDM.D.as_matrix()
+        colors = (np.nansum(DM, axis=0) - 1) / DM.shape[0]
+        TSNEEmbedder = leb.TSNEEmbedder(num_components=2)
+        m = TSNEEmbedder.embed(sDM)
+        xaxis = go.XAxis(title=spatialDM.D.index.name)
+        yaxis = go.YAxis(scaleanchor="x", title=spatialDM.D.index.name)
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis, showlegend=False)
+        trace1 = go.Scatter(x = m[:, 0],
+                           y = m[:, 1],
+                           mode = "markers",
+                           marker = dict(color=colors, size=16, showscale=True))
+        distances = np.zeros([m.shape[0], m.shape[0]])
+        for i in range(m.shape[0]):
+            for j in range(m.shape[0]):
+                distances[i, j] = np.linalg.norm(m[i, :] - m[j, :])
+        med = np.median(distances)
+        mask = distances < (med / 4)
+        Xe = []
+        Ye = []
+        for i in range(distances.shape[0]):
+            for j in range(distances.shape[1]):
+                if mask[i, j]:
+                    Xe += [m[i, 0], m[j, 0], None]
+                    Ye += [m[i, 1], m[j, 1], None]
+        trace2 = go.Scatter(x=Xe,
+                            y=Ye,
+                            mode='lines',
+                            line=go.Line(color='rgb(125,125,125)', width=1),
+                            hoverinfo='none')
+        data = [trace1, trace2]
+        fig = dict(data=data, layout=layout)
+        self.makeplot(fig)
+
+class Scatterplot(MatrixPlotter):
+    titlestring = "%s Scatterplot"
+
+    def plot(self):
+        """Constructs a distance matrix heatmap using the :obj:`DistanceMatrix` object, in plotly.
+
+        """
+        title = self.titlestring % (self.DS.name)
+        if self.DS.d != 2:
+            print("Scatter plot must get 2 dimensional dataset")
+            return
+        xaxis = go.XAxis(title=self.DS.D.index.name)
+        yaxis = go.YAxis(scaleanchor="x", title=self.DS.D.index.name)
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        trace = go.Scatter(x = self.DS.D.as_matrix()[:, 0],
+                           y = self.DS.D.as_matrix()[:, 1],
+                           mode = "markers")
+        data = [trace]
+        fig = dict(data=data, layout=layout)
+        self.makeplot(fig)
 
 class Heatmap(MatrixPlotter):
     titlestring = "%s Heatmap"
@@ -216,9 +380,7 @@ class EigenvectorHeatmap(MatrixPlotter):
         title = self.titlestring % (self.DS.name)
         D = self.DS.D.as_matrix().T
         d, n = D.shape
-        print(D.shape)
         U, _, _ = np.linalg.svd(D, full_matrices=False)
-        print(U.shape)
         xaxis = go.XAxis(
                 title="Eigenvectors",
                 ticktext = ["Eigenvector %s"%i for i in range(1, d + 1)],
@@ -565,41 +727,6 @@ class EverythingPlotter(CSVPlotter):
             with open(os.path.join(path, plotter.__name__ + ".html"), "w") as f:
                 f.write(self.html_data%(plotter.__name__, div))
 
-
-
-
-class DistanceMatrixHeatmap(DistanceMatrixPlotter):
-    titlestring = "%s %s Distance Matrix Heatmap"
-
-    def plot(self):
-        """Constructs a distance matrix heatmap using the :obj:`DistanceMatrix` object, in plotly.
-
-        """
-        title = self.titlestring % (self.dataset_name, self.metric_name)
-        xaxis = go.XAxis(
-                title="Observations",
-                ticktext = self.labels,
-                ticks = "",
-                showticklabels=False,
-                showgrid=False,
-                mirror=True,
-                tickvals = [i for i in range(len(self.labels))])
-        yaxis = go.YAxis(
-                scaleanchor="x",
-                title="Observations",
-                ticktext = self.labels,
-                showgrid=False,
-                ticks = "",
-                showticklabels=False,
-                mirror=True,
-                tickvals = [i for i in range(len(self.labels))])
-        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
-        trace = go.Heatmap(z = self.dm)
-        data = [trace]
-        fig = dict(data=data, layout=layout)
-        self.makeplot(fig)
-
-
     
 class Embedding2DScatter(DistanceMatrixPlotter):
     titlestring = "%s 2D %s Embedding Scatter under %s metric"
@@ -903,3 +1030,93 @@ class SpectrogramPlotter(TimeSeriesPlotter):
         fig= dict(data=[trace], layout=layout)
         iplot(fig)
 
+class Nifti4DPlotter:
+
+    def __init__(self, path):
+        self.path = path
+
+    def plot(self, downsample=1):
+        raw = nib.load(self.path)
+        M = np.max(raw.get_data())
+        n = raw.shape[3]
+        mean = nimage.mean_img(raw)
+        xyzcuts = nilplot.find_xyz_cut_coords(mean)
+        xcuts = nilplot.find_cut_slices(mean, "x")
+        ycuts = nilplot.find_cut_slices(mean, "y")
+        zcuts = nilplot.find_cut_slices(mean, "z")
+        del raw
+        nrange = range(0, n, downsample)
+        for i, img in enumerate(nimage.iter_img(self.path)):
+            if i in nrange:
+                nilplot.plot_epi(nimage.math_img("img / %f"%(M), img=img),
+                                  colorbar=False,
+                                  output_file="orth_epi%0d.png"%(i),
+                                  annotate=True,
+                                  cut_coords = xyzcuts,
+                                  cmap="gist_heat")
+                nilplot.plot_epi(nimage.math_img("img / %f"%(M), img=img),
+                                  colorbar=False,
+                                  output_file="x_epi%0d.png"%(i),
+                                  annotate=True,
+                                  display_mode = "x",
+                                  cut_coords = xcuts,
+                                  cmap="gist_heat")
+                nilplot.plot_epi(nimage.math_img("img / %f"%(M), img=img),
+                                  colorbar=False,
+                                  output_file="y_epi%0d.png"%(i),
+                                  annotate=True,
+                                  display_mode = "y",
+                                  cut_coords = ycuts,
+                                  cmap="gist_heat")
+                nilplot.plot_epi(nimage.math_img("img / %f"%(M), img=img),
+                                  colorbar=False,
+                                  output_file="z_epi%0d.png"%(i),
+                                  annotate=True,
+                                  display_mode = "z",
+                                  cut_coords = zcuts,
+                                  cmap="gist_heat")
+
+        filenames = ["orth_epi%0d.png"%(i) for i in nrange]
+
+        with imageio.get_writer('orth_epi.gif', mode='I') as writer:
+            for i, filename in enumerate(filenames):
+                image = Image.open(filename)
+                draw = ImageDraw.Draw(image)
+                fnt = ImageFont.truetype('Pillow/Tests/fonts/FreeMono.ttf', 16)
+                draw.text((2, 2), str(i), font=fnt, fill=(255, 0, 0, 255))
+                image.save(filename, "PNG")
+                image = imageio.imread(filename)
+                writer.append_data(image)
+
+        filenames = ["x_epi%0d.png"%(i) for i in nrange]
+        with imageio.get_writer('x_epi.gif', mode='I') as writer:
+            for i, filename in enumerate(filenames):
+                image = Image.open(filename)
+                draw = ImageDraw.Draw(image)
+                fnt = ImageFont.truetype('Pillow/Tests/fonts/FreeMono.ttf', 16)
+                draw.text((2, 2), str(i), font=fnt, fill=(255, 0, 0, 255))
+                image.save(filename, "PNG")
+                image = imageio.imread(filename)
+                writer.append_data(image)
+
+        filenames = ["y_epi%0d.png"%(i) for i in nrange]
+        with imageio.get_writer('y_epi.gif', mode='I') as writer:
+            for i, filename in enumerate(filenames):
+                image = Image.open(filename)
+                draw = ImageDraw.Draw(image)
+                fnt = ImageFont.truetype('Pillow/Tests/fonts/FreeMono.ttf', 16)
+                draw.text((2, 2), str(i), font=fnt, fill=(255, 0, 0, 255))
+                image.save(filename, "PNG")
+                image = imageio.imread(filename)
+                writer.append_data(image)
+
+        filenames = ["z_epi%0d.png"%(i) for i in nrange]
+        with imageio.get_writer('z_epi.gif', mode='I') as writer:
+            for i, filename in enumerate(filenames):
+                image = Image.open(filename)
+                draw = ImageDraw.Draw(image)
+                fnt = ImageFont.truetype('Pillow/Tests/fonts/FreeMono.ttf', 16)
+                draw.text((2, 2), str(i), font=fnt, fill=(255, 0, 0, 255))
+                image.save(filename, "PNG")
+                image = imageio.imread(filename)
+                writer.append_data(image)

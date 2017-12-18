@@ -41,8 +41,8 @@ class MDSEmbedder(BaseEmbedder):
         mds.fit(DM.getMatrix())
         emb = mds.embedding_
         emb = pd.DataFrame(emb)
-        emb.index = DM.labels
-        emb.index.name = DM.label_name
+        emb.index = DM.D.index
+        emb.index.name = DM.D.index.name
         name = DM.dataset.name + " " + \
                DM.metric_name + " " + \
                self.embedding_name
