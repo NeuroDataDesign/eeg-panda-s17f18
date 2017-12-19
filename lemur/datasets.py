@@ -112,6 +112,7 @@ class CloudDataSet:
             aws_secret_access_key=credential_info[2],
         )
         self.bucket_name = credential_info[0][:-1]
+        self.objects = self.client.list_objects(self.bucket_name)['Contents']
 
     def getResource(self, index):
         """Get a specific data point from the data set.
@@ -127,12 +128,7 @@ class CloudDataSet:
             A ndarray of the data point.
 
         """
-        resource_path = self.D["resource_path"].ix[index]
-        dim_column = self.D["dim_column"].ix[index]
-        with open(resource_path, "rb") as f:
-            if dim_column:
-                return pkl.load(f).T
-            return pkl.load(f)
+        self.client.download_file(self.bucket_name, )
 
     def getResourceDS(self, index):
         D = pd.DataFrame(self.getResource(index).T)
