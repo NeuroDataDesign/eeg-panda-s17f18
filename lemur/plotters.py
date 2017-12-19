@@ -26,7 +26,7 @@ def get_spaced_colors(n):
     max_value = 255
     interval = int(max_value / n)
     hues = range(0, max_value, interval)
-    return hues
+    return cl.to_rgb(["hsl(%d,100%%,40%%)"%i for i in hues])
 
 def get_heat_colors(n):
     max_value = 255
