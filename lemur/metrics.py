@@ -27,7 +27,7 @@ class FroCorr:
 
         """
         with np.errstate(divide = 'ignore', invalid = 'ignore'):
-            return list(map(lambda j: np.nan_to_num(np.corrcoef(D.getResource(j))), range(D.n)))
+            return list(map(lambda j: np.nan_to_num(np.corrcoef(D.getMatrix(j))), range(D.n)))
 
     def compare(x, y):
         """Compute the euclidian distance of two correlation matricies.

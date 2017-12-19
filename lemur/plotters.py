@@ -55,13 +55,81 @@ class MatrixPlotter:
         if self.plot_mode == "savediv":
             fig["layout"]["autosize"] = True
             div = plot(fig, output_type='div', include_plotlyjs=False)
-            with open(os.path.join(self.base_path, local_path + ".html"), "w") as f:
+            path = os.path.join(self.base_path, local_path + ".html")
+            os.makedirs("/".join(path.split("/")[:-1]), exist_ok=True)
+            with open(path, "w") as f:
                 f.write(div)
                 f.close()
 
         if self.plot_mode == "div":
             fig["layout"]["autosize"] = True
             return plot(fig, output_type='div', include_plotlyjs=False)
+
+class TimeSeriesPlotter:
+    """A generic one-to-one plotter for time series data to be extended.
+
+    Parameters
+    ----------
+    data : :obj:`ndarray`
+        The time series data.
+    resource_name : string
+        The name of the time series being plotted.
+    row_name : string
+        The name of the rows in the time-series (e.g. channels, sources. ect.).
+    column_name : string
+        The name of the columns in the time-series (e.g. time points, time steps, seconds, ect.).
+
+    Attributes
+    ----------
+    data : :obj:`ndarray`
+        The time series data.
+    d : int
+        The number of dimensions in the time series
+    n : int
+        The number of time points in the time series
+    row_name : string
+        The name of the rows in the time-series (e.g. channels, sources. ect.).
+    column_name : string
+        The name of the columns in the time-series (e.g. time points, time steps, seconds, ect.).
+    resource_name : string
+        The name of the time series being plotted.
+
+    """
+
+    def __init__(self, DS, mode = "notebook", base_path=None):
+        self.data = DS.D.as_matrix().T
+        self.d, self.n = self.data.shape
+        self.row_name = "Channels"
+        self.col_name = "Time Points"
+        self.resource_name = DS.name
+        self.plot_mode = mode
+        self.base_path = base_path
+
+    def makeplot(self, fig, local_path=None):
+        """Make the plotly figure visable to the user in the way they want.
+
+        Parameters
+        ----------
+        gid : :obj:`figure`
+            An plotly figure.
+
+        """
+        
+        if self.plot_mode == "notebook":
+            iplot(fig)
+        if self.plot_mode == "savediv":
+            fig["layout"]["autosize"] = True
+            div = plot(fig, output_type='div', include_plotlyjs=False)
+            path = os.path.join(self.base_path, local_path + ".html")
+            os.makedirs("/".join(path.split("/")[:-1]), exist_ok=True)
+            with open(path, "w") as f:
+                f.write(div)
+                f.close()
+
+        if self.plot_mode == "div":
+            fig["layout"]["autosize"] = True
+            return plot(fig, output_type='div', include_plotlyjs=False)
+
 
 class SquareHeatmap(MatrixPlotter):
     titlestring = "%s Heatmap"
@@ -135,25 +203,27 @@ class SpatialConnectivity(MatrixPlotter):
                 opacity=0
             )
         )
-        med = np.median(DM)
-        mask = DM < (med / 4)
-        Xe = []
-        Ye = []
-        Ze = []
-        for i in range(DM.shape[0]):
-            for j in range(DM.shape[1]):
-                if mask[i, j]:
-                    Xe += [sp[i, 0], sp[j, 0], None]
-                    Ye += [sp[i, 1], sp[j, 1], None]
-                    Ze += [sp[i, 2], sp[j, 2], None]
-        trace2 = go.Scatter(x=Xe,
-                            y=Ye,
-                            mode='lines',
-                            line=go.Line(color='rgb(125,125,125)', width=1),
-                            hoverinfo='none')
-        data = [trace1, trace2]
-        fig = dict(data=data)
-        self.makeplot(fig, "agg/" + self.shortname)
+        #med = np.nanmedian(DM)
+        #mask = np.nan_to_num(DM) > (3 * med)
+        #Xe = []
+        #Ye = []
+        #Ze = []
+        #for i in range(DM.shape[0]):
+        #    for j in range(DM.shape[1]):
+        #        if mask[i, j]:
+        #            Xe += [sp[i, 0], sp[j, 0], None]
+        #            Ye += [sp[i, 1], sp[j, 1], None]
+        #            Ze += [sp[i, 2], sp[j, 2], None]
+        #print(Xe)
+        #trace2 = go.Scatter3d(x=Xe,
+        #                      y=Ye,
+        #                      z=Ze,
+        #                      mode='lines',
+        #                      line=go.Line(color='rgb(125,125,125)', width=1),
+        #                      hoverinfo='none')
+        data = [trace1]
+        fig = dict(data=data, layout={"autosize":True})
+        self.makeplot(fig, self.DS.name + "/" + self.shortname)
 
 class ConnectedScatterplot(MatrixPlotter):
     titlestring = "%s Scatterplot"
@@ -196,7 +266,7 @@ class ConnectedScatterplot(MatrixPlotter):
                             hoverinfo='none')
         data = [trace1, trace2]
         fig = dict(data=data, layout=layout)
-        self.makeplot(fig, "agg/" + self.shortname)
+        self.makeplot(fig, self.DS.name + "/" + self.shortname)
 
 class Scatterplot(MatrixPlotter):
     titlestring = "%s Scatterplot"
@@ -747,57 +817,6 @@ class EverythingPlotter(CSVPlotter):
             with open(os.path.join(path, plotter.__name__ + ".html"), "w") as f:
                 f.write(self.html_data%(plotter.__name__, div))
 
-    
-class Embedding2DScatter(DistanceMatrixPlotter):
-    titlestring = "%s 2D %s Embedding Scatter under %s metric"
-
-    def plot(self, embedder):
-        """Constructs a 2d scatter plot of the embedded :obj:`DistanceMatrix` object, colorized by primary label.
-
-        Parameters
-        ----------
-        embedder : :obj:`BaseEmbedder`
-            An embedder object which should be used to embed the data into 2d space.
-
-        """
-        title = self.titlestring % (self.dataset_name, embedder.embedding_name, self.metric_name)
-        emb = embedder.embed(self.dm)
-        d = {
-            'factor 1': emb[:, 0],
-            'factor 2': emb[:, 1],
-            self.label_name: self.labels
-        }
-        D = pd.DataFrame(d)
-        sns.lmplot('factor 1',
-                   'factor 2',
-                    data = D,
-                    fit_reg = False,
-                    hue=self.label_name)
-        plt.title(title)
-        plt.show()
-
-
-class EmbeddingPairsPlotter(DistanceMatrixPlotter):
-    titlestring = "%s-%s-Embedding-Pairs-Plot-under-%s-metric"
-
-    def plot(self, embedder):
-        """Constructs a pairs plot of the embedded :obj:`DistanceMatrix` object dimensions.
-
-        Parameters
-        ----------
-        embedder : :obj:`BaseEmbedder`
-            An embedder object which should be used to embed the data.
-
-        """
-        title = self.titlestring % (self.dataset_name, embedder.embedding_name, self.metric_name)
-        emb = embedder.embed(self.dm)
-        Pdf = pd.DataFrame(emb, columns = ["factor %s"%x for x in range(1, emb.shape[1] + 1)])
-        Pdf[self.label_name] = self.labels
-        sns.pairplot(data=Pdf, hue=self.label_name, diag_kind="hist")
-        plt.subplots_adjust(top=0.9)
-        plt.suptitle(title)
-        plt.show()
-
 class EmbeddingParallelCoordinatePlotter(DistanceMatrixPlotter):
     titlestring = "%s-%s-Embedding-Parallel-Coordinate-Plot-under-%s-metric"
 
@@ -838,96 +857,10 @@ class EmbeddingParallelCoordinatePlotter(DistanceMatrixPlotter):
 
 
 
-class DendrogramPlotter(DistanceMatrixPlotter):
-    titlestring = "%s Dendrogram under %s metric"
-
-    def plot(self):
-        """Constructs a dendrogram using the :obj:`DistanceMatrix` object, in plotly.
-
-        """
-        title = self.titlestring % (self.dataset_name, self.metric_name)
-        observations = np.zeros([2, 2])
-        unique_labels = np.unique(self.labels)
-        label_to_number = dict(zip(unique_labels, range(1, len(unique_labels) + 1)))
-        number_labels = [label_to_number[l] for l in self.labels]
-        def distance_function(x):
-            flattened = self.dm[np.triu_indices(self.dm.shape[0], k=1)].flatten()
-            return [f for f in flattened] 
-        dendro = ff.create_dendrogram(X = observations,
-                                      distfun = distance_function,
-                                      labels=number_labels)
-        dendro.layout.update(dict(title=title))
-        dendro.layout.xaxis.update(dict(ticktext=self.labels,
-                                        title=self.label_name,
-                                        ticklen=1))
-        dendro.layout.xaxis.tickfont.update(dict(size=12))
-        dendro.layout.yaxis.update(dict(title=self.metric_name))
-        dendro.layout.margin.update(dict(b = 200))
-        del dendro.layout["width"]
-        del dendro.layout["height"]
-        self.makeplot(dendro)
-
-class TimeSeriesPlotter:
-    """A generic one-to-one plotter for time series data to be extended.
-
-    Parameters
-    ----------
-    data : :obj:`ndarray`
-        The time series data.
-    resource_name : string
-        The name of the time series being plotted.
-    row_name : string
-        The name of the rows in the time-series (e.g. channels, sources. ect.).
-    column_name : string
-        The name of the columns in the time-series (e.g. time points, time steps, seconds, ect.).
-
-    Attributes
-    ----------
-    data : :obj:`ndarray`
-        The time series data.
-    d : int
-        The number of dimensions in the time series
-    n : int
-        The number of time points in the time series
-    row_name : string
-        The name of the rows in the time-series (e.g. channels, sources. ect.).
-    column_name : string
-        The name of the columns in the time-series (e.g. time points, time steps, seconds, ect.).
-    resource_name : string
-        The name of the time series being plotted.
-
-    """
-
-    def __init__(self, data, mode = "notebook", resource_name = "single resource", 
-                 row_name = "sources", col_name = "time points"):
-        self.data = data
-        self.d, self.n = data.shape
-        self.row_name = row_name
-        self.col_name = col_name
-        self.resource_name = resource_name
-        self.plot_mode = mode
-
-    def makeplot(self, fig):
-        """Make the plotly figure visable to the user in the way they want.
-
-        Parameters
-        ----------
-        gid : :obj:`figure`
-            An plotly figure.
-
-        """
-        
-        if self.plot_mode == "notebook":
-            iplot(fig)
-        if self.plot_mode == "html":
-            fig["layout"]["autosize"] = True
-            h = random.getrandbits(128)
-            fname = "%032x.html"%h
-            plot(fig, output_type='file', filename=fname)
-
 
 class SparkLinePlotter(TimeSeriesPlotter):
     titlestring = "Sparklines for %s"
+    shortname = "sparkline"
 
     def plot(self, sample_freq):
         """Constructs a downsampled spark line plot of the time series.
@@ -956,11 +889,11 @@ class SparkLinePlotter(TimeSeriesPlotter):
             df = df.groupby(lambda x: x // winsize).mean()
             downsampled_data = df.as_matrix().T
             data = [dict(mode="lines",
-                         hoverinfo="none",
+                         name = str(i),
                          x=(np.arange(downsampled_data.shape[1]) * winsize) / sample_freq,
                          y=downsampled_data[i, :]) for i in range(downsampled_data.shape[0])]
         fig = dict(data=data, layout=layout)
-        self.makeplot(fig)
+        self.makeplot(fig, self.resource_name + "/" + self.shortname)
 
 class CorrelationMatrixPlotter(TimeSeriesPlotter):
     titlestring = "Correlation Matrix for %s"
