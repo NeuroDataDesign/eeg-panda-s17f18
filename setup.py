@@ -2,7 +2,7 @@ from distutils.core import setup
 setup(
   name = 'redlemur',
   packages = ['lemur'],
-  version = '0.02',
+  version = '0.03',
   description = 'High level visualization library',
   author = 'Ryan Marren',
   author_email = 'rmarren1@jhu.edu',
