@@ -76,7 +76,7 @@ def meda(ds_name=None, plot_name=None):
     app.logger.info('DS Name is: %s', ds_name)
     app.logger.info('Plot Name is: %s', plot_name)
 
-    base_path = os.path.join(APP_ROOT, 'data', ds_name)
+    base_path = os.path.join(APP_ROOT, 'data', ds_name, 'pheno')
 
     if plot_name == "default":
         todisp = "<h1> Choose a plot! </h1>"
@@ -98,52 +98,65 @@ def upload():
     target = os.path.join(APP_ROOT,'data')
     app.logger.info('Target route: %s', target)
 
-    file = request.files.getlist("file")[0]
-    filename = file.filename
-    filedir = "".join(filename.split(".")[:-1])
+    filedir = request.form['dataset-name']
     dspath = os.path.join(target, filedir)
     os.makedirs(dspath, exist_ok=True)
     session['basepath'] = dspath
+    print(dspath)
 
-    destination = os.path.join(dspath, filename)
-    app.logger.info('Accept incoming file: %s', filename)
-    app.logger.info('Save it to: %s', destination)
-    file.save(destination)
-    session['data'] = destination
+    file_names = ['pheno', 'eeg', 'fmri']
+    for file, name in zip(request.files.getlist("file"), file_names):
+        if file.filename != '':
+            dirpath = os.path.join(dspath, name)
+            os.makedirs(dirpath, exist_ok=True)
+            filename = file.filename
+            destination = os.path.join(dspath, filename)
+            app.logger.info('Accept incoming file: %s', filename)
+            app.logger.info('Save it to: %s', destination)
+            file.save(destination)
+            session[name + '_data'] = destination
+        else:
+            session[name + '_data'] = None
 
-    # Create the dataset object
-    csv_ds = lds.CSVDataSet(session['data'], name = filedir)
+    if session['pheno_data'] is not None:
+        # Create the dataset object
+        csv_ds = lds.CSVDataSet(session['pheno_data'], name = filedir)
 
+        # Clean the dataset object
+        csv_ds.imputeColumns("mean")
 
-    # Clean the dataset object
-    csv_ds.imputeColumns("mean")
+        # Save metadata
+        csv_ds.saveMetaData(os.path.join(dspath, "metadata.json"))
 
-    # Save metadata
-    csv_ds.saveMetaData(os.path.join(dspath, "metadata.json"))
+        # Create a lemur distance matrix based on the EEG data
+        DM = lds.DistanceMatrix(csv_ds, lms.VectorDifferenceNorm)
 
-    # Create a lemur distance matrix based on the EEG data
-    DM = lds.DistanceMatrix(csv_ds, lms.VectorDifferenceNorm)
+        # Compute an embedding for the more intensive plots
+        MDSEmbedder = leb.MDSEmbedder(num_components=3)
+        csv_embedded = MDSEmbedder.embed(DM)
+        phenopath = os.path.join(dspath, 'pheno')
+        for _, lemurname, plotname in MEDA_options:
+            tosave = getattr(lpl, lemurname)(csv_ds, mode='div').plot()
+            plotfilename = "%s.html"%(plotname)
+            plotpath = os.path.join(phenopath, plotfilename)
+            with open(plotpath, "w") as f:
+                app.logger.info('Writing to file: %s', plotfilename)
+                f.write(tosave)
+                f.close()
 
-    # Compute an embedding for the more intensive plots        
-    MDSEmbedder = leb.MDSEmbedder(num_components=3)
-    csv_embedded = MDSEmbedder.embed(DM)
-    for _, lemurname, plotname in MEDA_options:
-        tosave = getattr(lpl, lemurname)(csv_ds, mode='div').plot()
-        plotfilename = "%s.html"%(plotname)
-        plotpath = os.path.join(dspath, plotfilename)
-        with open(plotpath, "w") as f:
-            app.logger.info('Writing to file: %s', plotfilename)
-            f.write(tosave)
-            f.close()
+        for _, lemurname, plotname in MEDA_Embedded_options:
+            tosave = getattr(lpl, lemurname)(csv_embedded, mode='div').plot()
+            plotfilename = "%s.html"%(plotname)
+            plotpath = os.path.join(phenopath, plotfilename)
+            with open(plotpath, "w") as f:
+                app.logger.info('Writing to file: %s', plotfilename)
+                f.write(tosave)
+                f.close()
 
-    for _, lemurname, plotname in MEDA_Embedded_options:
-        tosave = getattr(lpl, lemurname)(csv_embedded, mode='div').plot()
-        plotfilename = "%s.html"%(plotname)
-        plotpath = os.path.join(dspath, plotfilename)
-        with open(plotpath, "w") as f:
-            app.logger.info('Writing to file: %s', plotfilename)
-            f.write(tosave)
-            f.close()
+    if session['eeg_data'] is not None:
+        # Create the dataset object
+        cloud_ds = lds.CloudDataSet(session['eeg_data'], name = filedir)
+
     return redirect(url_for('meda', ds_name=filedir, plot_name='default'))
 
 @app.route('/s3upload', methods=['POST'])
