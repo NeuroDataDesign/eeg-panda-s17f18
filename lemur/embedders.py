@@ -43,7 +43,7 @@ class MDSEmbedder(BaseEmbedder):
         emb = pd.DataFrame(emb)
         emb.index = DM.D.index
         emb.index.name = DM.D.index.name
-        name = DM.dataset.name + " " + \
+        name = DM.DS.name + " " + \
                DM.metric_name + " " + \
                self.embedding_name
         EDS = lds.DataSet(emb, name)

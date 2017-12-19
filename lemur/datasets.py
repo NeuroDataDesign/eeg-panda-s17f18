@@ -83,6 +83,34 @@ class fMRIDataSet:
         resource_path = self.D.ix[index][0]
         return nib.load(resource_path).get_data()
 
+class EEGDataSet:
+
+    def __init__(self, dataframe_descriptor, name="fmri"):
+        self.D = dataframe_descriptor
+        self.D.index = self.D["subjects"] + "-" + self.D["tasks"]
+        self.D.index.name = "index"
+        self.name = name
+        self.n = self.D.shape[0]
+
+    def getResource(self, index):
+        resource = self.D.ix[index]
+        return resource
+
+    def getMatrix(self, index):
+        resource_path = self.D.ix[index][0]
+        with open(resource_path, "rb") as f:
+            return pkl.load(f).T
+
+    def getResourceDS(self, index):
+        resource = self.getResource(index)
+        matrix = self.getMatrix(index)
+        D = pd.DataFrame(matrix.T)
+        name = "%s/%s"%(resource[1], resource[2])
+        DS = DataSet(D, name)
+        return DS
+
+
+
 class DiskDataSet:
     """A dataset living locally on the hard disk.
 
