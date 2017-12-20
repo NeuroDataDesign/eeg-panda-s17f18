@@ -24,49 +24,16 @@
                 Welcome to Red Lemur!
             </center>
         </h1>
-        <h4>
+        <!-- <h4>
             <center>
                 Phenotypic Data
             </center>
         </h4>
-        <p>
-            Introduction of phenotypic data
-            Introduction of phenotypic data
-            Introduction of phenotypic data
-            Introduction of phenotypic data
-            Introduction of phenotypic data
-            Introduction of phenotypic data
-            Introduction of phenotypic data
-            Introduction of phenotypic data
-            Introduction of phenotypic data
-            Introduction of phenotypic data
-            Introduction of phenotypic data
-            Introduction of phenotypic data
-            Introduction of phenotypic data
-
-        </p>
-
         <h4>
             <center>
                 EEG and fMRI Data
             </center>
-        </h4>
-        <p>
-            Introduction of EEG and fMRI data
-            Introduction of EEG and fMRI data
-            Introduction of EEG and fMRI data
-            Introduction of EEG and fMRI data
-            Introduction of EEG and fMRI data
-            Introduction of EEG and fMRI data
-            Introduction of EEG and fMRI data
-            Introduction of EEG and fMRI data
-            Introduction of EEG and fMRI data
-            Introduction of EEG and fMRI data
-            Introduction of EEG and fMRI data
-            Introduction of EEG and fMRI data
-            Introduction of EEG and fMRI data
-
-        </p>
+        </h4>-->
     </div>
 
 
@@ -77,7 +44,8 @@
         <form class="form-group" id="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
             <div class="row form-inline">
                 <div class="col-sm-4">
-                    <h4>Phenotypic:</h4>
+                    <h4><b>Phenotypic:</b></h4>
+                    <p>Stored data in a CSV, subjects as rows, tests as columns</p>
                     <strong>Phenotypic data (.csv) </strong><br>
                     <label style="margin-right:20px" class="btn btn-light">
                         <input id="file-picker" type="file" name="file" accept="text/csv">
@@ -85,7 +53,10 @@
                     <div id="msg"></div>
                 </div>
                 <div class="col-sm-4">
-                    <h4>EEG:</h4>
+                    <h4><b>EEG:</b></h4>
+                    <p>Store credentials to an AWS bucket in a CSV as follows:</p>
+                    <p style="font-size:14px">AWS_bucket_name,AWS_access_key,AWS_secret_key</p>
+                    <p>Bucket must be in <a href="http://bids.neuroimaging.io/bids_spec.pdf">BIDS Format</a> (look at EEG proposal)</p>
                     <strong>AWS Credentials (.csv)</strong><br>
                     <label style="margin-right:20px" class="btn btn-light">
                         <input id="file-picker" type="file" name="file" accept="text/csv">
@@ -93,7 +64,10 @@
                     <div id="msg"></div>
                 </div>
                 <div class="col-sm-4">
-                    <h4>fMRI:</h4>
+                    <h4><b>fMRI:</b></h4>
+                    <p>Store credentials in a CSV as follows:</p>
+                    <p style="font-size:14px">AWS_bucket_name,AWS_access_key,AWS_secret_key</p>
+                    <p>Bucket must be in <a href="http://bids.neuroimaging.io/bids_spec.pdf">BIDS Format</a></p>
                     <strong>AWS Credentials (.csv)</strong><br>
                     <label style="margin-right:20px" class="btn btn-light">
                         <input id="file-picker" type="file" name="file" accept="text/csv">
