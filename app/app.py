@@ -327,7 +327,7 @@ def upload():
                "cp", "s3://%s/fmri"%(bucket_name),
                os.path.join(session['basepath'], 'fmri'), "--recursive"]
         app.logger.info("fMRI Data Downloaded")
-        #call(cmd)
+        call(cmd)
 
         # Make plots
         fmri.run_fmri(os.path.basename(session['basepath']))
