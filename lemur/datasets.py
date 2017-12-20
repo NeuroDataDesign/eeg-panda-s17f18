@@ -218,7 +218,7 @@ class CloudDataSet:
             A ndarray of the data point.
 
         """
-        self.client.download_file(self.bucket_name, )
+        self.client.download_file(self.bucket_name, index)
 
     def getResourceDS(self, index):
         D = pd.DataFrame(self.getResource(index).T)
