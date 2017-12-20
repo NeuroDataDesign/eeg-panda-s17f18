@@ -175,9 +175,13 @@ class CorrelationMatrix(MatrixPlotter):
             C = np.nan_to_num(np.corrcoef(D))
 
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        color_center = np.min(C) / (np.abs(np.max(C)) + np.abs(np.min(C)))
         trace = go.Heatmap(x = self.DS.D.columns,
                            y = self.DS.D.columns,
-                           z = C)
+                           z = C,
+                           colorscale = [[0.0, 'rgb(255,0,)'], 
+                                         [(color_center, 'rgb(127,127,0)'], 
+                                         [1.0, 'rgb(0,255,0)']])
         fig = dict(data=[trace], layout=layout)
         return self.makeplot(fig)
 
@@ -259,7 +263,6 @@ class HGMMPlotter(MatrixPlotter):
         li = HGMMPlotter.gmmBranch(l0[0], random_state)
         levels.append(li)
         while (len(li) < n) and (len(levels) < 5):
-            print("Starting level", len(levels))
             lip = []
             for c in li:
                 q = HGMMPlotter.gmmBranch(c, random_state)
@@ -320,7 +323,7 @@ class HGMMStackedClusterMeansHeatmap(HGMMPlotter):
             X = np.column_stack(means)
             Xs.append(X)
         X = np.vstack(Xs)[::-1, :]
-        y_labels = np.tile(self.DS.D.columns, X.shape[0] // len(self.DS.D.columns))
+        y_labels = np.tile(self.DS.D.columns, X.shape[0] // len(self.DS.D.columns))[::-1]
         trace = go.Heatmap(z = X)
         data = [trace]
         xaxis = go.XAxis(
