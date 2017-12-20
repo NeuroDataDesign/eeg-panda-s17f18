@@ -38,18 +38,23 @@ class BIDSParser:
         subjects = [os.path.basename(x) for x in glob.glob(base_path + "/*")]
         if "chanlocs.csv" in subjects:
             subjects.remove("chanlocs.csv")
+        print(base_path)
+        print(subjects)
         for s in subjects:
             dataset.update({s:{}})
         for s in subjects:
             modalities = [os.path.basename(x) for x in glob.glob(os.path.join(base_path, s) + "/*")]
+            print(modalities)
             for m in modalities:
                 dataset[s].update({m:{}})
                 files = [os.path.basename(x) for x in glob.glob(os.path.join(base_path, s, m) + "/*")]
+                print(files)
                 for f in files:
                     t = "".join(f.split("_")[1:]).split(".")[0]
                     dataset[s][m].update({t:f})
         self.dataset = dataset
         self.base_path = base_path
+        print(self.dataset)
 
     def getModalityFrame(self, modality, extension):
         files = []
@@ -90,7 +95,7 @@ class EEGDataSet:
 
     def __init__(self, dataframe_descriptor, name="fmri"):
         self.D = dataframe_descriptor
-        self.D.index = self.D["subjects"] + "-" + self.D["tasks"]
+        self.D.index = self.D["subjects"].astype(str) + "-" + self.D["tasks"].astype(str)
         self.D.index.name = "index"
         self.name = name
         self.n = self.D.shape[0]
@@ -220,7 +225,7 @@ class CloudDataSet:
             A ndarray of the data point.
 
         """
-        self.client.download_file(self.bucket_name, )
+        self.client.download_file(self.bucket_name, index)
 
     def getResourceDS(self, index):
         D = pd.DataFrame(self.getResource(index).T)
