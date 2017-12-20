@@ -985,7 +985,7 @@ class SpectrogramPlotter(TimeSeriesPlotter):
 class RawTimeSeries2DPlotter(TimeSeriesPlotter):
     titlestring = "Intensity by Time and Channel Location for %s"
     
-    def plot(self, spatial):
+    def plot(self, spatial, downsample = 1000):
         """Constructs a plot of the channel locations, and their intensities at different times.
 
         Parameters
@@ -994,18 +994,16 @@ class RawTimeSeries2DPlotter(TimeSeriesPlotter):
             Locations of channels.
 
         """
-        title = self.titlestring % (self.DS.name)
+        title = self.titlestring % (self.resource_name)
         # Time series containing EEG data.
-        mts = self.DS.D.as_matrix().T
-        # 2D Spatial locations of channels.
-        locations = spatial.D.as_matrix()
+        mts = self.data.T
         
         # Set variables
         num_obs = mts.shape[0]
         num_channels = mts.shape[1]
 
         # Verify that 'locations' exist for exactly each channel.
-        if (num_channels != locations.shape[0]):
+        if (num_channels != spatial.shape[0]):
             raise TypeError("""Error: Ensure that the number of channels in the Multivariate Time Series (columns) 
                             is equal to the number of points (rows) in locations.""")
 
@@ -1013,8 +1011,8 @@ class RawTimeSeries2DPlotter(TimeSeriesPlotter):
         data = [dict(
             visible = False,
             name = 'Time = '+str(step),
-            x = locations[:, 0],
-            y = locations[:, 1],
+            x = spatial[:, 0],
+            y = spatial[:, 1],
             mode = 'markers',
             # Marker represents intensity.
             marker = dict(
@@ -1050,12 +1048,12 @@ class RawTimeSeries2DPlotter(TimeSeriesPlotter):
 
         # Plot figure.
         fig = dict(data=data, layout=layout)
-        self.makeplot(fig)
+        iplot(fig)
 
 class RawPeriodogram2DPlotter(TimeSeriesPlotter):
     titlestring = "Density by Frequency and Channel Location for %s"
     
-    def plot(self, spatial):
+    def plot(self, spatial, downsample = 1000):
         """Constructs a plot of the channel locations, and their densities at different frequencies.
 
         Parameters
@@ -1064,11 +1062,10 @@ class RawPeriodogram2DPlotter(TimeSeriesPlotter):
             Locations of channels.
 
         """
-        title = self.titlestring % (self.DS.name)
+        title = self.titlestring % (self.resource_name)
         # Time series containing EEG data.
-        mts = self.DS.D.as_matrix().T
-        # 2D Spatial locations of channels.
-        locations = spatial.D.as_matrix()
+        mts = self.data.T
+       
         # Set variables
         num_obs = mts.shape[0]
         num_channels = mts.shape[1]
@@ -1083,7 +1080,7 @@ class RawPeriodogram2DPlotter(TimeSeriesPlotter):
         num_dens = densities.shape[0]
 
         # Verify that 'locations' exist for exactly each channel.
-        if (num_channels != locations.shape[0]):
+        if (num_channels != spatial.shape[0]):
             raise TypeError("""Error: Ensure that the number of channels in the Multivariate Time Series (columns) 
                             is equal to the number of points (rows) in locations.""")
 
@@ -1091,8 +1088,8 @@ class RawPeriodogram2DPlotter(TimeSeriesPlotter):
         data = [dict(
             visible = False,
             name = 'Frequency = '+str(step),
-            x = locations[:, 0],
-            y = locations[:, 1],
+            x = spatial[:, 0],
+            y = spatial[:, 1],
             mode = 'markers',
             # Marker represents density.
             marker = dict(
@@ -1128,7 +1125,7 @@ class RawPeriodogram2DPlotter(TimeSeriesPlotter):
 
         # Plot figure.
         fig = dict(data=data, layout=layout)
-        self.makeplot(fig)
+        iplot(fig)
 
 class Nifti4DPlotter:
     name = "Nifti4DPlotter"
