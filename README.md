@@ -4,6 +4,17 @@ Welcome to Lemur!
 
 Lemur is a library to assist in the aggregate and one-to-one visualization of any set of data points. This tool was designed to assist in the visualization of multi-modal neuroscience/psychology datasets, but it can be used for any set of objects and similarity / dissimilarity function acting on pairs of such objects.
 
+### Sprint 2 Demo
+
+* docker pull yujialiu/redlemur:latest
+* docker run -p 127.0.0.1:5000:5000 -t yujialiu/redlemur:latest
+* go to localhost:5000
+* under 'Pipeline Upload' click 'choose file' then direct to the iris.csv file
+* Click 'Upload'
+* Wait about 15 seconds
+* Plots should shot up on your machine
+
+
 ### Sprint 1 Release:
 [Sprint 1 Demo Slides](https://docs.google.com/presentation/d/1WhvT_KDLle6KnK6QdVPW1PvJf-FzisBHaIJUEnq5vf0/edit?usp=sharing)
 
