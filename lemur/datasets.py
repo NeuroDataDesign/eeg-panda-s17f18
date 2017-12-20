@@ -38,6 +38,8 @@ class BIDSParser:
         subjects = [os.path.basename(x) for x in glob.glob(base_path + "/*")]
         if "chanlocs.csv" in subjects:
             subjects.remove("chanlocs.csv")
+        if "metadata.json" in subjects:
+            subjects.remove("metadata.json")
         print(base_path)
         print(subjects)
         for s in subjects:
