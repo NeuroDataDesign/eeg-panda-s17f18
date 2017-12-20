@@ -22,15 +22,46 @@ app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-MEDA_options = [
-    #'NameOfPlotInLemur': 'name-of-plot-file-name'
-    ('Heatmap', 'Heatmap', 'heatmap'),
-    ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheatmap'),
-    ('Location Lines', 'LocationLines', 'locationlines'),
-    ('Location Heatmap', 'LocationHeatmap', 'locationheatmap'),
-    ('Scree Plot', 'ScreePlotter', 'screeplot'),
+MEDA_options = {
+    'pheno': [
+        #'NameOfPlotInLemur': 'name-of-plot-file-name'
+        ('Heatmap', 'Heatmap', 'heatmap'),
+        ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheatmap'),
+        ('Location Lines', 'LocationLines', 'locationlines'),
+        ('Location Heatmap', 'LocationHeatmap', 'locationheatmap'),
+        ('Scree Plot', 'ScreePlotter', 'screeplot')
+    ],
+    'eeg': [
+        #'NameOfPlotInLemur': 'name-of-plot-file-name'
+        ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
+        ('Heatmap', 'Heatmap', 'squareheat'),
+        ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
+        ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
+        ('Location Lines', 'LocationLines', 'locationlines'),
+        ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+        ('Scree Plot', 'ScreePlotter', 'scree')
+    ],
+}
+
+# EEG
+One_to_One = [
+    ('Connected Scatter', 'ConnectedScatter', 'connectedscatter'),
+    ('Sparkline', 'Sparkline', 'sparkline'),
+    ('Spatial Connection', 'SpatialConnection', 'spatialconn'),
 ]
 
+EEG_Embed = [
+   #'NameOfPlotInLemur': 'name-of-plot-file-name'
+   ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
+   ('Heatmap', 'Heatmap', 'heatmap'),
+   ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
+   ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
+   ('Location Lines', 'LocationLines', 'locationlines'),
+   ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+   ('Scree Plot', 'ScreePlotter', 'scree')
+]
+
+# Used for phenotypic
 MEDA_Embedded_options = [
     ('Heatmap', 'Heatmap', 'embheatmap'),
     ('Histogram Heatmap', 'HistogramHeatmap', 'embhistogramheatmap'),
@@ -39,7 +70,7 @@ MEDA_Embedded_options = [
     ('Scree Plot', 'ScreePlotter', 'embscreeplot'),
     ('Correlation Matrix', 'CorrelationMatrix', 'embcorr'),
     ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'embevheat'),
-    ('HGMM Stacked Cluster Means Heatmap', 
+    ('HGMM Stacked Cluster Means Heatmap',
      'HGMMStackedClusterMeansHeatmap',
      'hgmmstackedclustermeansheatmap'),
     ('HGMM Cluster Means Dendrogram',
@@ -79,12 +110,12 @@ def medahome():
 def uploadrender():
     return render_template("upload.html")
 
-@app.route('/MEDA/plot/<ds_name>/<modality>/<plot_name>')
-def meda(ds_name=None, modality=None, plot_name=None):
+@app.route('/MEDA/plot/<ds_name>/pheno/<plot_name>')
+def meda_pheno(ds_name=None, plot_name=None):
     app.logger.info('DS Name is: %s', ds_name)
     app.logger.info('Plot Name is: %s', plot_name)
 
-    base_path = os.path.join(APP_ROOT, 'data', ds_name, modality)
+    base_path = os.path.join(APP_ROOT, 'data', ds_name, 'pheno')
 
     if plot_name == "default":
         todisp = "<h1> Choose a plot! </h1>"
@@ -95,10 +126,66 @@ def meda(ds_name=None, modality=None, plot_name=None):
             todisp = f.read()
     else:
         todisp = "<h1> Choose a plot! </h1>"
-    return render_template('meda.html',
+
+    return render_template('meda_pheno.html',
                            plot=todisp,
-                           MEDA_options=MEDA_options,
-                           MEDA_Embedded_options=MEDA_Embedded_options)
+                           total_plots={
+                               'MEDA Options': MEDA_options['pheno'],
+                               'MEDA Embedded Options': MEDA_Embedded_options
+                                       }
+                           )
+
+@app.route('/MEDA/plot/<ds_name>/eeg/<embed>/<plot_name>')
+def meda_eeg(ds_name=None, embed=None, plot_name=None):
+    app.logger.info('DS Name is: %s', ds_name)
+    app.logger.info('Plot Name is: %s', plot_name)
+
+    if embed == 'embed':
+        base_path = os.path.join(APP_ROOT, 'data', ds_name, 'eeg_embedded_deriatives', 'agg')
+    else:
+        base_path = os.path.join(APP_ROOT, 'data', ds_name, 'eeg_derivatives', 'agg')
+
+    if plot_name == "default":
+        todisp = "<h1> Choose a plot! </h1>"
+    elif plot_name is not None:
+        plot_filename = "%s.html"%(plot_name)
+        plot_path = os.path.join(base_path, plot_filename)
+        with open(plot_path, "r") as f:
+            todisp = f.read()
+    else:
+        todisp = "<h1> Choose a plot! </h1>"
+
+    return render_template('meda_eeg.html',
+                           plot=todisp,
+                           MEDA_options = MEDA_options['eeg'],
+                           MEDA_Embedded_options = EEG_Embed
+                       )
+
+@app.route('/MEDA/plot/<ds_name>/fmri/<embed>/<plot_name>')
+def meda_fmri(ds_name=None, embed=None, plot_name=None):
+    app.logger.info('DS Name is: %s', ds_name)
+    app.logger.info('Plot Name is: %s', plot_name)
+
+    if embed == 'embed':
+        base_path = os.path.join(APP_ROOT, 'data', ds_name, 'fmri_embedded_deriatives', 'agg')
+    else:
+        base_path = os.path.join(APP_ROOT, 'data', ds_name, 'fmri_derivatives', 'agg')
+
+    if plot_name == "default":
+        todisp = "<h1> Choose a plot! </h1>"
+    elif plot_name is not None:
+        plot_filename = "%s.html"%(plot_name)
+        plot_path = os.path.join(base_path, plot_filename)
+        with open(plot_path, "r") as f:
+            todisp = f.read()
+    else:
+        todisp = "<h1> Choose a plot! </h1>"
+
+    return render_template('meda_fmri.html',
+                           plot=todisp,
+                           MEDA_options = MEDA_options['eeg'],
+                           MEDA_Embedded_options = EEG_Embed
+                           )
 
 
 @app.route('/upload', methods=['POST'])
@@ -170,7 +257,7 @@ def upload():
                "cp", "s3://%s/eeg"%(bucket_name),
                os.path.join(session['basepath'], 'eeg'), "--recursive"]
         app.logger.info("EEG Data Downloaded")
-        #call(cmd)
+        call(cmd)
 
         # Make plots
         eeg.run_eeg(os.path.basename(session['basepath']))
@@ -178,7 +265,7 @@ def upload():
     if session['fmri_data'] is not None:
         # Download EEG patients
         app.logger.info("Downloading fMRI Data...")
-        credential_info = open(session['eeg_data'], 'r').read()
+        credential_info = open(session['fmri_data'], 'r').read()
         bucket_name = credential_info.split(",")[0]
         cmd = ["aws", "s3",
                "cp", "s3://%s/fmri"%(bucket_name),
@@ -189,7 +276,7 @@ def upload():
         # Make plots
         fmri.run_fmri(os.path.basename(session['basepath']))
 
-    return redirect(url_for('meda', ds_name=filedir, plot_name='default'))
+    return redirect(url_for('meda', ds_name=filedir, modality='eeg', plot_name='default'))
 
 @app.route('/s3upload', methods=['POST'])
 def s3upload():

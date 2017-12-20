@@ -19,9 +19,10 @@ def run_fmri(name):
   BASE = "data"
   DATASET = "%s/fmri"%(name)
   root = os.path.join(BASE, DATASET)
+  print(root)
   bp = lds.BIDSParser(root)
-  dataset_descriptor = bp.getModalityFrame("func", "nii.gz").iloc[:3]
-
+  dataset_descriptor = bp.getModalityFrame("func", "nii.gz")
+  print(dataset_descriptor)
   out_base = os.path.join(BASE, name, "fmri_derivatives")
   out_emb_base = os.path.join(BASE, name, "fmri_embedded_deriatives")
   os.makedirs(out_base + "/agg", exist_ok=True)
