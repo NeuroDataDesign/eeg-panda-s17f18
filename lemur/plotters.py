@@ -322,7 +322,9 @@ class HGMMStackedClusterMeansHeatmap(HGMMPlotter):
             Xs.append(X)
         X = np.vstack(Xs)[::-1, :]
         y_labels = np.tile(self.DS.D.columns, X.shape[0] // len(self.DS.D.columns))[::-1]
-        trace = go.Heatmap(z = X)
+        trace = go.Heatmap(z = X,
+                           zmin = -np.max(X),
+                           zmax = np.max(X))
         data = [trace]
         xaxis = go.XAxis(
                 title="Clusters",
