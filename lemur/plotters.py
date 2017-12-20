@@ -1050,6 +1050,75 @@ class RawTimeSeries2DPlotter(TimeSeriesPlotter):
         fig = dict(data=data, layout=layout)
         iplot(fig)
 
+class RawTimeSeries3DPlotter(TimeSeriesPlotter):
+    titlestring = "Intensity by Time and Channel Location for %s"
+    
+    def plot(self, spatial, downsample = 1000):
+        """Constructs a plot of the channel locations, and their intensities at different times.
+
+        Parameters
+        ----------
+        spatial : Dataset
+            Locations of channels.
+
+        """
+        title = self.titlestring % (self.resource_name)
+        # Time series containing EEG data.
+        mts = self.data.T
+        
+        # Set variables
+        num_obs = mts.shape[0]
+        num_channels = mts.shape[1]
+
+        # Verify that 'locations' exist for exactly each channel.
+        if (num_channels != spatial.shape[0]):
+            raise TypeError("""Error: Ensure that the number of channels in the Multivariate Time Series (columns) 
+                            is equal to the number of points (rows) in locations.""")
+
+        # Sets up data frame containing the different plots.
+        data = [go.Scatter3d(dict(
+            visible = False,
+            name = 'Time = '+str(step),
+            x = spatial[:, 0],
+            y = spatial[:, 1],
+            z = spatial[:, 2],
+            mode = 'markers',
+            # Marker represents intensity.
+            marker = dict(
+            size = 8,
+            color = mts[step, range(num_channels)],
+            colorbar = go.ColorBar(
+                    title='Voltage Intensity'
+                ),
+            colorscale='Viridis',
+            line = dict(
+                width = 1,
+                color = 'rgb(0, 0, 0)'
+            )))) for step in range(0, num_obs, downsample)]
+
+        # Set up timesteps
+        steps = []
+        for i in range(len(data)):
+            step = dict(
+                method = 'restyle',
+                args = ['visible', [False] * len(data)],
+            )
+            step['args'][1][i] = True # Toggle i'th trace to "visible"
+            steps.append(step)
+
+        # Sets up slider
+        sliders = [dict(
+            active = 10,
+            currentvalue = {"prefix": "Timestep: "},
+            pad = {"t": 50},
+            steps = steps
+        )]
+        layout = dict(sliders=sliders)
+
+        # Plot figure.
+        fig = dict(data=data, layout=layout)
+        iplot(fig)
+
 class RawPeriodogram2DPlotter(TimeSeriesPlotter):
     titlestring = "Density by Frequency and Channel Location for %s"
     
@@ -1103,6 +1172,84 @@ class RawPeriodogram2DPlotter(TimeSeriesPlotter):
                 width = 1,
                 color = 'rgb(0, 0, 0)'
             ))) for step in range(num_dens)]
+
+        # Set up timesteps
+        steps = []
+        for i in range(len(data)):
+            step = dict(
+                method = 'restyle',
+                args = ['visible', [False] * len(data)],
+            )
+            step['args'][1][i] = True # Toggle i'th trace to "visible"
+            steps.append(step)
+
+        # Sets up slider
+        sliders = [dict(
+            active = 10,
+            currentvalue = {"prefix": "Frequency: "},
+            pad = {"t": 50},
+            steps = steps
+        )]
+        layout = dict(sliders=sliders)
+
+        # Plot figure.
+        fig = dict(data=data, layout=layout)
+        iplot(fig)
+
+class RawPeriodogram3DPlotter(TimeSeriesPlotter):
+    titlestring = "Density by Frequency and Channel Location for %s"
+    
+    def plot(self, spatial, downsample = 1000):
+        """Constructs a plot of the channel locations, and their densities at different frequencies.
+
+        Parameters
+        ----------
+        spatial : Dataset
+            Locations of channels.
+
+        """
+        title = self.titlestring % (self.resource_name)
+        # Time series containing EEG data.
+        mts = self.data.T
+       
+        # Set variables
+        num_obs = mts.shape[0]
+        num_channels = mts.shape[1]
+
+        # Create matriz to hold frequencies and densities
+        freq0, density0 = signal.periodogram(mts[0:num_obs:downsample,0])
+        densities = np.zeros((len(density0), num_channels))
+        densities[:, 0] = density0
+        for j in range(1, num_channels):
+            freq, density = signal.periodogram(mts[0:num_obs:downsample,j])
+            densities[:, j] = density
+        num_dens = densities.shape[0]
+
+        # Verify that 'locations' exist for exactly each channel.
+        if (num_channels != spatial.shape[0]):
+            raise TypeError("""Error: Ensure that the number of channels in the Multivariate Time Series (columns) 
+                            is equal to the number of points (rows) in locations.""")
+
+        # Sets up data frame containing the different plots.
+        data = [go.Scatter3d(dict(
+            visible = False,
+            name = 'Frequency = '+str(step),
+            x = spatial[:, 0],
+            y = spatial[:, 1],
+            z = spatial[:, 2],
+            mode = 'markers',
+            # Marker represents density.
+            marker = dict(
+            size = 8,
+            color = densities[step, range(num_channels)],
+            colorbar = go.ColorBar(
+                    title='Power Density'
+                ),
+            colorscale='Viridis',
+            line = dict(
+                width = 1,
+                color = 'rgb(0, 0, 0)'
+            )))) for step in range(num_dens)]
 
         # Set up timesteps
         steps = []
