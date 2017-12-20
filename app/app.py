@@ -101,6 +101,8 @@ def medahome():
     basedir = os.path.join(APP_ROOT, 'data')
     datasets = [di for di in os.listdir(basedir) if os.path.isdir(os.path.join(basedir, di))]
     metas = []
+    eegs = []
+    fmris = []
     for d in datasets:
         print(os.path.join(basedir, d, "metadata.json"))
         if os.path.exists(os.path.join(basedir, d, "metadata.json")):
@@ -109,7 +111,11 @@ def medahome():
                 rawjson = f.read()
             metadata = json.loads(rawjson)
             metas.append(metadata)
-    return render_template('home.html', metas = metas)
+        if os.path.exists(os.path.join(basedir, d, 'eeg')):
+            eegs.append(d)
+        if os.path.exists(os.path.join(basedir, d, 'fmri')):
+            fmris.append(d)
+    return render_template('home.html', metas = metas, eegs = eegs, fmris = fmris)
 
 @app.route('/MEDA/upload')
 def uploadrender():
@@ -286,7 +292,7 @@ def upload():
         MDSEmbedder = leb.MDSEmbedder(num_components=3)
         csv_embedded = MDSEmbedder.embed(DM)
         phenopath = os.path.join(dspath, 'pheno')
-        for _, lemurname, plotname in MEDA_options:
+        for _, lemurname, plotname in MEDA_options['pheno']:
             tosave = getattr(lpl, lemurname)(csv_ds, mode='div').plot()
             plotfilename = "%s.html"%(plotname)
             plotpath = os.path.join(phenopath, plotfilename)
@@ -327,7 +333,7 @@ def upload():
                "cp", "s3://%s/fmri"%(bucket_name),
                os.path.join(session['basepath'], 'fmri'), "--recursive"]
         app.logger.info("fMRI Data Downloaded")
-        #call(cmd)
+        call(cmd)
 
         # Make plots
         fmri.run_fmri(os.path.basename(session['basepath']))

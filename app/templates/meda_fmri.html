@@ -3,6 +3,33 @@
     <div class="container-fluid">
         <div class="row">
             <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
+              <div class="container-fluid">Choose Modality</div>
+              <hr>
+              <!--Choose Modality -->
+              <ul class="nav nav-pills flex-column">
+                  {% if has_pheno %}
+                  <li class="nav-item">
+                      <a href={{ url_for('meda_fmri', ds_name=request.path.split('/')[-4], mode='none', plot_name='default') }}>
+                          Phenotypic
+                      </a>
+                  </li>
+                  {% endif %}
+                  {% if has_eeg %}
+                  <li class="nav-item">
+                      <a href={{ url_for('meda_fmri', ds_name=request.path.split('/')[-4], mode='none', plot_name='default') }}>
+                          EEG
+                      </a>
+                  </li>
+                  {% endif %}
+                  {% if has_fmri %}
+                  <li class="nav-item">
+                      <a href={{ url_for('meda_fmri', ds_name=request.path.split('/')[-4], mode='none', plot_name='default') }}>
+                          fMRI
+                      </a>
+                  </li>
+                  {% endif %}
+              </ul>
+
               <div class="container-fluid">MEDA Options</div>
               <hr>
               <ul class="nav nav-pills flex-column">
