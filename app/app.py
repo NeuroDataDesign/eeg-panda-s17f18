@@ -5,8 +5,13 @@ from flask import Flask, session, render_template, request, send_from_directory,
 import logging
 from logging.handlers import RotatingFileHandler
 import json
+from subprocess import call
 
-#sys.path.append(os.path.abspath(os.path.join('..')))
+import eeg
+import fmri
+
+import sys
+sys.path.append(os.path.abspath(os.path.join('..')))
 from lemur import datasets as lds, metrics as lms, plotters as lpl, embedders as leb
 
 app = Flask(__name__)
@@ -58,25 +63,28 @@ def index():
 @app.route('/MEDA/home')
 def medahome():
     basedir = os.path.join(APP_ROOT, 'data')
-    datasets = os.listdir(basedir)
+    datasets = [di for di in os.listdir(basedir) if os.path.isdir(os.path.join(basedir, di))]
     metas = []
     for d in datasets:
-        with open(os.path.join(basedir, d, "metadata.json")) as f:
-            rawjson = f.read()
-        metadata = json.loads(rawjson)
-        metas.append(metadata)
+        print(os.path.join(basedir, d, "metadata.json"))
+        if os.path.exists(os.path.join(basedir, d, "metadata.json")):
+
+            with open(os.path.join(basedir, d, "metadata.json")) as f:
+                rawjson = f.read()
+            metadata = json.loads(rawjson)
+            metas.append(metadata)
     return render_template('home.html', metas = metas)
 
 @app.route('/MEDA/upload')
 def uploadrender():
     return render_template("upload.html")
 
-@app.route('/MEDA/plot/<ds_name>/<plot_name>')
-def meda(ds_name=None, plot_name=None):
+@app.route('/MEDA/plot/<ds_name>/<modality>/<plot_name>')
+def meda(ds_name=None, modality=None, plot_name=None):
     app.logger.info('DS Name is: %s', ds_name)
     app.logger.info('Plot Name is: %s', plot_name)
 
-    base_path = os.path.join(APP_ROOT, 'data', ds_name, 'pheno')
+    base_path = os.path.join(APP_ROOT, 'data', ds_name, modality)
 
     if plot_name == "default":
         todisp = "<h1> Choose a plot! </h1>"
@@ -154,8 +162,32 @@ def upload():
                 f.close()
 
     if session['eeg_data'] is not None:
-        # Create the dataset object
-        cloud_ds = lds.CloudDataSet(session['eeg_data'], name = filedir)
+        # Download EEG patients
+        app.logger.info("Downloading EEG Data...")
+        credential_info = open(session['eeg_data'], 'r').read()
+        bucket_name = credential_info.split(",")[0]
+        cmd = ["aws", "s3",
+               "cp", "s3://%s/eeg"%(bucket_name),
+               os.path.join(session['basepath'], 'eeg'), "--recursive"]
+        app.logger.info("EEG Data Downloaded")
+        #call(cmd)
+
+        # Make plots
+        eeg.run_eeg(os.path.basename(session['basepath']))
+
+    if session['fmri_data'] is not None:
+        # Download EEG patients
+        app.logger.info("Downloading fMRI Data...")
+        credential_info = open(session['eeg_data'], 'r').read()
+        bucket_name = credential_info.split(",")[0]
+        cmd = ["aws", "s3",
+               "cp", "s3://%s/fmri"%(bucket_name),
+               os.path.join(session['basepath'], 'fmri'), "--recursive"]
+        app.logger.info("fMRI Data Downloaded")
+        #call(cmd)
+
+        # Make plots
+        fmri.run_fmri(os.path.basename(session['basepath']))
 
     return redirect(url_for('meda', ds_name=filedir, plot_name='default'))
 
@@ -175,21 +207,11 @@ def s3upload():
         app.logger.info('Accept incoming file: %s', filename)
         app.logger.info('Save it to: %s', destination)
         file.save(destination)
-        credential_info = open(destination, 'r').readlines()
-        # print (credential_info)
-        aws_access_key_id = credential_info[1][:-1]
-        # print (aws_access_key_id)
-        aws_secret_access_key = credential_info[2]
-        # print (aws_secret_access_key)
 
-        # s3 = boto3.client('s3')
-        client = boto3.client(
-            's3',
-            aws_access_key_id=credential_info[1][:-1],
-            aws_secret_access_key=credential_info[2],
-        )
+        credential_info = open(destination, 'r').readlines()
         bucket_name = credential_info[0][:-1]
 
+        cmd = ["aws", "s3", "cp", "s3://%s/%s"%(bucket_name, )]
         # # Uploads the given file using a managed uploader, which will split up large
         # # files automatically and upload parts in parallel.
         client.upload_file(destination, bucket_name, filename)
