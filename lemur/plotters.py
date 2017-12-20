@@ -180,7 +180,7 @@ class CorrelationMatrix(MatrixPlotter):
                            y = self.DS.D.columns,
                            z = C,
                            colorscale = [[0.0, 'rgb(255,0,)'], 
-                                         [(color_center, 'rgb(127,127,0)'], 
+                                         [color_center, 'rgb(127,127,0)'], 
                                          [1.0, 'rgb(0,255,0)']])
         fig = dict(data=[trace], layout=layout)
         return self.makeplot(fig)
