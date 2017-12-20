@@ -948,7 +948,6 @@ class SpectrogramPlotter(TimeSeriesPlotter):
     def plot(self, channel = 0, sample_freq = 500):
         """Constructs a spectrogram plot of the time series.
 
-
         Parameters
         ----------
         sample_freq : int
@@ -982,6 +981,81 @@ class SpectrogramPlotter(TimeSeriesPlotter):
 
         fig= dict(data=[trace], layout=layout)
         iplot(fig)
+        
+class RawTimeSeries2DPlotter(TimeSeriesPlotter):
+    titlestring = "Intensity by Time and Channel Location for %s"
+    
+    def plot(self, spatial):
+        """Constructs a plot of the channel locations, and their intensities at different times.
+
+        Parameters
+        ----------
+        spatial : Dataset
+            Locations of channels.
+
+        """
+        title = self.titlestring % (self.DS.name)
+        # Time series containing EEG data.
+        mts = self.DS.D.as_matrix()
+        # 2D Spatial locations of channels.
+        locations = spatial.D.as_matrix()
+        # Set variables
+        num_obs = mts.shape[0]
+        num_channels = mts.shape[1]
+
+        # Verify that 'locations' exist for exactly each channel.
+        if (num_channels != locations.shape[0]):
+            raise TypeError("""Error: Ensure that the number of channels in the Multivariate Time Series (columns) 
+                            is equal to the number of points (rows) in locations.""")
+
+        # Sets up data frame containing the different plots.
+        data = [dict(
+            visible = False,
+            name = 'Time = '+str(step),
+            x = locations[:, 0],
+            y = locations[:, 1],
+            mode = 'markers',
+            # Marker represents intensity.
+            marker = dict(
+            size = 15,
+            color = mts[step, range(num_channels)],
+            colorbar = go.ColorBar(
+                    title='Voltage Intensity'
+                ),
+            colorscale='Viridis',
+            line = dict(
+                width = 1,
+                color = 'rgb(0, 0, 0)'
+            ))) for step in range(0, num_obs, downsample)]
+
+        # Set up timesteps
+        steps = []
+        for i in range(len(data)):
+            step = dict(
+                method = 'restyle',
+                args = ['visible', [False] * len(data)],
+            )
+            step['args'][1][i] = True # Toggle i'th trace to "visible"
+            steps.append(step)
+
+        # Sets up slider
+        sliders = [dict(
+            active = 10,
+            currentvalue = {"prefix": "Timestep: "},
+            pad = {"t": 50},
+            steps = steps
+        )]
+        layout = dict(sliders=sliders)
+
+        # Plot figure.
+        fig = dict(data=data, layout=layout)
+        self.makeplot(fig)
+"""
+class RawPeriodogram2DPlotter(TimeSeriesPlotter):
+    titlestring = "Density by Frequency and Channel Location for %s"
+    
+    def plot(self, spatial):
+"""
 
 class Nifti4DPlotter:
     name = "Nifti4DPlotter"
