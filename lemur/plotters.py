@@ -175,13 +175,11 @@ class CorrelationMatrix(MatrixPlotter):
             C = np.nan_to_num(np.corrcoef(D))
 
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
-        print(color_center)
         trace = go.Heatmap(x = self.DS.D.columns,
                            y = self.DS.D.columns,
                            z = C,
-                           zmin=-1,
-                           zmax=1,
-                           )
+                           zmin = -1,
+                           zmax = 1)
         fig = dict(data=[trace], layout=layout)
         return self.makeplot(fig)
 
