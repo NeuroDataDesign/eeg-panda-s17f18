@@ -996,9 +996,10 @@ class RawTimeSeries2DPlotter(TimeSeriesPlotter):
         """
         title = self.titlestring % (self.DS.name)
         # Time series containing EEG data.
-        mts = self.DS.D.as_matrix()
+        mts = self.DS.D.as_matrix().T
         # 2D Spatial locations of channels.
         locations = spatial.D.as_matrix()
+        
         # Set variables
         num_obs = mts.shape[0]
         num_channels = mts.shape[1]
@@ -1050,12 +1051,84 @@ class RawTimeSeries2DPlotter(TimeSeriesPlotter):
         # Plot figure.
         fig = dict(data=data, layout=layout)
         self.makeplot(fig)
-"""
+
 class RawPeriodogram2DPlotter(TimeSeriesPlotter):
     titlestring = "Density by Frequency and Channel Location for %s"
     
     def plot(self, spatial):
-"""
+        """Constructs a plot of the channel locations, and their densities at different frequencies.
+
+        Parameters
+        ----------
+        spatial : Dataset
+            Locations of channels.
+
+        """
+        title = self.titlestring % (self.DS.name)
+        # Time series containing EEG data.
+        mts = self.DS.D.as_matrix().T
+        # 2D Spatial locations of channels.
+        locations = spatial.D.as_matrix()
+        # Set variables
+        num_obs = mts.shape[0]
+        num_channels = mts.shape[1]
+
+        # Create matriz to hold frequencies and densities
+        freq0, density0 = signal.periodogram(mts[0:num_obs:downsample,0])
+        densities = np.zeros((len(density0), num_channels))
+        densities[:, 0] = density0
+        for j in range(1, num_channels):
+            freq, density = signal.periodogram(mts[0:num_obs:downsample,j])
+            densities[:, j] = density
+        num_dens = densities.shape[0]
+
+        # Verify that 'locations' exist for exactly each channel.
+        if (num_channels != locations.shape[0]):
+            raise TypeError("""Error: Ensure that the number of channels in the Multivariate Time Series (columns) 
+                            is equal to the number of points (rows) in locations.""")
+
+        # Sets up data frame containing the different plots.
+        data = [dict(
+            visible = False,
+            name = 'Frequency = '+str(step),
+            x = locations[:, 0],
+            y = locations[:, 1],
+            mode = 'markers',
+            # Marker represents density.
+            marker = dict(
+            size = 15,
+            color = densities[step, range(num_channels)],
+            colorbar = go.ColorBar(
+                    title='Power Density'
+                ),
+            colorscale='Viridis',
+            line = dict(
+                width = 1,
+                color = 'rgb(0, 0, 0)'
+            ))) for step in range(num_dens)]
+
+        # Set up timesteps
+        steps = []
+        for i in range(len(data)):
+            step = dict(
+                method = 'restyle',
+                args = ['visible', [False] * len(data)],
+            )
+            step['args'][1][i] = True # Toggle i'th trace to "visible"
+            steps.append(step)
+
+        # Sets up slider
+        sliders = [dict(
+            active = 10,
+            currentvalue = {"prefix": "Frequency: "},
+            pad = {"t": 50},
+            steps = steps
+        )]
+        layout = dict(sliders=sliders)
+
+        # Plot figure.
+        fig = dict(data=data, layout=layout)
+        self.makeplot(fig)
 
 class Nifti4DPlotter:
     name = "Nifti4DPlotter"
