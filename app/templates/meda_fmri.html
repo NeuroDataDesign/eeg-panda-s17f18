@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
+              <div class="container-fluid">MEDA Options</div>
+              <hr>
+              <ul class="nav nav-pills flex-column">
+                  {% for sidename, lemurname, filename in MEDA_options %}
+                    <li class="nav-item">
+                      <a class="nav-link {{ 'active' if value == request.path.split('/')[-1]
+                              and 'none' == request.path.split('/')[-2]}}"
+                          href={{ url_for('meda_fmri', ds_name=request.path.split('/')[-4], embed='none', plot_name=filename) }}>{{ sidename }}
+                          {% if filename == request.path.split('/')[-1] %}
+                              <span class="sr-only">(current)</span>
+                          {%  endif %}
+                      </a>
+                    </li>
+                  {% endfor %}
+              </ul>
+
+              <div class="container-fluid">MEDA Embedded Options</div>
+              <hr>
+              <ul class="nav nav-pills flex-column">
+                  {% for sidename, lemurname, filename in MEDA_Embedded_options %}
+                      <li class="nav-item">
+                          <a class="nav-link {{ 'active' if value == request.path.split('/')[-1]
+                              and 'embed' == request.path.split('/')[-2]}}"
+                             href={{ url_for('meda_fmri', ds_name=request.path.split('/')[-4], embed='embed', plot_name=filename) }}>{{ sidename }}
+                              {% if filename == request.path.split('/')[-1] %}
+                                  <span class="sr-only">(current)</span>
+                              {%  endif %}
+                          </a>
+                      </li>
+                  {% endfor %}
+              </ul>
+
+            </nav>
+
+            <main role="main"
+                  class="col-sm-9 ml-sm-auto col-md-10 pt-3"
+                  style="height:calc(100vh - 75px)">
+                {{ plot|safe }}
+            </main>
+        </div>
+    </div>
+{% endblock %}
+
