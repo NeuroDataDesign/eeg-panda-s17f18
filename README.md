@@ -6,14 +6,14 @@ Lemur is a library to assist in the aggregate and one-to-one visualization of an
 
 ### Sprint 2 Demo
 
-* docker pull yujialiu/redlemur:latest
-* docker run -p 127.0.0.1:5000:5000 -t yujialiu/redlemur:latest
-* go to localhost:5000
-* download the iris.csv file from the base directory of lemur (the file is above this text!)
-* under 'Pipeline Upload' click 'choose file' then direct to the iris.csv file
+* run in a terminal `docker pull yujialiu/redlemur:latest`
+* run in a terminal `docker run -p 127.0.0.1:5000:5000 -t yujialiu/redlemur:latest`
+* go to `localhost:5000`
+* download the iris.csv file from the base directory of lemur, which can be done with `wget https://raw.githubusercontent.com/NeuroDataDesign/lemur/master/iris.csv`
+* under 'Pipeline Upload' click 'choose file' then direct to the `iris.csv` file
 * Click 'Upload'
 * Wait about 15 seconds
-* Plots should shot up on your machine
+* Click on plots in the left menu bar to display them in the center.
 
 
 ### Sprint 1 Release:
