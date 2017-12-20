@@ -158,3 +158,26 @@ Accept incoming file: eeg_pub.csv
 Save it to: /home/nitin/hopkins/fall2017/ndd/eeg-panda-s17f18/app/data/last_test/eeg_pub.csv
 Downloading EEG Data...
 EEG Data Downloaded
+DS Name is: last_test
+Plot Name is: default
+DS Name is: last_test
+Plot Name is: scree
+DS Name is: last_test
+Plot Name is: sparkline
+DS Name is: last_test
+Plot Name is: sparkline
+DS Name is: test
+Plot Name is: default
+DS Name is: test
+Plot Name is: default
+DS Name is: test
+Plot Name is: default
+DS Name is: test
+Plot Name is: emblocationheatmap
+DS Name is: test
+Plot Name is: embheatmap
+Target route: /home/nitin/hopkins/fall2017/ndd/eeg-panda-s17f18/app/data
+Accept incoming file: eeg_pub.csv
+Save it to: /home/nitin/hopkins/fall2017/ndd/eeg-panda-s17f18/app/data/god_help/eeg_pub.csv
+Downloading fMRI Data...
+fMRI Data Downloaded
