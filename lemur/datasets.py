@@ -36,6 +36,8 @@ class BIDSParser:
         dataset_name = os.path.basename(os.path.normpath(base_path))
         dataset = {}
         subjects = [os.path.basename(x) for x in glob.glob(base_path + "/*")]
+        if "chanlocs.csv" in subjects:
+            subjects.remove("chanlocs.csv")
         for s in subjects:
             dataset.update({s:{}})
         for s in subjects:
