@@ -9,6 +9,7 @@ Lemur is a library to assist in the aggregate and one-to-one visualization of an
 * docker pull yujialiu/redlemur:latest
 * docker run -p 127.0.0.1:5000:5000 -t yujialiu/redlemur:latest
 * go to localhost:5000
+* download the iris.csv file from the base directory of lemur (the file is above this text!)
 * under 'Pipeline Upload' click 'choose file' then direct to the iris.csv file
 * Click 'Upload'
 * Wait about 15 seconds
