@@ -1,7 +1,7 @@
 boto3==1.4.7
 Flask==0.12.2
 botocore==1.5.92
-redlemur==0.03
+redlemur==0.05
 scipy==1.0.0
 matplotlib==2.1.0
 plotly==2.2.2
@@ -13,3 +13,6 @@ boto3==1.4.7
 numpy==1.13.3
 colorlover==0.2.1
 scikit_learn==0.19.1
+nilearn==0.4.0
+nibabel==2.2.1
+imageio==2.2.0
