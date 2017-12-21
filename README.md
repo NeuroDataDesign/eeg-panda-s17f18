@@ -17,6 +17,7 @@ Lemur is a library to assist in the aggregate and one-to-one visualization of an
 
 ##### 3. Launch the Docker Image
 * Launch the docker image with `docker run -p 5000:5000 rymarr/lemur`
+* Congrats! Your image is now live on your machine at `http://0.0.0.0:5000/`
 
 ##### 4. Launch a New Image Processing Job
 * Go to the 'Upload' tab
