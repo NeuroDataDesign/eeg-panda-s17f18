@@ -3,6 +3,33 @@
     <div class="container-fluid">
         <div class="row">
             <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
+              <div class="container-fluid">Choose Modality</div>
+              <hr>
+              <!--Choose Modality -->
+              <ul class="nav nav-pills flex-column">
+                  {% if has_pheno %}
+                  <li class="nav-item">
+                      <a href={{ url_for('meda_fmri', ds_name=request.path.split('/')[-4], mode='none', plot_name='default') }}>
+                          Phenotypic
+                      </a>
+                  </li>
+                  {% endif %}
+                  {% if has_eeg %}
+                  <li class="nav-item">
+                      <a href={{ url_for('meda_fmri', ds_name=request.path.split('/')[-4], mode='none', plot_name='default') }}>
+                          EEG
+                      </a>
+                  </li>
+                  {% endif %}
+                  {% if has_fmri %}
+                  <li class="nav-item">
+                      <a href={{ url_for('meda_fmri', ds_name=request.path.split('/')[-4], mode='none', plot_name='default') }}>
+                          fMRI
+                      </a>
+                  </li>
+                  {% endif %}
+              </ul>
+
               <div class="container-fluid">MEDA Options</div>
               <hr>
               <ul class="nav nav-pills flex-column">
@@ -10,7 +37,7 @@
                     <li class="nav-item">
                       <a class="nav-link {{ 'active' if value == request.path.split('/')[-1]
                               and 'none' == request.path.split('/')[-2]}}"
-                          href={{ url_for('meda_fmri', ds_name=request.path.split('/')[-4], embed='none', plot_name=filename) }}>{{ sidename }}
+                          href={{ url_for('meda_fmri', ds_name=request.path.split('/')[-4], mode='none', plot_name=filename) }}>{{ sidename }}
                           {% if filename == request.path.split('/')[-1] %}
                               <span class="sr-only">(current)</span>
                           {%  endif %}
@@ -26,7 +53,7 @@
                       <li class="nav-item">
                           <a class="nav-link {{ 'active' if value == request.path.split('/')[-1]
                               and 'embed' == request.path.split('/')[-2]}}"
-                             href={{ url_for('meda_fmri', ds_name=request.path.split('/')[-4], embed='embed', plot_name=filename) }}>{{ sidename }}
+                             href={{ url_for('meda_fmri', ds_name=request.path.split('/')[-4], mode='embed', plot_name=filename) }}>{{ sidename }}
                               {% if filename == request.path.split('/')[-1] %}
                                   <span class="sr-only">(current)</span>
                               {%  endif %}
@@ -35,12 +62,50 @@
                   {% endfor %}
               </ul>
 
+              <!--<div class="container-fluid">One-to-One Plots</div>
+              <hr>
+              <ul class="nav nav-pills flex-column">
+                  {% for sidename, lemurname, filename in One_to_One %}
+                      <li class="nav-item">
+                          <a class="nav-link {{ 'active' if value == request.path.split('/')[-1]
+                          and 'embed' == request.path.split('/')[-2]}}"
+                             href={{ url_for('meda_fmri', ds_name=request.path.split('/')[-4], mode='one',
+                           subj_name="none", tests_name="none", plot_name=filename) }}>{{ sidename }}
+                              {% if filename == request.path.split('/')[-1] %}
+                                  <span class="sr-only">(current)</span>
+                              {%  endif %}
+                          </a>
+                      </li>
+                  {% endfor %}
+              </ul>-->
+
             </nav>
 
             <main role="main"
                   class="col-sm-9 ml-sm-auto col-md-10 pt-3"
                   style="height:calc(100vh - 75px)">
-                {{ plot|safe }}
+                {% if request.args.get('subj_name') == "none" and plot == None %}
+                    <h1><b>One-to-One {{ one_title }} Plots!</b></h1>
+                    <p>Our One-to-One plot viewer allows you to investigate subjects of interest from the dataset at a
+                        closer level. After identifiying which subject and which paradigms you wish to investigate, choose
+                        them from the list below!</p>
+                {% endif %}
+                {% if request.args.get('subj_name') == "none" and plot == None %}
+                    <ul>
+                        {% for subject, tasks in interm %}
+                            <li> {{ subject }}<ul>
+                                {% for task in tasks %}
+                                    <li>
+                                        <a href={{ url_for('meda_fmri', ds_name=request.path.split('/')[-4], mode='one',
+                                subj_name=subject, test_name=task, plot_name=request.path.split('/')[-1]) }}>{{ task }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul></li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    {{ plot|safe }}
+                {% endif %}
             </main>
         </div>
     </div>
