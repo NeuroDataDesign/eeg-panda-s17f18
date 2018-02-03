@@ -1,9 +1,15 @@
 import os
+import boto3
 import pandas as pd
 import numpy as np
 import pickle as pkl
 import logging
 import json
+import glob
+
+from nilearn import image as nimage
+from nilearn import plotting as nilplot
+import nibabel as nib
 
 class DataSet:
     def __init__(self, D, name="default"):
@@ -23,6 +29,98 @@ class DataSet:
 
     def getMatrix(self):
         return self.D.as_matrix()
+
+class BIDSParser:
+
+    def __init__(self, base_path):
+        dataset_name = os.path.basename(os.path.normpath(base_path))
+        dataset = {}
+        subjects = [os.path.basename(x) for x in glob.glob(base_path + "/*")]
+        if "chanlocs.csv" in subjects:
+            subjects.remove("chanlocs.csv")
+        if "metadata.json" in subjects:
+            subjects.remove("metadata.json")
+        print(base_path)
+        print(subjects)
+        for s in subjects:
+            dataset.update({s:{}})
+        for s in subjects:
+            modalities = [os.path.basename(x) for x in glob.glob(os.path.join(base_path, s) + "/*")]
+            print(modalities)
+            for m in modalities:
+                dataset[s].update({m:{}})
+                files = [os.path.basename(x) for x in glob.glob(os.path.join(base_path, s, m) + "/*")]
+                print(files)
+                for f in files:
+                    t = "".join(f.split("_")[1:]).split(".")[0]
+                    dataset[s][m].update({t:f})
+        self.dataset = dataset
+        self.base_path = base_path
+        print(self.dataset)
+
+    def getModalityFrame(self, modality, extension):
+        files = []
+        subjects = []
+        tasks = []
+        for s in self.dataset.keys():
+            for t in self.dataset[s][modality].keys():
+                f = self.dataset[s][modality][t]
+                if f.endswith(extension):
+                    files.append(os.path.join(self.base_path, s, modality, f))
+                    subjects.append(s)
+                    tasks.append(t)
+        d = {
+            "resource_path": files,
+            "subjects": subjects,
+            "tasks": tasks        
+        }
+        return pd.DataFrame(d)
+
+class fMRIDataSet:
+
+    def __init__(self, dataframe_descriptor, name="fmri"):
+        self.D = dataframe_descriptor
+        self.D.index = self.D["subjects"] + "-" + self.D["tasks"]
+        self.D.index.name = "index"
+        self.name = name
+        self.n = self.D.shape[0]
+
+    def getResource(self, index):
+        resource = self.D.ix[index]
+        return resource
+
+    def getMatrix(self, index):
+        resource_path = self.D.ix[index][0]
+        return nib.load(resource_path).get_data()
+
+class EEGDataSet:
+
+    def __init__(self, dataframe_descriptor, name="fmri"):
+        self.D = dataframe_descriptor
+        self.D.index = self.D["subjects"].astype(str) + "-" + self.D["tasks"].astype(str)
+        self.D.index.name = "index"
+        self.name = name
+        self.n = self.D.shape[0]
+
+    def getResource(self, index):
+        resource = self.D.ix[index]
+        return resource
+
+    def getMatrix(self, index):
+        resource_path = self.D.ix[index][0]
+        with open(resource_path, "rb") as f:
+            return pkl.load(f).T
+
+    def getResourceDS(self, index):
+        resource = self.getResource(index)
+        matrix = self.getMatrix(index)
+        D = pd.DataFrame(matrix.T)
+        name = "%s/%s"%(resource[1], resource[2])
+        DS = DataSet(D, name)
+        return DS
+
+
+
 class DiskDataSet:
     """A dataset living locally on the hard disk.
 
@@ -105,13 +203,15 @@ class CloudDataSet:
 
     """
 
-    def __init__(self, df_path, index_column = None):
-        self.D = pd.read_csv(df_path)
-        if index_column is not None:
-            self.D.index = self.D[index_column]
-            self.D.index.name = index_column
-        self.N = self.D.shape[0]
-        self.name = df_path.split("/")[-1].split(".")[0].split("_")[0]
+    def __init__(self, df_path):
+        credential_info = open(df_path, 'r').readlines()
+        self.client = boto3.client(
+            's3',
+            aws_access_key_id=credential_info[1][:-1],
+            aws_secret_access_key=credential_info[2],
+        )
+        self.bucket_name = credential_info[0][:-1]
+        self.objects = self.client.list_objects(self.bucket_name)['Contents']
 
     def getResource(self, index):
         """Get a specific data point from the data set.
@@ -127,12 +227,7 @@ class CloudDataSet:
             A ndarray of the data point.
 
         """
-        resource_path = self.D["resource_path"].ix[index]
-        dim_column = self.D["dim_column"].ix[index]
-        with open(resource_path, "rb") as f:
-            if dim_column:
-                return pkl.load(f).T
-            return pkl.load(f)
+        self.client.download_file(self.bucket_name, index)
 
     def getResourceDS(self, index):
         D = pd.DataFrame(self.getResource(index).T)
@@ -364,14 +459,14 @@ class DistanceMatrix:
     """
 
     def __init__(self, dataset, metric):
-        self.dataset = dataset
-        self.name = self.dataset.name
-        self.labels = self.dataset.D.index.values
-        self.label_name = self.dataset.D.index.name
+        self.DS = dataset
+        self.name = self.DS.name
+        self.labels = self.DS.D.index.values
+        self.label_name = self.DS.D.index.name
         self.metric = metric
         self.metric_name = metric.__name__
-        self.n = self.dataset.n
-        parameterization = self.metric.parameterize(self.dataset)
+        self.n = self.DS.n
+        parameterization = self.metric.parameterize(self.DS)
         self.D = np.zeros([self.n, self.n])
         for i in range(self.n):
             I = parameterization[i]
@@ -380,8 +475,8 @@ class DistanceMatrix:
                 self.D[i, j] = self.metric.compare(I, J)
                 self.D[j, i] = self.D[i, j]
         self.D = pd.DataFrame(self.D)
-        self.D.index = self.dataset.D.index
-        self.D.index.name = self.dataset.D.index.name
+        self.D.index = self.DS.D.index
+        self.D.index.name = self.DS.D.index.name
 
     def getMatrix(self):
         """Get the distance matrix.
@@ -397,21 +492,21 @@ class DistanceMatrix:
 class InterpointMatrix:
 
     def __init__(self, dataset, metric):
-        self.dataset = dataset
-        self.name = self.dataset.name
+        self.DS = dataset
+        self.name = self.DS.name
         self.metric = metric
         self.metric_name = metric.__name__
-        self.d = self.dataset.d
+        self.d = self.DS.d
         self.D = np.zeros([self.d, self.d])
         for i in range(self.d):
             I = self.dataset.D.iloc[:, i]
             for j in range(i + 1):
-                J = self.dataset.D.iloc[:, j]
+                J = self.DS.D.iloc[:, j]
                 self.D[i, j] = self.metric.compare(I, J)
                 self.D[j, i] = self.D[i, j]
         self.D = pd.DataFrame(self.D)
-        self.D.index = self.dataset.D.columns
-        self.D.index.name = self.dataset.D.index.name
+        self.D.index = self.DS.D.columns
+        self.D.index.name = self.DS.D.index.name
 
     def getMatrix(self):
         """Get the distance matrix.
