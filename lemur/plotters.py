@@ -1,4 +1,6 @@
 import os
+import imageio
+from PIL import ImageDraw, Image, ImageFont
 
 from plotly.offline import iplot, plot
 import plotly.graph_objs as go
@@ -13,7 +15,12 @@ import random
 import scipy.signal as signal
 from sklearn.mixture import GaussianMixture
 import colorlover as cl
-from sklearn.ensemble import RandomForestRegressor
+
+from nilearn import image as nimage
+from nilearn import plotting as nilplot
+import nibabel as nib
+
+from lemur import embedders as leb
 
 def get_spaced_colors(n):
     max_value = 255
@@ -21,12 +28,19 @@ def get_spaced_colors(n):
     hues = range(0, max_value, interval)
     return cl.to_rgb(["hsl(%d,100%%,40%%)"%i for i in hues])
 
+def get_heat_colors(n):
+    max_value = 255
+    interval = int(max_value / n)
+    hues = range(0, max_value, interval)
+    return cl.to_rgb(["hsl(%d,100%%,40%%)"%i for i in hues])
+
 class MatrixPlotter:
-    def __init__(self, DS, mode="notebook", *args, **kwargs):
+    def __init__(self, DS, mode="notebook", base_path = None):
         self.DS = DS
         self.plot_mode = mode
+        self.base_path = base_path
 
-    def makeplot(self, fig):
+    def makeplot(self, fig, local_path=None):
         """Make the plotly figure visable to the user in the way they want.
 
         Parameters
@@ -38,17 +52,247 @@ class MatrixPlotter:
         
         if self.plot_mode == "notebook":
             iplot(fig)
-        if self.plot_mode == "html":
+        if self.plot_mode == "savediv":
             fig["layout"]["autosize"] = True
-            h = random.getrandbits(128)
-            fname = "%032x.html"%h
-            plot(fig, output_type='file', filename=fname)
+            div = plot(fig, output_type='div', include_plotlyjs=False)
+            path = os.path.join(self.base_path, local_path + ".html")
+            os.makedirs("/".join(path.split("/")[:-1]), exist_ok=True)
+            with open(path, "w") as f:
+                f.write(div)
+                f.close()
+
         if self.plot_mode == "div":
             fig["layout"]["autosize"] = True
             return plot(fig, output_type='div', include_plotlyjs=False)
 
+class TimeSeriesPlotter:
+    """A generic one-to-one plotter for time series data to be extended.
+
+    Parameters
+    ----------
+    data : :obj:`ndarray`
+        The time series data.
+    resource_name : string
+        The name of the time series being plotted.
+    row_name : string
+        The name of the rows in the time-series (e.g. channels, sources. ect.).
+    column_name : string
+        The name of the columns in the time-series (e.g. time points, time steps, seconds, ect.).
+
+    Attributes
+    ----------
+    data : :obj:`ndarray`
+        The time series data.
+    d : int
+        The number of dimensions in the time series
+    n : int
+        The number of time points in the time series
+    row_name : string
+        The name of the rows in the time-series (e.g. channels, sources. ect.).
+    column_name : string
+        The name of the columns in the time-series (e.g. time points, time steps, seconds, ect.).
+    resource_name : string
+        The name of the time series being plotted.
+
+    """
+
+    def __init__(self, DS, mode = "notebook", base_path=None):
+        self.data = DS.D.as_matrix().T
+        self.d, self.n = self.data.shape
+        self.row_name = "Channels"
+        self.col_name = "Time Points"
+        self.resource_name = DS.name
+        self.plot_mode = mode
+        self.base_path = base_path
+
+    def makeplot(self, fig, local_path=None):
+        """Make the plotly figure visable to the user in the way they want.
+
+        Parameters
+        ----------
+        gid : :obj:`figure`
+            An plotly figure.
+
+        """
+        
+        if self.plot_mode == "notebook":
+            iplot(fig)
+        if self.plot_mode == "savediv":
+            fig["layout"]["autosize"] = True
+            div = plot(fig, output_type='div', include_plotlyjs=False)
+            path = os.path.join(self.base_path, local_path + ".html")
+            os.makedirs("/".join(path.split("/")[:-1]), exist_ok=True)
+            with open(path, "w") as f:
+                f.write(div)
+                f.close()
+
+        if self.plot_mode == "div":
+            fig["layout"]["autosize"] = True
+            return plot(fig, output_type='div', include_plotlyjs=False)
+
+
+class SquareHeatmap(MatrixPlotter):
+    titlestring = "%s Heatmap"
+    shortname = "squareheat"
+
+    def plot(self):
+        """Constructs a distance matrix heatmap using the :obj:`DistanceMatrix` object, in plotly.
+
+        """
+        title = self.titlestring % (self.DS.name)
+        xaxis = go.XAxis(
+                title=self.DS.D.index.name,
+                ticktext = self.DS.D.index,
+                ticks = "",
+                showticklabels=False,
+                showgrid=False,
+                mirror=True,
+                tickvals = [i for i in range(len(self.DS.D.index))])
+        yaxis = go.YAxis(
+                scaleanchor="x",
+                title=self.DS.D.index.name,
+                ticktext = self.DS.D.index,
+                showgrid=False,
+                ticks = "",
+                showticklabels=False,
+                mirror=True,
+                tickvals = [i for i in range(len(self.DS.D.index))])
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        trace = go.Heatmap(z = self.DS.D.as_matrix().T)
+        data = [trace]
+        fig = dict(data=data, layout=layout)
+        return self.makeplot(fig, "agg/" + self.shortname)
+
+class Scatterplot(MatrixPlotter):
+    titlestring = "%s Scatterplot"
+    shortname = "scatter"
+
+    def plot(self):
+        """Constructs a distance matrix heatmap using the :obj:`DistanceMatrix` object, in plotly.
+
+        """
+        title = self.titlestring % (self.DS.name)
+        if self.DS.d != 2:
+            print("Scatter plot must get 2 dimensional dataset")
+            return
+        xaxis = go.XAxis(title=self.DS.D.index.name)
+        yaxis = go.YAxis(scaleanchor="x", title=self.DS.D.index.name)
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        trace = go.Scatter(x = self.DS.D.as_matrix()[:, 0],
+                           y = self.DS.D.as_matrix()[:, 1],
+                           mode = "markers")
+        data = [trace]
+        fig = dict(data=data, layout=layout)
+        return self.makeplot(fig, "agg/" + self.shortname)
+
+class SpatialConnectivity(MatrixPlotter):
+    titlestring = "%s Spatial Connectivity"
+    shortname = "spatialconn"
+
+    def plot(self, spatial):
+        title = self.titlestring % (self.DS.name)
+        DM = self.DS.D.as_matrix()
+        sp = spatial.D.as_matrix()
+        trace1 = go.Scatter3d(
+            x=sp[:, 0],
+            y=sp[:, 1],
+            z=sp[:, 2],
+            mode='markers',
+            marker=dict(
+                size=12,
+                opacity=0
+            )
+        )
+        #med = np.nanmedian(DM)
+        #mask = np.nan_to_num(DM) > (3 * med)
+        #Xe = []
+        #Ye = []
+        #Ze = []
+        #for i in range(DM.shape[0]):
+        #    for j in range(DM.shape[1]):
+        #        if mask[i, j]:
+        #            Xe += [sp[i, 0], sp[j, 0], None]
+        #            Ye += [sp[i, 1], sp[j, 1], None]
+        #            Ze += [sp[i, 2], sp[j, 2], None]
+        #print(Xe)
+        #trace2 = go.Scatter3d(x=Xe,
+        #                      y=Ye,
+        #                      z=Ze,
+        #                      mode='lines',
+        #                      line=go.Line(color='rgb(125,125,125)', width=1),
+        #                      hoverinfo='none')
+        data = [trace1]
+        fig = dict(data=data, layout={"autosize":True})
+        return self.makeplot(fig, self.DS.name + "/" + self.shortname)
+
+class ConnectedScatterplot(MatrixPlotter):
+    titlestring = "%s Scatterplot"
+    shortname = "connectedscatter"
+
+    def plot(self, spatialDM):
+        """Constructs a distance matrix heatmap using the :obj:`DistanceMatrix` object, in plotly.
+
+        """
+        title = self.titlestring % (self.DS.name)
+        DM = self.DS.D.as_matrix()
+        sDM = spatialDM.D.as_matrix()
+        colors = (np.nansum(DM, axis=0) - 1) / DM.shape[0]
+        TSNEEmbedder = leb.TSNEEmbedder(num_components=2)
+        m = TSNEEmbedder.embed(sDM)
+        xaxis = go.XAxis(title=spatialDM.D.index.name)
+        yaxis = go.YAxis(scaleanchor="x", title=spatialDM.D.index.name)
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis, showlegend=False)
+        trace1 = go.Scatter(x = m[:, 0],
+                           y = m[:, 1],
+                           mode = "markers",
+                           marker = dict(color=colors, size=16, showscale=True))
+        distances = np.zeros([m.shape[0], m.shape[0]])
+        for i in range(m.shape[0]):
+            for j in range(m.shape[0]):
+                distances[i, j] = np.linalg.norm(m[i, :] - m[j, :])
+        med = np.median(distances)
+        mask = distances < (med / 4)
+        Xe = []
+        Ye = []
+        for i in range(distances.shape[0]):
+            for j in range(distances.shape[1]):
+                if mask[i, j]:
+                    Xe += [m[i, 0], m[j, 0], None]
+                    Ye += [m[i, 1], m[j, 1], None]
+        trace2 = go.Scatter(x=Xe,
+                            y=Ye,
+                            mode='lines',
+                            line=go.Line(color='rgb(125,125,125)', width=1),
+                            hoverinfo='none')
+        data = [trace1, trace2]
+        fig = dict(data=data, layout=layout)
+        return self.makeplot(fig, self.DS.name + "/" + self.shortname)
+
+class Scatterplot(MatrixPlotter):
+    titlestring = "%s Scatterplot"
+    shortname = "scatter"
+
+    def plot(self):
+        """Constructs a distance matrix heatmap using the :obj:`DistanceMatrix` object, in plotly.
+
+        """
+        title = self.titlestring % (self.DS.name)
+        if self.DS.d != 2:
+            print("Scatter plot must get 2 dimensional dataset")
+            return
+        xaxis = go.XAxis(title=self.DS.D.index.name)
+        yaxis = go.YAxis(scaleanchor="x", title=self.DS.D.index.name)
+        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        trace = go.Scatter(x = self.DS.D.as_matrix()[:, 0],
+                           y = self.DS.D.as_matrix()[:, 1],
+                           mode = "markers")
+        data = [trace]
+        fig = dict(data=data, layout=layout)
+        return self.makeplot(fig, "agg/" + self.shortname)
+
 class Heatmap(MatrixPlotter):
     titlestring = "%s Heatmap"
+    shortname = "heatmap"
 
     def plot(self):
         title = self.titlestring % (self.DS.name)
@@ -66,10 +310,11 @@ class Heatmap(MatrixPlotter):
         trace = go.Heatmap(z = self.DS.D.as_matrix().T)
         data = [trace]
         fig = dict(data=data, layout=layout)
-        return self.makeplot(fig)
+        return self.makeplot(fig, "agg/" + self.shortname)
 
 class LocationHeatmap(MatrixPlotter):
     titlestring = "%s Location Heatmap"
+    shortname = "locationheat"
 
     def plot(self, showticklabels=False):
         title = self.titlestring % (self.DS.name)
@@ -89,10 +334,11 @@ class LocationHeatmap(MatrixPlotter):
                            z = z)
         data = [trace]
         fig = dict(data=data, layout=layout)
-        return self.makeplot(fig)
+        return self.makeplot(fig, "agg/" + self.shortname)
 
 class LocationLines(MatrixPlotter):
     titlestring = "%s Embedding Location Lines"
+    shortname = "locationlines"
 
     def plot(self, showticklabels=False):
         title = self.titlestring % (self.DS.name)
@@ -111,10 +357,11 @@ class LocationLines(MatrixPlotter):
                       yaxis=dict(title="Mean or Median Value"))
         data = [trace0, trace1]
         fig = dict(data=data, layout=layout)
-        return self.makeplot(fig)
+        return self.makeplot(fig, "agg/" + self.shortname)
 
 class HistogramHeatmap(MatrixPlotter):
     titlestring = "%s Histogram Heatmap"
+    shortname = "histogramheat"
 
     def plot(self, showticklabels=False):
         title = self.titlestring % (self.DS.name)
@@ -147,10 +394,11 @@ class HistogramHeatmap(MatrixPlotter):
                 mirror=True)
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data = data, layout = layout)
-        return self.makeplot(fig)
+        return self.makeplot(fig, "agg/" + self.shortname)
 
 class CorrelationMatrix(MatrixPlotter):
     titlestring = "%s Correlation Matrix"
+    shortname = "correlation"
 
     def plot(self, showticklabels=False):
         title = self.titlestring % (self.DS.name)
@@ -181,10 +429,11 @@ class CorrelationMatrix(MatrixPlotter):
                            zmin = -1,
                            zmax = 1)
         fig = dict(data=[trace], layout=layout)
-        return self.makeplot(fig)
+        return self.makeplot(fig, "agg/" + self.shortname)
 
 class ScreePlotter(MatrixPlotter): 
     titlestring = "%s Scree Plot"
+    shortname = "scree"
 
     def plot(self):
         title = self.titlestring % (self.DS.name)
@@ -211,18 +460,17 @@ class ScreePlotter(MatrixPlotter):
         data = [var, cumvar]
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data=data, layout=layout)
-        return self.makeplot(fig)
+        return self.makeplot(fig, "agg/" + self.shortname)
 
 class EigenvectorHeatmap(MatrixPlotter):
     titlestring = "%s Eigenvector Heatmap"
+    shortname = "evheat"
 
     def plot(self):
         title = self.titlestring % (self.DS.name)
         D = self.DS.D.as_matrix().T
         d, n = D.shape
-        print(D.shape)
         U, _, _ = np.linalg.svd(D, full_matrices=False)
-        print(U.shape)
         xaxis = go.XAxis(
                 title="Eigenvectors",
                 ticktext = ["Eigenvector %s"%i for i in range(1, d + 1)],
@@ -244,7 +492,7 @@ class EigenvectorHeatmap(MatrixPlotter):
         trace = go.Heatmap(z = U)
         data = [trace]
         fig = dict(data=data, layout=layout)
-        return self.makeplot(fig)
+        return self.makeplot(fig, "agg/" + self.shortname)
 
 class HGMMPlotter(MatrixPlotter):
     def __init__(self, *args, **kwargs):
@@ -292,6 +540,7 @@ class HGMMPlotter(MatrixPlotter):
 
 class HGMMClusterMeansDendrogram(HGMMPlotter):
     titlestring = "%s HGMM Cluster Means Dendrogram to Lev. %d"
+    shortname = "hgmmcmd"
 
     def plot(self, level=4):
         title = self.titlestring % (self.DS.name, level)
@@ -305,10 +554,11 @@ class HGMMClusterMeansDendrogram(HGMMPlotter):
         fig["layout"]["yaxis"]["title"] = "Cluster Mean Distances"
         del fig.layout["width"]
         del fig.layout["height"]
-        return self.makeplot(fig)
+        return self.makeplot(fig, "agg/" + self.shortname)
 
 class HGMMStackedClusterMeansHeatmap(HGMMPlotter):
     titlestring = "%s HGMM Stacked Cluster Means up to Level %d"
+    shortname = "hgmmscmh"
 
     def plot(self, level=4, showticklabels=False):
         title = self.titlestring % (self.DS.name, level)
@@ -344,10 +594,11 @@ class HGMMStackedClusterMeansHeatmap(HGMMPlotter):
         shapes = [dict(type="line",x0=-0.5, x1=X.shape[1] - 0.5, y0=b, y1=b) for b in bar_locations]
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis, shapes=shapes)
         fig = dict(data=data, layout=layout)
-        return self.makeplot(fig)
+        return self.makeplot(fig, "agg/" + self.shortname)
 
 class HGMMClusterMeansLevelHeatmap(HGMMPlotter):
     titlestring = "%s HGMM Cluster Means, Level %d"
+    shortname = "hgmmcmlh"
 
     def plot(self, level=4, showticklabels=False):
         title = self.titlestring % (self.DS.name, level)
@@ -372,10 +623,11 @@ class HGMMClusterMeansLevelHeatmap(HGMMPlotter):
                 mirror=True)
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data=data, layout=layout)
-        return self.makeplot(fig)
+        return self.makeplot(fig, "agg/" + self.shortname)
 
 class HGMMClusterMeansLevelLines(HGMMPlotter):
     titlestring = "%s HGMM Cluster Means Level %d"
+    shortname = "hgmmcmll"
 
     def plot(self, level=4, showticklabels=False):
         title = self.titlestring % (self.DS.name, level)
@@ -397,11 +649,11 @@ class HGMMClusterMeansLevelLines(HGMMPlotter):
                 mirror=True)
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data=data, layout=layout)
-        return self.makeplot(fig)
+        return self.makeplot(fig, "agg/" + self.shortname)
 
 class HGMMPairsPlot(HGMMPlotter):
     titlestring = "%s HGMM Classification Pairs Plot Level %d"
-
+    shortname = "hgmmpp"
     def plot(self, level=2):
         title = self.titlestring % (self.DS.name, level)
         data = []
@@ -419,7 +671,7 @@ class HGMMPairsPlot(HGMMPlotter):
         fig["layout"]["title"] = title
         del fig.layout["width"]
         del fig.layout["height"]
-        return self.makeplot(fig)
+        return self.makeplot(fig, "agg/" + self.shortname)
 
 class DistanceMatrixPlotter:
     """A generic aggregate plotter acting on a distance matrix to be extended.
@@ -576,94 +828,8 @@ class EverythingPlotter(CSVPlotter):
             with open(os.path.join(path, plotter.__name__ + ".html"), "w") as f:
                 f.write(self.html_data%(plotter.__name__, div))
 
-
-
-
-class DistanceMatrixHeatmap(DistanceMatrixPlotter):
-    titlestring = "%s %s Distance Matrix Heatmap"
-
-    def plot(self):
-        """Constructs a distance matrix heatmap using the :obj:`DistanceMatrix` object, in plotly.
-
-        """
-        title = self.titlestring % (self.dataset_name, self.metric_name)
-        xaxis = go.XAxis(
-                title="Observations",
-                ticktext = self.labels,
-                ticks = "",
-                showticklabels=False,
-                showgrid=False,
-                mirror=True,
-                tickvals = [i for i in range(len(self.labels))])
-        yaxis = go.YAxis(
-                scaleanchor="x",
-                title="Observations",
-                ticktext = self.labels,
-                showgrid=False,
-                ticks = "",
-                showticklabels=False,
-                mirror=True,
-                tickvals = [i for i in range(len(self.labels))])
-        layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
-        trace = go.Heatmap(z = self.dm)
-        data = [trace]
-        fig = dict(data=data, layout=layout)
-        self.makeplot(fig)
-
-
-    
-class Embedding2DScatter(DistanceMatrixPlotter):
-    titlestring = "%s 2D %s Embedding Scatter under %s metric"
-
-    def plot(self, embedder):
-        """Constructs a 2d scatter plot of the embedded :obj:`DistanceMatrix` object, colorized by primary label.
-
-        Parameters
-        ----------
-        embedder : :obj:`BaseEmbedder`
-            An embedder object which should be used to embed the data into 2d space.
-
-        """
-        title = self.titlestring % (self.dataset_name, embedder.embedding_name, self.metric_name)
-        emb = embedder.embed(self.dm)
-        d = {
-            'factor 1': emb[:, 0],
-            'factor 2': emb[:, 1],
-            self.label_name: self.labels
-        }
-        D = pd.DataFrame(d)
-        sns.lmplot('factor 1',
-                   'factor 2',
-                    data = D,
-                    fit_reg = False,
-                    hue=self.label_name)
-        plt.title(title)
-        plt.show()
-
-
-class EmbeddingPairsPlotter(DistanceMatrixPlotter):
-    titlestring = "%s %s Embedding Pairs Plot under %s metric"
-
-    def plot(self, embedder):
-        """Constructs a pairs plot of the embedded :obj:`DistanceMatrix` object dimensions.
-
-        Parameters
-        ----------
-        embedder : :obj:`BaseEmbedder`
-            An embedder object which should be used to embed the data.
-
-        """
-        title = self.titlestring % (self.dataset_name, embedder.embedding_name, self.metric_name)
-        emb = embedder.embed(self.dm)
-        Pdf = pd.DataFrame(emb, columns = ["factor %s"%x for x in range(1, emb.shape[1] + 1)])
-        Pdf[self.label_name] = self.labels
-        sns.pairplot(data=Pdf, hue=self.label_name, diag_kind="hist")
-        plt.subplots_adjust(top=0.9)
-        plt.suptitle(title)
-        plt.show()
-
 class EmbeddingParallelCoordinatePlotter(DistanceMatrixPlotter):
-    titlestring = "%s %s Embedding Parallel Coordinate Plot under %s metric"
+    titlestring = "%s-%s-Embedding-Parallel-Coordinate-Plot-under-%s-metric"
 
     def plot(self, embedder):
         """Constructs a parallel coordinate plot of the embedded :obj:`DistanceMatrix` object.
@@ -702,96 +868,10 @@ class EmbeddingParallelCoordinatePlotter(DistanceMatrixPlotter):
 
 
 
-class DendrogramPlotter(DistanceMatrixPlotter):
-    titlestring = "%s Dendrogram under %s metric"
-
-    def plot(self):
-        """Constructs a dendrogram using the :obj:`DistanceMatrix` object, in plotly.
-
-        """
-        title = self.titlestring % (self.dataset_name, self.metric_name)
-        observations = np.zeros([2, 2])
-        unique_labels = np.unique(self.labels)
-        label_to_number = dict(zip(unique_labels, range(1, len(unique_labels) + 1)))
-        number_labels = [label_to_number[l] for l in self.labels]
-        def distance_function(x):
-            flattened = self.dm[np.triu_indices(self.dm.shape[0], k=1)].flatten()
-            return [f for f in flattened] 
-        dendro = ff.create_dendrogram(X = observations,
-                                      distfun = distance_function,
-                                      labels=number_labels)
-        dendro.layout.update(dict(title=title))
-        dendro.layout.xaxis.update(dict(ticktext=self.labels,
-                                        title=self.label_name,
-                                        ticklen=1))
-        dendro.layout.xaxis.tickfont.update(dict(size=12))
-        dendro.layout.yaxis.update(dict(title=self.metric_name))
-        dendro.layout.margin.update(dict(b = 200))
-        del dendro.layout["width"]
-        del dendro.layout["height"]
-        self.makeplot(dendro)
-
-class TimeSeriesPlotter:
-    """A generic one-to-one plotter for time series data to be extended.
-
-    Parameters
-    ----------
-    data : :obj:`ndarray`
-        The time series data.
-    resource_name : string
-        The name of the time series being plotted.
-    row_name : string
-        The name of the rows in the time-series (e.g. channels, sources. ect.).
-    column_name : string
-        The name of the columns in the time-series (e.g. time points, time steps, seconds, ect.).
-
-    Attributes
-    ----------
-    data : :obj:`ndarray`
-        The time series data.
-    d : int
-        The number of dimensions in the time series
-    n : int
-        The number of time points in the time series
-    row_name : string
-        The name of the rows in the time-series (e.g. channels, sources. ect.).
-    column_name : string
-        The name of the columns in the time-series (e.g. time points, time steps, seconds, ect.).
-    resource_name : string
-        The name of the time series being plotted.
-
-    """
-
-    def __init__(self, data, mode = "notebook", resource_name = "single resource", 
-                 row_name = "sources", col_name = "time points"):
-        self.data = data
-        self.d, self.n = data.shape
-        self.row_name = row_name
-        self.col_name = col_name
-        self.resource_name = resource_name
-        self.plot_mode = mode
-
-    def makeplot(self, fig):
-        """Make the plotly figure visable to the user in the way they want.
-
-        Parameters
-        ----------
-        gid : :obj:`figure`
-            An plotly figure.
-
-        """
-        
-        if self.plot_mode == "notebook":
-            iplot(fig)
-        if self.plot_mode == "html":
-            fig["layout"]["autosize"] = True
-            h = random.getrandbits(128)
-            fname = "%032x.html"%h
-            plot(fig, output_type='file', filename=fname)
-
 
 class SparkLinePlotter(TimeSeriesPlotter):
     titlestring = "Sparklines for %s"
+    shortname = "sparkline"
 
     def plot(self, sample_freq):
         """Constructs a downsampled spark line plot of the time series.
@@ -820,11 +900,11 @@ class SparkLinePlotter(TimeSeriesPlotter):
             df = df.groupby(lambda x: x // winsize).mean()
             downsampled_data = df.as_matrix().T
             data = [dict(mode="lines",
-                         hoverinfo="none",
+                         name = str(i),
                          x=(np.arange(downsampled_data.shape[1]) * winsize) / sample_freq,
                          y=downsampled_data[i, :]) for i in range(downsampled_data.shape[0])]
         fig = dict(data=data, layout=layout)
-        self.makeplot(fig)
+        self.makeplot(fig, self.resource_name + "/" + self.shortname)
 
 class CorrelationMatrixPlotter(TimeSeriesPlotter):
     titlestring = "Correlation Matrix for %s"
@@ -914,3 +994,66 @@ class SpectrogramPlotter(TimeSeriesPlotter):
         fig= dict(data=[trace], layout=layout)
         iplot(fig)
 
+class Nifti4DPlotter:
+    name = "Nifti4DPlotter"
+    def __init__(self, resource):
+        self.path = resource[0]
+        self.subject = resource[1]
+        self.task = resource[2]
+
+    def plot(self, downsample=1, out_base="."):
+        out_path = os.path.join(out_base, self.subject, self.name, self.task)
+        os.makedirs(out_path, exist_ok=True)
+        raw = nib.load(self.path)
+        M = np.max(raw.get_data())
+        n = raw.shape[3]
+        mean = nimage.mean_img(raw)
+        xyzcuts = nilplot.find_xyz_cut_coords(mean)
+        xcuts = nilplot.find_cut_slices(mean, "x")
+        ycuts = nilplot.find_cut_slices(mean, "y")
+        zcuts = nilplot.find_cut_slices(mean, "z")
+        del raw
+        nrange = range(0, n, downsample)
+        for i, img in enumerate(nimage.iter_img(self.path)):
+            if i in nrange:
+                nilplot.plot_epi(nimage.math_img("img / %f"%(M), img=img),
+                                  colorbar=False,
+                                  output_file="%s/orth_epi%0d.png"%(out_path, i),
+                                  annotate=True,
+                                  cut_coords = xyzcuts,
+                                  cmap="gist_heat")
+                nilplot.plot_epi(nimage.math_img("img / %f"%(M), img=img),
+                                  colorbar=False,
+                                  output_file="%s/x_epi%0d.png"%(out_path, i),
+                                  annotate=True,
+                                  display_mode = "x",
+                                  cut_coords = xcuts,
+                                  cmap="gist_heat")
+                nilplot.plot_epi(nimage.math_img("img / %f"%(M), img=img),
+                                  colorbar=False,
+                                  output_file="%s/y_epi%0d.png"%(out_path, i),
+                                  annotate=True,
+                                  display_mode = "y",
+                                  cut_coords = ycuts,
+                                  cmap="gist_heat")
+                nilplot.plot_epi(nimage.math_img("img / %f"%(M), img=img),
+                                  colorbar=False,
+                                  output_file="%s/z_epi%0d.png"%(out_path, i),
+                                  annotate=True,
+                                  display_mode = "z",
+                                  cut_coords = zcuts,
+                                  cmap="gist_heat")
+
+
+        slice_names = ["orth_epi", "x_epi", "y_epi", "z_epi"]
+        for slic in slice_names:
+            filenames = ["%s/%s%0d.png"%(out_path, slic, i) for i in nrange]
+            with imageio.get_writer('%s/%s.gif'%(out_path, slic), mode='I') as writer:
+                for i, filename in zip(nrange, filenames):
+                    image = Image.open(filename)
+                    draw = ImageDraw.Draw(image)
+                    fnt = ImageFont.truetype('Pillow/Tests/fonts/FreeMono.ttf', 16)
+                    draw.text((2, 2), str(i), font=fnt, fill=(255, 0, 0, 255))
+                    image.save(filename, "PNG")
+                    image = imageio.imread(filename)
+                    writer.append_data(image)
