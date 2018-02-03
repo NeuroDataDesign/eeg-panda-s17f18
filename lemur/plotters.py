@@ -316,7 +316,7 @@ class LocationHeatmap(MatrixPlotter):
     titlestring = "%s Location Heatmap"
     shortname = "locationheat"
 
-    def plot(self):
+    def plot(self, showticklabels=False):
         title = self.titlestring % (self.DS.name)
         D = self.DS.D.as_matrix().T
         means = np.mean(D, axis=1)
@@ -328,11 +328,10 @@ class LocationHeatmap(MatrixPlotter):
                 tickvals = [0, 1])
         xaxis = go.XAxis(
                 title="dimensions",
-                ticktext = self.DS.D.columns,
-                showticklabels=False,
-                tickvals = [i for i in range(len(self.DS.D.columns))])
+                showticklabels=showticklabels)
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
-        trace = go.Heatmap(z = z)
+        trace = go.Heatmap(x = self.DS.D.columns,
+                           z = z)
         data = [trace]
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
@@ -341,18 +340,20 @@ class LocationLines(MatrixPlotter):
     titlestring = "%s Embedding Location Lines"
     shortname = "locationlines"
 
-    def plot(self):
+    def plot(self, showticklabels=False):
         title = self.titlestring % (self.DS.name)
         D = self.DS.D.as_matrix().T
         means = np.mean(D, axis=1)
         medians = np.median(D, axis=1)
-        trace0 = go.Scatter(x = np.arange(len(means)), y = means, name="means")
-        trace1 = go.Scatter(x = np.arange(len(medians)), y = medians, name="medians")
+        trace0 = go.Scatter(x = self.DS.D.columns, 
+                            y = means, 
+                            name="means")
+        trace1 = go.Scatter(x = self.DS.D.columns, 
+                            y = medians, 
+                            name="medians")
         layout = dict(title=title,
                       xaxis=dict(title="Dimensions",
-                                 ticktext = self.DS.D.columns,
-                                 showticklabels=False,
-                                 tickvals = [i for i in range(len(self.DS.D.columns))]),
+                                 showticklabels=showticklabels),
                       yaxis=dict(title="Mean or Median Value"))
         data = [trace0, trace1]
         fig = dict(data=data, layout=layout)
@@ -362,7 +363,7 @@ class HistogramHeatmap(MatrixPlotter):
     titlestring = "%s Histogram Heatmap"
     shortname = "histogramheat"
 
-    def plot(self):
+    def plot(self, showticklabels=False):
         title = self.titlestring % (self.DS.name)
         D = self.DS.D.as_matrix().T
         d, n = D.shape
@@ -376,7 +377,8 @@ class HistogramHeatmap(MatrixPlotter):
             hist = np.histogram(D[i, :], bins = bins)[0]
             H.append(hist)
         z = np.vstack(H)
-        trace = go.Heatmap(z = z)
+        trace = go.Heatmap(y = self.DS.D.columns,
+                           z = z)
         data = [trace]
         xaxis = go.XAxis(
                 title="Normalized Value",
@@ -388,7 +390,7 @@ class HistogramHeatmap(MatrixPlotter):
         yaxis = go.YAxis(
                 title="Dimensions",
                 ticks = "",
-                showticklabels=False,
+                showticklabels=showticklabels,
                 mirror=True)
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data = data, layout = layout)
@@ -398,32 +400,34 @@ class CorrelationMatrix(MatrixPlotter):
     titlestring = "%s Correlation Matrix"
     shortname = "correlation"
 
-    def plot(self):
+    def plot(self, showticklabels=False):
         title = self.titlestring % (self.DS.name)
         D = self.DS.D.as_matrix().T
         xaxis = dict(
             title = "Dimensions",
             ticks = "",
-            ticktext = self.DS.D.columns,
             showgrid=False,
-            showticklabels=False,
-            tickvals = [i for i in range(len(self.DS.D.columns))]
+            zeroline=False,
+            showticklabels=showticklabels,
         )
         yaxis = dict(
             scaleanchor="x",
             title = "Dimensions",
             ticks = "",
-            ticktext = self.DS.D.columns,
             showgrid=False,
-            showticklabels=False,
-            tickvals = [i for i in range(len(self.DS.D.columns))]
+            zeroline=False,
+            showticklabels=showticklabels,
         )
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         with np.errstate(divide = 'ignore', invalid = 'ignore'):
             C = np.nan_to_num(np.corrcoef(D))
 
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
-        trace = go.Heatmap(z = C)
+        trace = go.Heatmap(x = self.DS.D.columns,
+                           y = self.DS.D.columns,
+                           z = C,
+                           zmin = -1,
+                           zmax = 1)
         fig = dict(data=[trace], layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
 
@@ -493,28 +497,31 @@ class EigenvectorHeatmap(MatrixPlotter):
 class HGMMPlotter(MatrixPlotter):
     def __init__(self, *args, **kwargs):
         super(HGMMPlotter, self).__init__(*args, **kwargs)
+        if 'random_state' in kwargs.keys():
+            random_state = kwargs['random_state']
+        else:
+            random_state = None
         X = self.DS.D.as_matrix()
         levels = []
         n = X.shape[0]
-        l0 = HGMMPlotter.hgmml0(X)
+        l0 = HGMMPlotter.hgmml0(X, random_state)
         levels.append(l0)
-        li = HGMMPlotter.gmmBranch(l0[0])
+        li = HGMMPlotter.gmmBranch(l0[0], random_state)
         levels.append(li)
         while (len(li) < n) and (len(levels) < 5):
-            print("Starting level", len(levels))
             lip = []
             for c in li:
-                q = HGMMPlotter.gmmBranch(c)
+                q = HGMMPlotter.gmmBranch(c, random_state)
                 if q is not None:
                     lip.extend(q)
             levels.append(lip)
             li = lip
         self.levels = levels
 
-    def gmmBranch(level):
+    def gmmBranch(level, random_state):
         X, p, mu = level
         if X.shape[0] >= 2:
-            gmm = GaussianMixture(n_components=2)
+            gmm = GaussianMixture(n_components=2, random_state=random_state)
             gmm.fit(X)
             X0 = X[gmm.predict(X) == 0, :]
             X1 = X[gmm.predict(X) == 1, :]
@@ -522,12 +529,12 @@ class HGMMPlotter(MatrixPlotter):
             return [(X0, int(mypro[0]), gmm.means_[0, :],),
                     (X1, int(mypro[1]), gmm.means_[1, :],)]
         elif X.shape[0] == 1:
-            gmm = GaussianMixture(n_components=1)
+            gmm = GaussianMixture(n_components=1, random_state=random_state)
             gmm.fit(X)
             return [(X, int(np.rint(p * gmm.weights_[0])), gmm.means_[0, :],)] 
 
-    def hgmml0(X):
-        gmm = GaussianMixture(n_components=1)
+    def hgmml0(X, random_state):
+        gmm = GaussianMixture(n_components=1, random_state=random_state)
         gmm.fit(X)
         return [(X, int(np.rint(X.shape[0] * gmm.weights_[0])), gmm.means_[0, :],)]
 
@@ -553,7 +560,7 @@ class HGMMStackedClusterMeansHeatmap(HGMMPlotter):
     titlestring = "%s HGMM Stacked Cluster Means up to Level %d"
     shortname = "hgmmscmh"
 
-    def plot(self, level=4):
+    def plot(self, level=4, showticklabels=False):
         title = self.titlestring % (self.DS.name, level)
         Xs = []
         for l in self.levels[1:level]:
@@ -564,7 +571,10 @@ class HGMMStackedClusterMeansHeatmap(HGMMPlotter):
             X = np.column_stack(means)
             Xs.append(X)
         X = np.vstack(Xs)[::-1, :]
-        trace = go.Heatmap(z = X)
+        y_labels = np.tile(self.DS.D.columns, X.shape[0] // len(self.DS.D.columns))[::-1]
+        trace = go.Heatmap(z = X,
+                           zmin = -np.max(X),
+                           zmax = np.max(X))
         data = [trace]
         xaxis = go.XAxis(
                 title="Clusters",
@@ -574,10 +584,11 @@ class HGMMStackedClusterMeansHeatmap(HGMMPlotter):
                 tickvals = [i for i in range(X.shape[1])])
         yaxis = go.YAxis(
                 title="Dimensions",
-                showticklabels=False,
+                showticklabels=showticklabels,
                 ticks="",
-                mirror=True,
-                tickvals = [i for i in range(X.shape[0])])
+                ticktext = y_labels,
+                tickvals = [i for i in range(len(y_labels))],
+                mirror=True)
         emb_size = len(self.levels[0][0][2])
         bar_locations = np.arange(0, X.shape[0]  + emb_size - 1, emb_size) - 0.5
         shapes = [dict(type="line",x0=-0.5, x1=X.shape[1] - 0.5, y0=b, y1=b) for b in bar_locations]
@@ -589,27 +600,27 @@ class HGMMClusterMeansLevelHeatmap(HGMMPlotter):
     titlestring = "%s HGMM Cluster Means, Level %d"
     shortname = "hgmmcmlh"
 
-    def plot(self, level=4):
+    def plot(self, level=4, showticklabels=False):
         title = self.titlestring % (self.DS.name, level)
         means = []
         for c in self.levels[level]:
             for _ in range(c[1]):
                 means.append(c[2])
         X = np.column_stack(means)
-        trace = go.Heatmap(z = X)
+        trace = go.Heatmap(y = self.DS.D.columns,
+                           z = X)
         data = [trace]
         xaxis = go.XAxis(
-                title="clusters",
+                title="Clusters",
                 showticklabels=False,
                 ticks="",
                 mirror=True,
                 tickvals = [i for i in range(X.shape[1])])
         yaxis = go.YAxis(
-                title="embedding dimensions",
-                showticklabels=False,
+                title="Dimensions",
+                showticklabels=showticklabels,
                 ticks="",
-                mirror=True,
-                tickvals = [i for i in range(X.shape[0])])
+                mirror=True)
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
@@ -618,23 +629,23 @@ class HGMMClusterMeansLevelLines(HGMMPlotter):
     titlestring = "%s HGMM Cluster Means Level %d"
     shortname = "hgmmcmll"
 
-    def plot(self, level=4):
+    def plot(self, level=4, showticklabels=False):
         title = self.titlestring % (self.DS.name, level)
         data = []
         colors = get_spaced_colors(len(self.levels[level]))
         for i, c in enumerate(self.levels[level]):
             data.append(go.Scatter(x = c[2],
-                                   y = list(range(len(c[2]))),
+                                   y = self.DS.D.columns,
                                    mode="lines",
                                    line=dict(width=np.sqrt(c[1]), color=colors[i]),
                                    name="cluster " + str(i)))
         xaxis = go.XAxis(
-                title="mean values",
+                title="Mean Values",
                 showticklabels=False,
                 mirror=True)
         yaxis = go.YAxis(
-                title="embedding dimensions",
-                showticklabels=False,
+                title="Dimensions",
+                showticklabels=showticklabels,
                 mirror=True)
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data=data, layout=layout)
