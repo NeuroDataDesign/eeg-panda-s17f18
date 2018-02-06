@@ -1,0 +1,118 @@
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur-f17s18\app\data
+Accept incoming file: eeg_pub.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur-f17s18\app\data\eeg_pub\eeg_pub.csv
+Downloading EEG Data...
+EEG Data Downloaded
+DS Name is: eeg_pub
+Plot Name is: default
+DS Name is: eeg_pub
+Plot Name is: squareheat
+DS Name is: eeg_pub
+Plot Name is: evheat
+DS Name is: eeg_pub
+Plot Name is: scree
+DS Name is: eeg_pub
+Plot Name is: correlation
+DS Name is: eeg_pub
+Plot Name is: heatmap
+DS Name is: eeg_pub
+Plot Name is: evheat
+DS Name is: eeg_pub
+Plot Name is: histogramheat
+DS Name is: eeg_pub
+Plot Name is: locationlines
+DS Name is: eeg_pub
+Plot Name is: locationheat
+DS Name is: eeg_pub
+Plot Name is: connectedscatter
+DS Name is: eeg_pub
+Plot Name is: connectedscatter
+DS Name is: eeg_pub
+Plot Name is: sparkline
+DS Name is: eeg_pub
+Plot Name is: sparkline
+DS Name is: eeg_pub
+Plot Name is: sparkline
+DS Name is: eeg_pub
+Plot Name is: spatialconn
+DS Name is: eeg_pub
+Plot Name is: spatialconn
+DS Name is: eeg_pub
+Plot Name is: locationheat
+DS Name is: eeg_pub
+Plot Name is: connectedscatter
+DS Name is: eeg_pub
+Plot Name is: connectedscatter
+DS Name is: eeg_pub
+Plot Name is: spatialconn
+DS Name is: eeg_pub
+Plot Name is: spatialconn
+DS Name is: hammer
+Plot Name is: default
+DS Name is: hammer
+Plot Name is: heatmap
+DS Name is: eeg_pub
+Plot Name is: default
+DS Name is: eeg_pub
+Plot Name is: spatialconn
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur-f17s18\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur-f17s18\app\data\test_eeg\test_eeg.csv
+Downloading EEG Data...
+EEG Data Downloaded
+DS Name is: test_eeg
+Plot Name is: default
+DS Name is: test_eeg
+Plot Name is: locationheat
+DS Name is: test_eeg
+Plot Name is: connectedscatter
+DS Name is: test_eeg
+Plot Name is: connectedscatter
+DS Name is: test_eeg
+Plot Name is: connectedscatter
+DS Name is: test_eeg
+Plot Name is: sparkline
+DS Name is: test_eeg
+Plot Name is: sparkline
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur-f17s18\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur-f17s18\app\data\test2\test_eeg.csv
+Downloading EEG Data...
+EEG Data Downloaded
+DS Name is: test2
+Plot Name is: default
+DS Name is: test2
+Plot Name is: spatialtimeseries
+DS Name is: test2
+Plot Name is: spatialtimeseries
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur-f17s18\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur-f17s18\app\data\test3\test_eeg.csv
+Downloading EEG Data...
+EEG Data Downloaded
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur-f17s18\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur-f17s18\app\data\test4\test_eeg.csv
+Downloading EEG Data...
+EEG Data Downloaded
+DS Name is: test4
+Plot Name is: default
+DS Name is: test4
+Plot Name is: spatialtimeseries
+DS Name is: test4
+Plot Name is: spatialtimeseries
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur-f17s18\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur-f17s18\app\data\test5\test_eeg.csv
+Downloading EEG Data...
+EEG Data Downloaded
+DS Name is: test5
+Plot Name is: default
+DS Name is: test5
+Plot Name is: spatialpgram
+DS Name is: test5
+Plot Name is: spatialpgram
+DS Name is: test5
+Plot Name is: spatialtimeseries
+DS Name is: test5
+Plot Name is: spatialtimeseries
