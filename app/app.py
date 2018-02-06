@@ -47,7 +47,12 @@ MEDA_options = {
 One_to_One = [
     ('Connected Scatter', 'ConnectedScatter', 'connectedscatter'),
     ('Sparkline', 'Sparkline', 'sparkline'),
+<<<<<<< HEAD
+    ('Spatial Time Series', 'SpatialTimeSeries', 'spatialtimeseries'),
+    ('Spatial Periodogram', 'SpatialPeriodogram', 'spatialpgram')
+=======
     ('Spatial Connection', 'SpatialConnection', 'spatialconn'),
+>>>>>>> 00caf8609c7d30af4715a3e6000f88feccf868e2
 ]
 
 EEG_Embed = [
