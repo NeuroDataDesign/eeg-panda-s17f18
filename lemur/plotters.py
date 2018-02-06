@@ -959,6 +959,10 @@ class SpectrogramPlotter(TimeSeriesPlotter):
     def plot(self, channel = 0, sample_freq = 500):
         """Constructs a spectrogram plot of the time series.
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 00caf8609c7d30af4715a3e6000f88feccf868e2
         Parameters
         ----------
         sample_freq : int
@@ -992,6 +996,7 @@ class SpectrogramPlotter(TimeSeriesPlotter):
 
         fig= dict(data=[trace], layout=layout)
         iplot(fig)
+<<<<<<< HEAD
         
 class SpatialTimeSeries(TimeSeriesPlotter):
     titlestring = "Intensity by Time and Channel Location for %s"
@@ -1141,6 +1146,8 @@ class SpatialPeriodogram(TimeSeriesPlotter):
         # Plot figure.
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, self.resource_name + "/" + self.shortname)
+=======
+>>>>>>> 00caf8609c7d30af4715a3e6000f88feccf868e2
 
 class Nifti4DPlotter:
     name = "Nifti4DPlotter"
