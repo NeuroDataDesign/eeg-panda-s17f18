@@ -12,7 +12,7 @@ git push origin master
 git checkout gh-pages
 rm -rf ./*
 touch .nojekyll
-git checkout master docs/web
+git checkout master docs
 mkdir pkg
 mv ./docs/web/pkg/_build/html/* ./pkg/
 mv ./docs/web/index.html ./
