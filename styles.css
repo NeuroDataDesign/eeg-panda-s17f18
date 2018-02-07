@@ -6,7 +6,6 @@
   padding-top: var(--jumbotron-padding-y);
   padding-bottom: var(--jumbotron-padding-y);
   margin-bottom: 0;
-  background-color: #9D1C00;
 }
 @media (min-width: 768px) {
   .jumbotron {
@@ -39,5 +38,9 @@ footer p {
 .box-shadow { box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05); }
 
 .lemur-light {
-  background-color: #C62300;
+  background-color: #c64038;
+}
+
+.lemur-dark {
+  background-color: #9D1C00;
 }
