@@ -1,0 +1,39 @@
+Target route: /home/nitin/hopkins/fall2017/ndd/lemur/app/data
+Accept incoming file: test.csv
+Save it to: /home/nitin/hopkins/fall2017/ndd/lemur/app/data/test/test.csv
+Downloading EEG Data...
+EEG Data Downloaded
+DS Name is: test
+Plot Name is: default
+DS Name is: test
+Plot Name is: squareheat
+Target route: /home/nitin/hopkins/fall2017/ndd/lemur/app/data
+Accept incoming file: test.csv
+Save it to: /home/nitin/hopkins/fall2017/ndd/lemur/app/data/test_eeg/test.csv
+Downloading EEG Data...
+EEG Data Downloaded
+DS Name is: test_eeg
+Plot Name is: default
+DS Name is: test_eeg
+Plot Name is: locationlines
+DS Name is: test_eeg
+Plot Name is: histogramheat
+DS Name is: test_eeg
+Plot Name is: evheat
+DS Name is: test_eeg
+Plot Name is: evheat
+DS Name is: test_eeg
+Plot Name is: squareheat
+DS Name is: test_eeg
+Plot Name is: sparkline
+DS Name is: test_eeg
+Plot Name is: spatialtimeseries
+DS Name is: test_eeg
+Plot Name is: spatialtimeseries
+DS Name is: test_eeg
+Plot Name is: spatialtimeseries
+Target route: /home/nitin/hopkins/fall2017/ndd/lemur/app/data
+Accept incoming file: test.csv
+Save it to: /home/nitin/hopkins/fall2017/ndd/lemur/app/data/test_with_pip/test.csv
+Downloading EEG Data...
+EEG Data Downloaded

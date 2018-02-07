@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# build the docs
-cd docs
+# build the lemur docs
+cd docs/web/pkg
 make clean
 make html
 cd ..
@@ -12,8 +12,10 @@ git push origin master
 git checkout gh-pages
 rm -rf ./*
 touch .nojekyll
-git checkout master docs/_build/html
-mv ./docs/_build/html/* ./
+git checkout master docs/web
+mkdir pkg
+mv ./docs/web/pkg/_build/html/* ./pkg/
+mv ./docs/web/index.html ./
 rm -rf ./docs
 git add -A
 git commit -m "publishing updated docs..."
