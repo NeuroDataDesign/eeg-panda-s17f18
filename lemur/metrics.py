@@ -27,7 +27,7 @@ class FroCorr:
 
         """
         with np.errstate(divide = 'ignore', invalid = 'ignore'):
-            return list(map(lambda j: np.nan_to_num(np.corrcoef(D.getResource(j))), range(D.n)))
+            return list(map(lambda j: np.nan_to_num(np.corrcoef(D.getMatrix(j))), range(D.n)))
 
     def compare(x, y):
         """Compute the euclidian distance of two correlation matricies.
@@ -72,7 +72,7 @@ class DiffAve:
 
         """
         with np.errstate(divide = 'ignore', invalid = 'ignore'):
-            return list(map(lambda j: np.mean(D.getResource(j), axis=3), range(D.n)))
+            return list(map(lambda j: np.mean(D.getMatrix(j), axis=3), range(D.n)))
 
     def compare(x, y):
         """Compute the euclidian distance of two average volumes.

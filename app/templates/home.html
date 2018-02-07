@@ -1,6 +1,8 @@
 {% extends "layout.html" %}
 {% block content %}
     <div class="container-fluid">
+
+        <h1>Phenotypic Datasets</h1>
         <table class="table">
             <thead class="thead">
                 <tr>
@@ -14,12 +16,49 @@
             {% for meta in metas  %}
                 <tr>
                     <td>{{loop.index}}</td>
-                    <td><a  href="/MEDA/plot/{{ meta.name }}/default">{{ meta.name }}</a></td>
+                    <td><a  href="/MEDA/plot/{{ meta.name }}/pheno/default">{{ meta.name }}</a></td>
                     <td>{{ meta.n }}</td>
                     <td>{{ meta.d }}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
+
+        <h1>EEG Datasets</h1>
+        <table class="table">
+            <thead class="thead">
+            <tr>
+                <th>#</th>
+                <th>Dataset Name</th>
+            <tr>
+            </thead>
+            <tbody>
+            {% for eeg in eegs  %}
+                <tr>
+                    <td>{{loop.index}}</td>
+                    <td><a  href="/MEDA/plot/{{ eeg }}/eeg/none/default">{{ eeg }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <h1>fMRI Datasets</h1>
+        <table class="table">
+            <thead class="thead">
+            <tr>
+                <th>#</th>
+                <th>Dataset Name</th>
+            <tr>
+            </thead>
+            <tbody>
+            {% for fmri in fmris  %}
+                <tr>
+                    <td>{{loop.index}}</td>
+                    <td><a  href="/MEDA/plot/{{ fmri }}/fmri/none/default">{{ fmri }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
     </div>
 {% endblock %}
