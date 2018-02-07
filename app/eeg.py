@@ -69,21 +69,11 @@ def run_eeg(name):
 
   # In[6]:
 
-
-<<<<<<< HEAD
   # Get 3D locations
   locs = chanlocs.as_matrix()[:, 1:4]
   for i in range(eds.n):
       lpl.SpatialTimeSeries(eds.getResourceDS(i), mode="savediv", base_path=out_base).plot(locs)
       lpl.SpatialPeriodogram(eds.getResourceDS(i), mode="savediv", base_path=out_base).plot(locs)
-=======
-  for i in range(eds.n):
-      print(i)
-      single_ds = eds.getResourceDS(i)
-      single_DM = lds.DataSet(single_ds.D.corr(), single_ds.name)
-      lpl.SpatialConnectivity(single_DM, mode="savediv",
-                              base_path=out_base).plot(spatial)
->>>>>>> 00caf8609c7d30af4715a3e6000f88feccf868e2
 
 
   # In[7]:
