@@ -1,0 +1,93 @@
+- Function
+    - Input:
+        - Event array
+        - Timeseries
+        - Window around timestamp of event
+            - Have a default value
+    - Output:
+        - Time series split up according to events
+
+## Spectrogram Plots
+
+- Raw Spectrogram
+    - Input:
+        - p_global
+            - Sampling Frequency ['sample_freq']
+            - Patient ID ['patient_id']
+            - Paradigm Title Dictionary\* ['title'] => get_title()
+        - D
+            - Patient data per paradigm
+        - p_local
+            - Custom x, y bounds ['x_bounds'] => (min, max), ['y_bounds'] => (min, max)
+                - Have a set default
+            - Range of channels to present ['disp_chans']
+            - Slider or subplots ['slider']
+                - If subplot, each subplot gets a row to itself
+    - Output:
+        - Title: Patient ID, paradigm, channel #
+        - X axis: Frequency (Hz)
+        - Y axis: Amplitude
+
+- Event Based Frequency Comparison
+    - Input:
+        - Sampling Frequency
+        - Patient data per paradigm
+        - Patient ID
+        - Paradigm Name
+        - Event data (parse using function at top)
+        - Custom x, y bounds
+            - Have a set default
+        - Range of channels to present
+        - Have slider
+            - By default yes, not necessary
+    - Output:
+        - Title: Patient ID, paradigm, channel #
+        - X axis: Frequency (Hz)
+        - Y axis: Amplitude
+        - Slider (optional): Move through different channels
+        - Subplots: look below
+    - Notes:
+        - Display different events by subplot
+
+## Sparkline Plots
+
+- Raw Sparklines
+    - Input:
+        - p_global
+            - Sampling Frequency ['sample_freq']
+            - Patient ID ['patient_id']
+            - Paradigm Title Dictionary\* ['title'] => get_title()
+        - D
+            - Patient data per paradigm
+        - p_local
+            - Downsample rate
+            - Custom x, y bounds ['x_bounds'] => (min, max), ['y_bounds'] => (min, max)
+                - Have a set default
+            - Range of channels to present ['disp_chans']
+            - Slider or subplots ['slider']
+                - If subplot, each subplot gets a row to itself
+    - Output:
+        - Title: Patient ID, paradigm, channel #
+        - X axis: Time (decide by sampling freq and downsample rate)
+        - Y axis: Amplitude
+
+- Event Based Sparkline Comparison
+    - Input:
+        - Patient data per paradigm
+        - Patient ID
+        - Paradigm Name
+        - Event data
+        - Custom x, y bounds
+            - Have a set default
+        - Downsample rate
+        - Range of channels to present
+        - Have slider
+            - By default yes, not necessary
+    - Output:
+        - Title: Patient ID, paradigm, channel #
+        - X axis: Frequency (Hz)
+        - Y axis: Amplitude
+        - Slider (optional): Move through different channels
+        - Subplots: look below
+    - Notes:
+        - Display different events by subplot
