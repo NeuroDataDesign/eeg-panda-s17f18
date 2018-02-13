@@ -13,7 +13,6 @@ import hashlib
 from ipywidgets import interact
 import random
 import scipy.signal as signal
-from sklearn.mixture import GaussianMixture
 import colorlover as cl
 
 from nilearn import image as nimage
@@ -494,58 +493,15 @@ class EigenvectorHeatmap(MatrixPlotter):
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
 
-class HGMMPlotter(MatrixPlotter):
-    def __init__(self, *args, **kwargs):
-        super(HGMMPlotter, self).__init__(*args, **kwargs)
-        if 'random_state' in kwargs.keys():
-            random_state = kwargs['random_state']
-        else:
-            random_state = None
-        X = self.DS.D.as_matrix()
-        levels = []
-        n = X.shape[0]
-        l0 = HGMMPlotter.hgmml0(X, random_state)
-        levels.append(l0)
-        li = HGMMPlotter.gmmBranch(l0[0], random_state)
-        levels.append(li)
-        while (len(li) < n) and (len(levels) < 5):
-            lip = []
-            for c in li:
-                q = HGMMPlotter.gmmBranch(c, random_state)
-                if q is not None:
-                    lip.extend(q)
-            levels.append(lip)
-            li = lip
-        self.levels = levels
 
-    def gmmBranch(level, random_state):
-        X, p, mu = level
-        if X.shape[0] >= 2:
-            gmm = GaussianMixture(n_components=2, random_state=random_state)
-            gmm.fit(X)
-            X0 = X[gmm.predict(X) == 0, :]
-            X1 = X[gmm.predict(X) == 1, :]
-            mypro = np.rint(gmm.weights_ * p)
-            return [(X0, int(mypro[0]), gmm.means_[0, :],),
-                    (X1, int(mypro[1]), gmm.means_[1, :],)]
-        elif X.shape[0] == 1:
-            gmm = GaussianMixture(n_components=1, random_state=random_state)
-            gmm.fit(X)
-            return [(X, int(np.rint(p * gmm.weights_[0])), gmm.means_[0, :],)] 
-
-    def hgmml0(X, random_state):
-        gmm = GaussianMixture(n_components=1, random_state=random_state)
-        gmm.fit(X)
-        return [(X, int(np.rint(X.shape[0] * gmm.weights_[0])), gmm.means_[0, :],)]
-
-class HGMMClusterMeansDendrogram(HGMMPlotter):
+class HGMMClusterMeansDendrogram(MatrixPlotter):
     titlestring = "%s HGMM Cluster Means Dendrogram to Lev. %d"
     shortname = "hgmmcmd"
 
-    def plot(self, level=4):
-        title = self.titlestring % (self.DS.name, level)
+    def plot(self):
+        title = self.titlestring % (self.DS.name, self.DS.levels)
         means = []
-        for c in self.levels[level]:
+        for c in self.DS.clusters[self.DS.levels]:
             means.append(c[2])
         X = np.column_stack(means).T
         fig = ff.create_dendrogram(X)
@@ -556,14 +512,15 @@ class HGMMClusterMeansDendrogram(HGMMPlotter):
         del fig.layout["height"]
         return self.makeplot(fig, "agg/" + self.shortname)
 
-class HGMMStackedClusterMeansHeatmap(HGMMPlotter):
+
+class HGMMStackedClusterMeansHeatmap(MatrixPlotter):
     titlestring = "%s HGMM Stacked Cluster Means up to Level %d"
     shortname = "hgmmscmh"
 
-    def plot(self, level=4, showticklabels=False):
-        title = self.titlestring % (self.DS.name, level)
+    def plot(self, showticklabels=False):
+        title = self.titlestring % (self.DS.name, self.DS.levels)
         Xs = []
-        for l in self.levels[1:level]:
+        for l in self.DS.clusters[1:self.DS.levels + 1]:
             means = []
             for c in l:
                 for _ in range(c[1]):
@@ -571,7 +528,7 @@ class HGMMStackedClusterMeansHeatmap(HGMMPlotter):
             X = np.column_stack(means)
             Xs.append(X)
         X = np.vstack(Xs)[::-1, :]
-        y_labels = np.tile(self.DS.D.columns, X.shape[0] // len(self.DS.D.columns))[::-1]
+        y_labels = np.tile(self.DS.columns, X.shape[0] // len(self.DS.columns))[::-1]
         trace = go.Heatmap(z = X,
                            zmin = -np.max(X),
                            zmax = np.max(X))
@@ -589,25 +546,26 @@ class HGMMStackedClusterMeansHeatmap(HGMMPlotter):
                 ticktext = y_labels,
                 tickvals = [i for i in range(len(y_labels))],
                 mirror=True)
-        emb_size = len(self.levels[0][0][2])
+        emb_size = len(self.DS.clusters[0][0][2])
         bar_locations = np.arange(0, X.shape[0]  + emb_size - 1, emb_size) - 0.5
         shapes = [dict(type="line",x0=-0.5, x1=X.shape[1] - 0.5, y0=b, y1=b) for b in bar_locations]
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis, shapes=shapes)
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
 
-class HGMMClusterMeansLevelHeatmap(HGMMPlotter):
+
+class HGMMClusterMeansLevelHeatmap(MatrixPlotter):
     titlestring = "%s HGMM Cluster Means, Level %d"
     shortname = "hgmmcmlh"
 
-    def plot(self, level=4, showticklabels=False):
-        title = self.titlestring % (self.DS.name, level)
+    def plot(self, showticklabels=False):
+        title = self.titlestring % (self.DS.name, self.DS.levels)
         means = []
-        for c in self.levels[level]:
+        for c in self.DS.clusters[self.DS.levels]:
             for _ in range(c[1]):
                 means.append(c[2])
         X = np.column_stack(means)
-        trace = go.Heatmap(y = self.DS.D.columns,
+        trace = go.Heatmap(y = self.DS.columns,
                            z = X)
         data = [trace]
         xaxis = go.XAxis(
@@ -625,17 +583,18 @@ class HGMMClusterMeansLevelHeatmap(HGMMPlotter):
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
 
-class HGMMClusterMeansLevelLines(HGMMPlotter):
+
+class HGMMClusterMeansLevelLines(MatrixPlotter):
     titlestring = "%s HGMM Cluster Means Level %d"
     shortname = "hgmmcmll"
 
-    def plot(self, level=4, showticklabels=False):
-        title = self.titlestring % (self.DS.name, level)
+    def plot(self, showticklabels=False):
+        title = self.titlestring % (self.DS.name, self.DS.levels)
         data = []
-        colors = get_spaced_colors(len(self.levels[level]))
-        for i, c in enumerate(self.levels[level]):
+        colors = get_spaced_colors(len(self.DS.clusters[self.DS.levels]))
+        for i, c in enumerate(self.DS.clusters[self.DS.levels]):
             data.append(go.Scatter(x = c[2],
-                                   y = self.DS.D.columns,
+                                   y = self.DS.columns,
                                    mode="lines",
                                    line=dict(width=np.sqrt(c[1]), color=colors[i]),
                                    name="cluster " + str(i)))
@@ -651,16 +610,18 @@ class HGMMClusterMeansLevelLines(HGMMPlotter):
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
 
-class HGMMPairsPlot(HGMMPlotter):
+
+class HGMMPairsPlot(MatrixPlotter):
     titlestring = "%s HGMM Classification Pairs Plot Level %d"
     shortname = "hgmmpp"
-    def plot(self, level=2):
-        title = self.titlestring % (self.DS.name, level)
+
+    def plot(self):
+        title = self.titlestring % (self.DS.name, self.DS.levels)
         data = []
-        colors = get_spaced_colors(len(self.levels[level]))
+        colors = get_spaced_colors(len(self.DS.clusters[self.DS.levels]))
         samples = []
         labels = []
-        for i, c in enumerate(self.levels[level]):
+        for i, c in enumerate(self.DS.clusters[self.DS.levels]):
             samples.append(c[0].T)
             labels.append(c[0].shape[0] * [i])
         samples = np.hstack(samples)[:3, :]
@@ -672,6 +633,7 @@ class HGMMPairsPlot(HGMMPlotter):
         del fig.layout["width"]
         del fig.layout["height"]
         return self.makeplot(fig, "agg/" + self.shortname)
+
 
 class DistanceMatrixPlotter:
     """A generic aggregate plotter acting on a distance matrix to be extended.
