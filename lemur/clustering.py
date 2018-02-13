@@ -10,6 +10,8 @@ class HGMMClustering:
         DS :obj:`Dataset`
         level : int
             Number of levels to cluster
+        random_state : int (optional)
+            Initialize Gaussian Mixture Model with specified random state
         """
         self.DS = DS
         self.name = DS.name
