@@ -5,7 +5,6 @@ from PIL import ImageDraw, Image, ImageFont
 from plotly.offline import iplot, plot
 import plotly.graph_objs as go
 import plotly.figure_factory as ff
-import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -48,7 +47,7 @@ class MatrixPlotter:
             An plotly figure.
 
         """
-        
+
         if self.plot_mode == "notebook":
             iplot(fig)
         if self.plot_mode == "savediv":
@@ -113,7 +112,7 @@ class TimeSeriesPlotter:
             An plotly figure.
 
         """
-        
+
         if self.plot_mode == "notebook":
             iplot(fig)
         if self.plot_mode == "savediv":
@@ -344,11 +343,11 @@ class LocationLines(MatrixPlotter):
         D = self.DS.D.as_matrix().T
         means = np.mean(D, axis=1)
         medians = np.median(D, axis=1)
-        trace0 = go.Scatter(x = self.DS.D.columns, 
-                            y = means, 
+        trace0 = go.Scatter(x = self.DS.D.columns,
+                            y = means,
                             name="means")
-        trace1 = go.Scatter(x = self.DS.D.columns, 
-                            y = medians, 
+        trace1 = go.Scatter(x = self.DS.D.columns,
+                            y = medians,
                             name="medians")
         layout = dict(title=title,
                       xaxis=dict(title="Dimensions",
@@ -430,7 +429,7 @@ class CorrelationMatrix(MatrixPlotter):
         fig = dict(data=[trace], layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
 
-class ScreePlotter(MatrixPlotter): 
+class ScreePlotter(MatrixPlotter):
     titlestring = "%s Scree Plot"
     shortname = "scree"
 
@@ -519,12 +518,22 @@ class HGMMStackedClusterMeansHeatmap(MatrixPlotter):
 
     def plot(self, showticklabels=False):
         title = self.titlestring % (self.DS.name, self.DS.levels)
+        
         Xs = []
         for l in self.DS.clusters[1:self.DS.levels + 1]:
+            #When number of samples is too high, need to downsample
+            freq = [c[1] for c in l]
+            if sum(freq) > 500:
+                freq = [round((x / sum(freq)) * 500) for x in freq]
+                if sum(freq) != 500: #Rounding can give numbers not exactly 500
+                    freq[freq.index(max(freq))] += 1
+
+            print(sum(freq))
+
             means = []
-            for c in l:
-                for _ in range(c[1]):
-                    means.append(c[2])
+            for i, c in enumerate(l):
+                means += [c[2]] * freq[i]
+
             X = np.column_stack(means)
             Xs.append(X)
         X = np.vstack(Xs)[::-1, :]
@@ -560,11 +569,17 @@ class HGMMClusterMeansLevelHeatmap(MatrixPlotter):
 
     def plot(self, showticklabels=False):
         title = self.titlestring % (self.DS.name, self.DS.levels)
+
+        #When number of samples is too high, need to downsample
+        freq = [c[1] for c in self.DS.clusters[self.DS.levels]]
+        if sum(freq) > 500:
+            freq = [round((x / sum(freq)) * 500) for x in freq]
+
         means = []
-        for c in self.DS.clusters[self.DS.levels]:
-            for _ in range(c[1]):
-                means.append(c[2])
+        for i, c in enumerate(self.DS.clusters[self.DS.levels]):
+            means += [c[2]] * freq[i]
         X = np.column_stack(means)
+
         trace = go.Heatmap(y = self.DS.columns,
                            z = X)
         data = [trace]
@@ -592,11 +607,17 @@ class HGMMClusterMeansLevelLines(MatrixPlotter):
         title = self.titlestring % (self.DS.name, self.DS.levels)
         data = []
         colors = get_spaced_colors(len(self.DS.clusters[self.DS.levels]))
+
+        #When number of samples is too high, need to downsample
+        freq = [c[1] for c in self.DS.clusters[self.DS.levels]]
+        if sum(freq) > 300:
+            freq = [round((x / sum(freq)) * 300) for x in freq]
+
         for i, c in enumerate(self.DS.clusters[self.DS.levels]):
             data.append(go.Scatter(x = c[2],
                                    y = self.DS.columns,
                                    mode="lines",
-                                   line=dict(width=np.sqrt(c[1]), color=colors[i]),
+                                   line=dict(width=np.sqrt(freq[i]), color=colors[i]),
                                    name="cluster " + str(i)))
         xaxis = go.XAxis(
                 title="Mean Values",
@@ -676,7 +697,7 @@ class DistanceMatrixPlotter:
             An plotly figure.
 
         """
-        
+
         if self.plot_mode == "notebook":
             iplot(fig)
         if self.plot_mode == "html":
@@ -699,7 +720,7 @@ class CSVPlotter:
             An plotly figure.
 
         """
-        
+
         if self.plot_mode == "notebook":
             iplot(fig)
         if self.plot_mode == "html":
@@ -954,11 +975,11 @@ class SpectrogramPlotter(TimeSeriesPlotter):
 
         fig= dict(data=[trace], layout=layout)
         iplot(fig)
-        
+
 class SpatialTimeSeries(TimeSeriesPlotter):
     titlestring = "Intensity by Time and Channel Location for %s"
     shortname = "spatialtimeseries"
-    
+
     def plot(self, spatial, downsample = 1000):
         """Constructs a plot of the channel locations, and their intensities at different times.
 
@@ -971,7 +992,7 @@ class SpatialTimeSeries(TimeSeriesPlotter):
         title = self.titlestring % (self.resource_name)
         # Time series containing EEG data.
         mts = self.data.T
-        
+
         # Set variables
         num_obs = mts.shape[0]
         num_channels = mts.shape[1]
@@ -1028,7 +1049,7 @@ class SpatialTimeSeries(TimeSeriesPlotter):
 class SpatialPeriodogram(TimeSeriesPlotter):
     titlestring = "Density by Frequency and Channel Location for %s"
     shortname = "spatialpgram"
-    
+
     def plot(self, spatial, downsample = 1000):
         """Constructs a plot of the channel locations, and their densities at different frequencies.
 
@@ -1041,7 +1062,7 @@ class SpatialPeriodogram(TimeSeriesPlotter):
         title = self.titlestring % (self.resource_name)
         # Time series containing EEG data.
         mts = self.data.T
-       
+
         # Set variables
         num_obs = mts.shape[0]
         num_channels = mts.shape[1]
