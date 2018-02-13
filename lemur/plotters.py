@@ -495,7 +495,7 @@ class EigenvectorHeatmap(MatrixPlotter):
 
 
 class HGMMClusterMeansDendrogram(MatrixPlotter):
-    titlestring = "%s HGMM Cluster Means Dendrogram to Lev. %d"
+    titlestring = "%s HGMM Cluster Means Dendrogram, Level %d"
     shortname = "hgmmcmd"
 
     def plot(self):
@@ -514,7 +514,7 @@ class HGMMClusterMeansDendrogram(MatrixPlotter):
 
 
 class HGMMStackedClusterMeansHeatmap(MatrixPlotter):
-    titlestring = "%s HGMM Stacked Cluster Means up to Level %d"
+    titlestring = "%s HGMM Stacked Cluster Means, Level %d"
     shortname = "hgmmscmh"
 
     def plot(self, showticklabels=False):
@@ -585,7 +585,7 @@ class HGMMClusterMeansLevelHeatmap(MatrixPlotter):
 
 
 class HGMMClusterMeansLevelLines(MatrixPlotter):
-    titlestring = "%s HGMM Cluster Means Level %d"
+    titlestring = "%s HGMM Cluster Means, Level %d"
     shortname = "hgmmcmll"
 
     def plot(self, showticklabels=False):
@@ -612,7 +612,7 @@ class HGMMClusterMeansLevelLines(MatrixPlotter):
 
 
 class HGMMPairsPlot(MatrixPlotter):
-    titlestring = "%s HGMM Classification Pairs Plot Level %d"
+    titlestring = "%s HGMM Classification Pairs Plot, Level %d"
     shortname = "hgmmpp"
 
     def plot(self):
