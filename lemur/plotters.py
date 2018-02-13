@@ -528,8 +528,6 @@ class HGMMStackedClusterMeansHeatmap(MatrixPlotter):
                 if sum(freq) != 500: #Rounding can give numbers not exactly 500
                     freq[freq.index(max(freq))] += 1
 
-            print(sum(freq))
-
             means = []
             for i, c in enumerate(l):
                 means += [c[2]] * freq[i]
