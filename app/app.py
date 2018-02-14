@@ -43,15 +43,21 @@ MEDA_options = {
     ],
 }
 
-# EEG
-One_to_One = [
-    ('Connected Scatter', 'ConnectedScatter', 'connectedscatter'),
-    ('Sparkline', 'Sparkline', 'sparkline'),
-    ('Spatial Time Series', 'SpatialTimeSeries', 'spatialtimeseries'),
-    ('Spatial Periodogram', 'SpatialPeriodogram', 'spatialpgram')
-]
+# EEG and FMRI One-to-One options.
+One_to_One_options = {
+    'eeg': [
+        ('Connected Scatter', 'ConnectedScatter', 'connectedscatter'),
+        ('Sparkline', 'Sparkline', 'sparkline'),
+        ('Spatial Time Series', 'SpatialTimeSeries', 'spatialtimeseries'),
+        ('Spatial Periodogram', 'SpatialPeriodogram', 'spatialpgram')
+    ],
+    'fmri': [
+        ('Time Elapse of fMRI Signal', 'TimeElapse', 'orth_epi')
+    ]
+}
 
-EEG_Embed = [
+# Embed for EEG and FMRI
+Embed = [
    #'NameOfPlotInLemur': 'name-of-plot-file-name'
    ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
    ('Heatmap', 'Heatmap', 'heatmap'),
@@ -88,6 +94,7 @@ MEDA_Embedded_options = [
      'hgmmclustermeanslevelheatmap'),
 ]
 
+# REMOVE AFTER INTEGRATION
 # fMRI
 fmri_One_to_One = [
     ('Time Elapse of fMRI Signal', 'TimeElapse', 'orth_epi'),
@@ -100,6 +107,8 @@ def index():
 @app.route('/MEDA/home')
 def medahome():
     basedir = os.path.join(APP_ROOT, 'data')
+    if not os.path.exists(basedir):
+        os.makedirs(basedir)
     datasets = [di for di in os.listdir(basedir) if os.path.isdir(os.path.join(basedir, di))]
     metas = []
     eegs = []
@@ -121,6 +130,57 @@ def medahome():
 @app.route('/MEDA/upload')
 def uploadrender():
     return render_template("upload.html")
+
+# Function currently plots EEG modality, but is a general purpose function for FMRI as well.
+# TO DO: Check the differences between templates.
+@app.route('/MEDA/plot/<ds_name>/<modality>/<mode>/<plot_name>')
+def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
+    app.logger.info('DS Name is: %s', ds_name)
+    app.logger.info('Plot Name is: %s', plot_name)
+    subj_name = request.args.get('subj_name')
+    test_name = request.args.get('test_name')
+    if mode == 'embed':
+        base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_embedded_deriatives', 'agg')
+    elif mode == 'one' and subj_name == 'none':
+        base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_derivatives')
+    elif mode == 'one':
+        base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_derivatives', subj_name, test_name)
+    else:
+        base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_derivatives', 'agg')
+
+    subjs = []
+    tasks = []
+    if plot_name == "default":
+        todisp = "<h1> Choose a plot! </h1>"
+    elif subj_name == "none" and mode == 'one':
+        subjs = [di for di in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, di))
+                    and di.startswith('sub')]
+        tasks = []
+        for subj in subjs:
+            tasks.append([task_di for task_di in os.listdir(os.path.join(base_path, subj))
+                          if os.path.isdir(os.path.join(base_path, subj, task_di))])
+        todisp = None
+    elif plot_name is not None:
+        plot_filename = "%s.html"%(plot_name)
+        plot_path = os.path.join(base_path, plot_filename)
+        with open(plot_path, "r") as f:
+            todisp = f.read()
+    else:
+        todisp = "<h1> Choose a plot! </h1>"
+
+    plot_title = ""
+    if mode == "one":
+        for title, _, tag in One_to_One_options[modality]:
+            if tag == plot_name: plot_title = title
+
+    return render_template('meda_'+modality+'.html',
+                           interm=zip(subjs, tasks),
+                           one_title=plot_title,
+                           plot=todisp,
+                           MEDA_options = MEDA_options[modality],
+                           MEDA_Embedded_options = Embed,
+                           One_to_One = One_to_One_options[modality]
+                       )
 
 @app.route('/MEDA/plot/<ds_name>/pheno/<plot_name>')
 def meda_pheno(ds_name=None, plot_name=None):
@@ -146,55 +206,6 @@ def meda_pheno(ds_name=None, plot_name=None):
                                'MEDA Embedded Options': MEDA_Embedded_options
                                        }
                            )
-
-@app.route('/MEDA/plot/<ds_name>/eeg/<mode>/<plot_name>')
-def meda_eeg(ds_name=None, mode=None, plot_name=None):
-    app.logger.info('DS Name is: %s', ds_name)
-    app.logger.info('Plot Name is: %s', plot_name)
-    subj_name = request.args.get('subj_name')
-    test_name = request.args.get('test_name')
-    if mode == 'embed':
-        base_path = os.path.join(APP_ROOT, 'data', ds_name, 'eeg_embedded_deriatives', 'agg')
-    elif mode == 'one' and subj_name == 'none':
-        base_path = os.path.join(APP_ROOT, 'data', ds_name, 'eeg_derivatives')
-    elif mode == 'one':
-        base_path = os.path.join(APP_ROOT, 'data', ds_name, 'eeg_derivatives', subj_name, test_name)
-    else:
-        base_path = os.path.join(APP_ROOT, 'data', ds_name, 'eeg_derivatives', 'agg')
-
-    subjs = []
-    tasks = []
-    if plot_name == "default":
-        todisp = "<h1> Choose a plot! </h1>"
-    elif subj_name == "none" and mode == 'one':
-        subjs = [di for di in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, di))
-                    and di.startswith('sub')]
-        tasks = []
-        for subj in subjs:
-            tasks.append([task_di for task_di in os.listdir(os.path.join(base_path, subj))
-                          if os.path.isdir(os.path.join(base_path, subj, task_di))])
-        todisp = None
-    elif plot_name is not None:
-        plot_filename = "%s.html"%(plot_name)
-        plot_path = os.path.join(base_path, plot_filename)
-        with open(plot_path, "r") as f:
-            todisp = f.read()
-    else:
-        todisp = "<h1> Choose a plot! </h1>"
-
-    plot_title = ""
-    if mode == "one":
-        for title, _, tag in One_to_One:
-            if tag == plot_name: plot_title = title
-
-    return render_template('meda_eeg.html',
-                           interm=zip(subjs, tasks),
-                           one_title=plot_title,
-                           plot=todisp,
-                           MEDA_options = MEDA_options['eeg'],
-                           MEDA_Embedded_options = EEG_Embed,
-                           One_to_One = One_to_One
-                       )
 
 @app.route('/MEDA/plot/<ds_name>/fmri/<mode>/<plot_name>')
 def meda_fmri(ds_name=None, mode=None, plot_name=None):
@@ -246,13 +257,19 @@ def meda_fmri(ds_name=None, mode=None, plot_name=None):
                            one_title=plot_title,
                            plot=todisp,
                            MEDA_options = MEDA_options['eeg'],
-                           MEDA_Embedded_options = EEG_Embed,
+                           MEDA_Embedded_options = Embed,
                            One_to_One = fmri_One_to_One
                        )
-
+# Pass modality as string, and base path.
+def run_modality(modality, basepath):
+    if modality == 'eeg':
+        eeg.run_eeg(basepath)
+    elif modality == 'fmri':
+        fmri.run_fmri(basepath)
 
 @app.route('/upload', methods=['POST'])
 def upload():
+    
     target = os.path.join(APP_ROOT,'data')
     app.logger.info('Target route: %s', target)
 
@@ -282,7 +299,7 @@ def upload():
             session[name + '_data'] = destination
         else:
             session[name + '_data'] = None
-
+    
     if session['pheno_data'] is not None:
         # Create the dataset object
         csv_ds = lds.CSVDataSet(session['pheno_data'], name = filedir)
@@ -317,7 +334,23 @@ def upload():
                 app.logger.info('Writing to file: %s', plotfilename)
                 f.write(tosave)
                 f.close()
+                
+    for name in ['eeg']:
+        if session[name+'_data'] is not None:
+            # Download EEG patients
+            app.logger.info("Downloading "+name+" Data...")
+            credential_info = open(session[name+'_data'], 'r').read()
+            bucket_name = credential_info.split(",")[0]
+            cmd = ["aws", "s3",
+                   "cp", ("s3://%s/"+name)%(bucket_name),
+                   os.path.join(session['basepath'], name), "--recursive"]
+            app.logger.info(name+" Data Downloaded")
+            call(cmd)
 
+            # Make plots
+            run_modality(name, os.path.basename(session['basepath']))
+
+    '''
     if session['eeg_data'] is not None:
         # Download EEG patients
         app.logger.info("Downloading EEG Data...")
@@ -332,6 +365,7 @@ def upload():
         # Make plots
         eeg.run_eeg(os.path.basename(session['basepath']))
 
+    '''
     if session['fmri_data'] is not None:
         # Download EEG patients
         app.logger.info("Downloading fMRI Data...")
@@ -345,9 +379,10 @@ def upload():
 
         # Make plots
         fmri.run_fmri(os.path.basename(session['basepath']))
+   
 
     if session['eeg_data'] is not None:
-        return redirect(url_for('meda_eeg', ds_name=filedir, mode='none', plot_name='default'))
+        return redirect(url_for('meda_modality', ds_name=filedir, modality='eeg', mode='none', plot_name='default'))
     if session['fmri_data'] is not None:
         return redirect(url_for('meda_fmri', ds_name=filedir, mode='none', plot_name='default'))
     return redirect(url_for('meda_pheno', ds_name=filedir, mode='none', plot_name='default'))

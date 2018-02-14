@@ -1022,7 +1022,7 @@ class SpatialTimeSeries(TimeSeriesPlotter):
         # Sets up data frame containing the different plots.
         data = [go.Scatter3d(dict(
             visible = False,
-            name = 'Time = '+str(step),
+            name = str(step),
             x = spatial[:, 0],
             y = spatial[:, 1],
             z = spatial[:, 2],
@@ -1032,7 +1032,7 @@ class SpatialTimeSeries(TimeSeriesPlotter):
             size = 8,
             color = mts[step, range(num_channels)],
             colorbar = go.ColorBar(
-                    title='Voltage Intensity'
+                    title='Voltage'
                 ),
             colorscale='Viridis',
             line = dict(

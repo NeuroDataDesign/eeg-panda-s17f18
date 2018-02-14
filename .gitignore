@@ -1,6 +1,8 @@
 .idea/*
 data/*
 app/data/*
+app/foo.log
+app/foo.log.1
 credentials/*
 *.swp
 *.pyc
