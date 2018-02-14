@@ -18,6 +18,7 @@ Lemur is a library to assist in the aggregate and one-to-one visualization of an
 * [Phenotypic Demo (images not live due to data usage agreement)](https://github.com/NeuroDataDesign/lemur-f17s18/blob/master/docs/notebooks/rmarren1/Lemur%20Phenotypic.ipynb)
 
 ##### Documentation
+* [Landing Page](https://neurodatadesign.github.io/lemur/)
 * Code
   * [lemur Package Documentation](https://neurodatadesign.github.io/lemur-f17s18/)
   * [AWS Grant Application](https://github.com/NeuroDataDesign/lemur-f17s18/blob/master/docs/group/proposal/Multi-Modal%20Brain%20Visualizations.pdf)
