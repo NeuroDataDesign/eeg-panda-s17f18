@@ -54,3 +54,7 @@ code {
   padding: 4px;
   width: 100%;
 }
+
+a {
+  color: rgb(7, 32, 76);
+}
