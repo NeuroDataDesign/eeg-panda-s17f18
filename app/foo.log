@@ -37,3 +37,60 @@ Accept incoming file: test.csv
 Save it to: /home/nitin/hopkins/fall2017/ndd/lemur/app/data/test_with_pip/test.csv
 Downloading EEG Data...
 EEG Data Downloaded
+Target route: /home/nitin/hopkins/fall2017/ndd/lemur/app/data
+Accept incoming file: eeg_pub.csv
+Save it to: /home/nitin/hopkins/fall2017/ndd/lemur/app/data/eeg_pub/eeg_pub.csv
+Downloading EEG Data...
+EEG Data Downloaded
+Target route: /home/nitin/hopkins/fall2017/ndd/lemur/app/data
+Accept incoming file: eeg_pub.csv
+Save it to: /home/nitin/hopkins/fall2017/ndd/lemur/app/data/eeg_final/eeg_pub.csv
+Downloading EEG Data...
+EEG Data Downloaded
+Target route: /home/nitin/hopkins/fall2017/ndd/lemur/app/data
+Input name: eeg, File name: eeg_pub.csv
+Accept incoming file: eeg_pub.csv
+Save it to: /home/nitin/hopkins/fall2017/ndd/lemur/app/data/taptap/eeg_pub.csv
+Downloading EEG Data...
+EEG Data Downloaded
+Target route: /home/nitin/hopkins/fall2017/ndd/lemur/app/data
+Accept incoming file: eeg_pub.csv
+Save it to: /home/nitin/hopkins/fall2017/ndd/lemur/app/data/butwhai/eeg_pub.csv
+Downloading EEG Data...
+EEG Data Downloaded
+Target route: /home/nitin/hopkins/fall2017/ndd/lemur/app/data
+Here
+Input name: pheno, File name: 
+Here
+Input name: eeg, File name: eeg_pub.csv
+Accept incoming file: eeg_pub.csv
+Save it to: /home/nitin/hopkins/fall2017/ndd/lemur/app/data/butwhai2/eeg_pub.csv
+Here
+Input name: fmri, File name: 
+Downloading EEG Data...
+EEG Data Downloaded
+Target route: /home/nitin/hopkins/fall2017/ndd/lemur/app/data
+Input type: pheno, File name: 
+Input type: eeg, File name: eeg_pub.csv
+Accept incoming file: eeg_pub.csv
+Save it to: /home/nitin/hopkins/fall2017/ndd/lemur/app/data/butwhai2/eeg_pub.csv
+Input type: fmri, File name: 
+Downloading EEG Data...
+EEG Data Downloaded
+Target route: /home/nitin/hopkins/fall2017/ndd/lemur/app/data
+Input type: pheno, File name: 
+Input type: eeg, File name: eeg_pub.csv
+Accept incoming file: eeg_pub.csv
+Save it to: /home/nitin/hopkins/fall2017/ndd/lemur/app/data/butwhai4/eeg_pub.csv
+Input type: fmri, File name: 
+Downloading EEG Data...
+EEG Data Downloaded
+Target route: /home/nitin/hopkins/fall2017/ndd/lemur/app/data
+Input type: pheno, File name: 
+Input type: eeg, File name: eeg_pub.csv
+Input type in loop: eeg
+Accept incoming file: eeg_pub.csv
+Save it to: /home/nitin/hopkins/fall2017/ndd/lemur/app/data/butwhai5/eeg_pub.csv
+Input type: fmri, File name: 
+Downloading EEG Data...
+EEG Data Downloaded

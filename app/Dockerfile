@@ -15,6 +15,8 @@ RUN apt-get update -y && \
 COPY ./ /app
 
 WORKDIR /app
+RUN rm -rf data
+RUN mkdir data
 
 RUN pip3 install -r requirements.txt
 RUN pip3 install awscli

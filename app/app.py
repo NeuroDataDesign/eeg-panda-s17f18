@@ -260,11 +260,18 @@ def upload():
     dspath = os.path.join(target, filedir)
     os.makedirs(dspath, exist_ok=True)
     session['basepath'] = dspath
-    print(dspath)
+    # print(dspath)
+    # print(request.files.getlist('file'))
+    # print(request.files['file[]'])
 
     file_names = ['pheno', 'eeg', 'fmri']
-    for file, name in zip(request.files.getlist("file"), file_names):
-        if file.filename != '':
+    for name in file_names:
+        files = request.files.getlist(name)
+        # app.logger.info('Input type: %s, File name: %s', name, file.filename)
+        print(files)
+        if len(files) != 0:
+            file = files[0]
+            app.logger.info('Input type in loop: %s', name)
             dirpath = os.path.join(dspath, name)
             os.makedirs(dirpath, exist_ok=True)
             filename = file.filename

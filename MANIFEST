@@ -4,5 +4,6 @@ setup.py
 lemur/__init__.py
 lemur/datasets.py
 lemur/embedders.py
+lemur/get-pip.py
 lemur/metrics.py
 lemur/plotters.py
