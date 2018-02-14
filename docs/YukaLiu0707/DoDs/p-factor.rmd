@@ -196,6 +196,7 @@ lavaan WARNING: could not compute scaled test statistic
 which seems to be a problem inside the structure of model.
 
 ----------------------------------------------------------------------
+```{r console sample}
 lavaan (0.5-23.1097) converged normally after  73 iterations
 
   Number of observations                           661
@@ -239,4 +240,4 @@ Parameter Estimates:
 
   Information                                 Expected
   Standard Errors                           Robust.sem
-
+```
