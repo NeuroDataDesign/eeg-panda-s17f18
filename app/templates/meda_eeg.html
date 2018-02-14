@@ -10,7 +10,7 @@
                     <li class="nav-item">
                       <a class="nav-link {{ 'active' if value == request.path.split('/')[-1]
                               and 'none' == request.path.split('/')[-2]}}"
-                          href={{ url_for('meda_eeg', ds_name=request.path.split('/')[-4], mode='none', plot_name=filename) }}>{{ sidename }}
+                          href={{ url_for('meda_modality', ds_name=request.path.split('/')[-4], modality = 'eeg', mode='none', plot_name=filename) }}>{{ sidename }}
                           {% if filename == request.path.split('/')[-1] %}
                               <span class="sr-only">(current)</span>
                           {%  endif %}
@@ -26,7 +26,7 @@
                       <li class="nav-item">
                           <a class="nav-link {{ 'active' if value == request.path.split('/')[-1]
                               and 'embed' == request.path.split('/')[-2]}}"
-                             href={{ url_for('meda_eeg', ds_name=request.path.split('/')[-4], mode='embed', plot_name=filename) }}>{{ sidename }}
+                             href={{ url_for('meda_modality', ds_name=request.path.split('/')[-4], modality = 'eeg', mode='embed', plot_name=filename) }}>{{ sidename }}
                               {% if filename == request.path.split('/')[-1] %}
                                   <span class="sr-only">(current)</span>
                               {%  endif %}
@@ -42,7 +42,7 @@
                       <li class="nav-item">
                           <a class="nav-link {{ 'active' if value == request.path.split('/')[-1]
                             and 'embed' == request.path.split('/')[-2]}}"
-                             href={{ url_for('meda_eeg', ds_name=request.path.split('/')[-4], mode='one',
+                             href={{ url_for('meda_modality', ds_name=request.path.split('/')[-4], modality = 'eeg', mode='one',
                              subj_name="none", tests_name="none", plot_name=filename) }}>{{ sidename }}
                               {% if filename == request.path.split('/')[-1] %}
                                   <span class="sr-only">(current)</span>
@@ -69,7 +69,7 @@
                         <li> {{ subject }}<ul>
                         {% for task in tasks %}
                             <li>
-                                <a href={{ url_for('meda_eeg', ds_name=request.path.split('/')[-4], mode='one',
+                                <a href={{ url_for('meda_modality', ds_name=request.path.split('/')[-4], modality = 'eeg', mode='one',
                                 subj_name=subject, test_name=task, plot_name=request.path.split('/')[-1]) }}>{{ task }}</a>
                             </li>
                         {% endfor %}
