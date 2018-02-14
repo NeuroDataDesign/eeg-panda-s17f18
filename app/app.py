@@ -100,6 +100,8 @@ def index():
 @app.route('/MEDA/home')
 def medahome():
     basedir = os.path.join(APP_ROOT, 'data')
+    if not os.path.exists(basedir):
+        os.makedirs(basedir)
     datasets = [di for di in os.listdir(basedir) if os.path.isdir(os.path.join(basedir, di))]
     metas = []
     eegs = []
@@ -253,6 +255,7 @@ def meda_fmri(ds_name=None, mode=None, plot_name=None):
 
 @app.route('/upload', methods=['POST'])
 def upload():
+    
     target = os.path.join(APP_ROOT,'data')
     app.logger.info('Target route: %s', target)
 
