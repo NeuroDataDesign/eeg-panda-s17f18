@@ -1,0 +1,183 @@
+---
+title: "p-factor-rmd"
+author: "Yujia Liu"
+date: "2/13/2018"
+output: html_document
+---
+
+#Settings
+
+
+
+#Load libraries
+```{r LoadLibrary}
+#Set working directory
+setwd("~/Desktop/p-factor")
+library(lavaan); library(ggplot2);library(VIM); library(mice);library(psych);library(semTools);
+```
+
+```{r LoadData}
+hbn_cbcl<-read.csv("/Users/YujiaLiu/Desktop/p-factor/imputated_cbcl.csv",row.names = 1, header = TRUE, sep = ",");
+hbn_wisc <- read.csv("/Users/YujiaLiu/Desktop/p-factor/wisc.csv",row.names = 1, header = TRUE, sep = ",");
+```
+
+#Classical CBCL model
+```{r cbcl p factor，warning=FALSE}
+
+#Classical model
+model1<-'
+int=~CBCL_14+CBCL_29+CBCL_30+CBCL_31+CBCL_32+CBCL_33+CBCL_35+CBCL_45+CBCL_50+CBCL_52+CBCL_71+CBCL_91+CBCL_112+
+CBCL_05+CBCL_42+CBCL_65+CBCL_69+CBCL_75+CBCL_102+CBCL_103+CBCL_111+
+CBCL_47+CBCL_49+CBCL_51+CBCL_54+CBCL_56A+CBCL_56B+CBCL_56C+CBCL_56D+CBCL_56E+CBCL_56F+CBCL_56G
+ext=~CBCL_02+CBCL_26+CBCL_28+CBCL_39+CBCL_43+CBCL_63+CBCL_67+CBCL_72+CBCL_73+CBCL_81+CBCL_82+CBCL_90+CBCL_96+CBCL_99+CBCL_101+CBCL_105+CBCL_106+
+CBCL_03+CBCL_16+CBCL_19+CBCL_20+CBCL_21+CBCL_22+CBCL_23+CBCL_37+CBCL_57+CBCL_68+CBCL_86+CBCL_87+CBCL_88+CBCL_89+CBCL_94+CBCL_95+CBCL_97+CBCL_104
+p=~CBCL_14+CBCL_29+CBCL_30+CBCL_31+CBCL_32+CBCL_33+CBCL_35+CBCL_45+CBCL_50+CBCL_52+CBCL_71+CBCL_91+CBCL_112+
+CBCL_05+CBCL_42+CBCL_65+CBCL_69+CBCL_75+CBCL_102+CBCL_103+CBCL_111+
+CBCL_47+CBCL_49+CBCL_51+CBCL_54+CBCL_56A+CBCL_56B+CBCL_56C+CBCL_56D+CBCL_56E+CBCL_56F+CBCL_56G+
+CBCL_02+CBCL_26+CBCL_28+CBCL_39+CBCL_43+CBCL_63+CBCL_67+CBCL_72+CBCL_73+CBCL_81+CBCL_82+CBCL_90+CBCL_96+CBCL_99+CBCL_101+CBCL_105+CBCL_106+
+CBCL_03+CBCL_16+CBCL_19+CBCL_20+CBCL_21+CBCL_22+CBCL_23+CBCL_37+CBCL_57+CBCL_68+CBCL_86+CBCL_87+CBCL_88+CBCL_89+CBCL_94+CBCL_95+CBCL_97+CBCL_104+
+CBCL_11+CBCL_12+CBCL_25+CBCL_27+CBCL_34+CBCL_36+CBCL_38+CBCL_48+CBCL_62+CBCL_64+CBCL_79+
+CBCL_09+CBCL_18+CBCL_40+CBCL_46+CBCL_58+CBCL_59+CBCL_60+CBCL_66+CBCL_70+CBCL_76+CBCL_83+CBCL_84+CBCL_85+CBCL_92+CBCL_100+
+CBCL_01+CBCL_04+CBCL_08+CBCL_10+CBCL_13+CBCL_17+CBCL_41+CBCL_61+CBCL_78+CBCL_80+
+CBCL_06+CBCL_07+CBCL_15+CBCL_24+CBCL_44+CBCL_53+CBCL_55+CBCL_74+CBCL_77+CBCL_93+CBCL_98+CBCL_107+CBCL_108+CBCL_109+CBCL_110
+#bifactor
+p~~0*int
+p~~0*ext
+int~~0*ext
+'
+mydata<-hbn_cbcl
+cfa_model1<-cfa(model1, std.lv = T, estimator = "WLSMV", data=mydata)
+summary(cfa_model1,fit.measures=T); 
+
+#Predicting values
+cfa_model1_pred<-predict(cfa_model1)
+mydata<-cbind(mydata,cfa_model1_pred)
+
+#Histograms by site
+ggplot(mydata, aes(p, colour=study)) + geom_density()+ xlab("CBCL p-factor");
+ggplot(mydata, aes(int, colour=study)) + geom_density()+ xlab("CBCL specific internalizing") 
+ggplot(mydata, aes(ext, colour=study)) + geom_density()+ xlab("CBCL specific externalizing") 
+
+#Violin plots by site
+ggplot(mydata, aes(y=p, x=study, colour=study)) + geom_violin(draw_quantiles = c(0.25, 0.5, 0.75))+ 
+  geom_jitter(alpha=1/5, width = 0.25)+ xlab("Study")+ylab("CBCL p-factor") 
+ggplot(mydata, aes(y=int, x=study, colour=study)) + geom_violin(draw_quantiles = c(0.25, 0.5, 0.75))+ 
+  geom_jitter(alpha=1/5, width = 0.25)+ xlab("Study")+ylab("CBCL specific internalizing") 
+ggplot(mydata, aes(y=ext, x=study, colour=study)) + geom_violin(draw_quantiles = c(0.25, 0.5, 0.75))+ 
+  geom_jitter(alpha=1/5, width = 0.25)+ xlab("Study")+ylab("CBCL specific externalizing") 
+
+#Export data
+write.csv(mydata,file="pfactor_a.xlsx")
+#write.csv(hbn_wisc_inp2,file = 'wisc.csv')
+```
+
+
+
+#Bifactor model with 1 general and 3 specific factors
+```{r alternative models}
+
+#MODEL B - Bifactor
+model_b<-'
+#p-factor
+cbcl_p=~
+CBCL_05+CBCL_33+CBCL_45+CBCL_54+CBCL_103+CBCL_112+ 
+CBCL_11+CBCL_29+CBCL_50+CBCL_65+CBCL_71+CBCL_75+
+CBCL_04+CBCL_28+CBCL_37+CBCL_41+CBCL_43+CBCL_94
+#specific factors
+cbcl_dist=~CBCL_05+CBCL_33+CBCL_45+CBCL_54+CBCL_103+CBCL_112
+cbcl_fear=~CBCL_11+CBCL_29+CBCL_50+CBCL_65+CBCL_71+CBCL_75
+cbcl_ext=~CBCL_04+CBCL_28+CBCL_37+CBCL_41+CBCL_43+CBCL_94 #replaced CBCL_10 --> CBCL_04
+#model specifications
+cbcl_p~~0*cbcl_dist
+cbcl_p~~0*cbcl_fear
+cbcl_p~~0*cbcl_ext
+#cbcl_dist~~0*cbcl_fear
+cbcl_dist~~0*cbcl_ext
+cbcl_fear~~0*cbcl_ext
+'
+model_b_g <-'
+#g-factor
+wisc_g=~
+WISC_Similarities_Raw+WISC_Similarities_Scaled+WISC_Vocab_Raw+WISC_Vocab_Scaled+
+WISC_BD_Scaled+WISC_BD_Raw+WISC_VP_Scaled+WISC_VP_Raw+
+WISC_MR_Scaled+WISC_MR_Raw+WISC_FW_Scaled+WISC_FW_Raw+
+WISC_DS_Scaled+WISC_DS_Raw+WISC_PS_Scaled+WISC_PS_Raw+
+WISC_Coding_Scaled+WISC_Coding_Raw+WISC_SS_Scaled+WISC_SS_Raw
+#specific factors
+wisc_vc=~WISC_Similarities_Raw+WISC_Similarities_Scaled+WISC_Vocab_Raw+WISC_Vocab_Scaled
+wisc_vs=~WISC_BD_Scaled+WISC_BD_Raw+WISC_VP_Scaled+WISC_VP_Raw
+wisc_fr=~WISC_MR_Scaled+WISC_MR_Raw+WISC_FW_Scaled+WISC_FW_Raw
+wisc_wm=~WISC_DS_Scaled+WISC_DS_Raw+WISC_PS_Scaled+WISC_PS_Raw
+wisc_ps=~WISC_Coding_Scaled+WISC_Coding_Raw+WISC_SS_Scaled+WISC_SS_Raw
+#model specifications
+wisc_g~~0*wisc_vc
+wisc_g~~0*wisc_vs
+wisc_g~~0*wisc_fr
+wisc_g~~0*wisc_wm
+wisc_g~~0*wisc_ps
+'
+#reduce number of specific factors- or go to the item level itself and recompute.
+model_b_g2 <-'
+#g-factor
+wisc_g=~
+WISC_Similarities_Scaled+WISC_Vocab_Scaled+
+WISC_BD_Scaled+WISC_VP_Scaled+
+WISC_MR_Scaled+WISC_FW_Scaled+
+WISC_DS_Scaled+WISC_PS_Scaled+
+WISC_Coding_Scaled+WISC_SS_Scaled
+#specific factors
+wisc_vc=~WISC_Similarities_Scaled+WISC_Vocab_Scaled
+wisc_vs=~WISC_BD_Scaled+WISC_VP_Scaled
+wisc_fr=~WISC_MR_Scaled+WISC_FW_Scaled
+wisc_wm=~WISC_DS_Scaled+WISC_PS_Scaled
+wisc_ps=~WISC_Coding_Scaled+WISC_SS_Scaled
+#model specifications
+wisc_g~~0*wisc_vc
+wisc_g~~0*wisc_vs
+wisc_g~~0*wisc_fr
+wisc_g~~0*wisc_wm
+wisc_g~~0*wisc_ps
+
+#Create orthogonalities across all specific factors
+wisc_vc~~0*wisc_vs
+wisc_vc~~0*wisc_fr
+wisc_vc~~0*wisc_wm
+wisc_vc~~0*wisc_ps
+
+wisc_vs~~0*wisc_fr
+wisc_vs~~0*wisc_wm
+wisc_vs~~0*wisc_ps
+
+wisc_fr~~0*wisc_wm
+wisc_fr~~0*wisc_ps
+
+wisc_wm~~0*wisc_ps
+'
+
+# Model using WISC
+cfa_model_b<-cfa(model_b_g2, std.lv = T, estimator = "WLSMV", data=hbn_wisc)
+summary(cfa_model_b,fit.measures=T); lavInspect(cfa_model_b, "zero.cell.tables");
+reliability(cfa_model_b)
+
+
+# A new model using CBCL
+cfa_model_b<-cfa(model_b, std.lv = T, estimator = "WLSMV", data=mydata, group="study")
+summary(cfa_model_b,fit.measures=T); lavInspect(cfa_model_b, "zero.cell.tables");
+reliability(cfa_model_b)
+
+#Predicting values
+cfa_model_b_pred<-lavPredict(cfa_model_b)
+mydata<-cbind(mydata,cfa_model_b_pred)
+
+#Histograms by site
+ggplot(mydata, aes(cbcl_p, colour=study)) + geom_density()+ xlab("CBCL p-factor")
+ggplot(mydata, aes(cbcl_fear, colour=study)) + geom_density()+ xlab("CBCL specific fear") 
+ggplot(mydata, aes(cbcl_dist, colour=study)) + geom_density()+ xlab("CBCL specific distress") 
+ggplot(mydata, aes(cbcl_ext, colour=study)) + geom_density()+ xlab("CBCL specific externalizing") 
+
+#Violin plots by site
+ggplot(mydata, aes(y=cbcl_p, x=study, colour=study)) + geom_violin(draw_quantiles = c(0.25, 0.5, 0.75))+ 
+  geom_jitter(alpha=1/5, width = 0.25)+ xlab("Study")+ylab("CBCL p-factor") 
+
+```
+# Currently in the bi-factor model, only CBCL information is used to predict p-factor score. We need more information about what is going on in this bi-factor model.
