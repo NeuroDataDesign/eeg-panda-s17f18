@@ -1,0 +1,125 @@
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data\test_eeg\test_eeg.csv
+Downloading EEG Data...
+EEG Data Downloaded
+DS Name is: test_eeg
+Plot Name is: default
+DS Name is: test_eeg
+Plot Name is: connectedscatter
+DS Name is: test_eeg
+Plot Name is: connectedscatter
+DS Name is: test_eeg
+Plot Name is: sparkline
+DS Name is: test_eeg
+Plot Name is: sparkline
+DS Name is: test_eeg
+Plot Name is: spatialtimeseries
+DS Name is: test_eeg
+Plot Name is: spatialtimeseries
+DS Name is: test_eeg
+Plot Name is: spatialpgram
+DS Name is: test_eeg
+Plot Name is: spatialpgram
+DS Name is: test_eeg
+Plot Name is: default
+DS Name is: test_eeg
+Plot Name is: spatialtimeseries
+DS Name is: test_eeg
+Plot Name is: spatialtimeseries
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data\test2\test_eeg.csv
+Downloading EEG Data...
+EEG Data Downloaded
+DS Name is: test2
+Plot Name is: default
+DS Name is: test2
+Plot Name is: spatialtimeseries
+DS Name is: test2
+Plot Name is: spatialtimeseries
+DS Name is: test2
+Plot Name is: default
+DS Name is: test2
+Plot Name is: spatialtimeseries
+DS Name is: test2
+Plot Name is: spatialtimeseries
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data\test3\test_eeg.csv
+Downloading EEG Data...
+EEG Data Downloaded
+DS Name is: test3
+Plot Name is: default
+DS Name is: test3
+Plot Name is: spatialtimeseries
+DS Name is: test3
+Plot Name is: spatialtimeseries
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data\test4\test_eeg.csv
+Downloading EEG Data...
+EEG Data Downloaded
+DS Name is: test4
+Plot Name is: default
+DS Name is: test4
+Plot Name is: spatialtimeseries
+DS Name is: test4
+Plot Name is: spatialtimeseries
+DS Name is: test4
+Plot Name is: default
+DS Name is: test4
+Plot Name is: spatialtimeseries
+DS Name is: test4
+Plot Name is: spatialtimeseries
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data\test5\test_eeg.csv
+Downloading EEG Data...
+EEG Data Downloaded
+DS Name is: test5
+Plot Name is: default
+DS Name is: test5
+Plot Name is: spatialtimeseries
+DS Name is: test5
+Plot Name is: spatialtimeseries
+DS Name is: test5
+Plot Name is: spatialtimeseries
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data\test6\test_eeg.csv
+Downloading EEG Data...
+EEG Data Downloaded
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data\test7\test_eeg.csv
+Downloading EEG Data...
+EEG Data Downloaded
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data\test8\test_eeg.csv
+Downloading EEG Data...
+EEG Data Downloaded
+DS Name is: test8
+Plot Name is: default
+DS Name is: test8
+Plot Name is: spatialtimeseries
+DS Name is: test8
+Plot Name is: spatialtimeseries
+DS Name is: test8
+Plot Name is: default
+DS Name is: test8
+Plot Name is: spatialtimeseries
+DS Name is: test8
+Plot Name is: spatialtimeseries
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data\demo_data\test_eeg.csv
+Downloading EEG Data...
+EEG Data Downloaded
+DS Name is: demo_data
+Plot Name is: default
+DS Name is: demo_data
+Plot Name is: spatialtimeseries
+DS Name is: demo_data
+Plot Name is: spatialtimeseries
