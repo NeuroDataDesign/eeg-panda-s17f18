@@ -260,7 +260,12 @@ def meda_fmri(ds_name=None, mode=None, plot_name=None):
                            MEDA_Embedded_options = Embed,
                            One_to_One = fmri_One_to_One
                        )
-
+# Pass modality as string, and base path.
+def run_modality(modality, basepath):
+    if modality == 'eeg':
+        eeg.run_eeg(basepath)
+    elif modality == 'fmri':
+        fmri.run_fmri(basepath)
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -287,7 +292,7 @@ def upload():
             session[name + '_data'] = destination
         else:
             session[name + '_data'] = None
-
+    
     if session['pheno_data'] is not None:
         # Create the dataset object
         csv_ds = lds.CSVDataSet(session['pheno_data'], name = filedir)
@@ -322,7 +327,23 @@ def upload():
                 app.logger.info('Writing to file: %s', plotfilename)
                 f.write(tosave)
                 f.close()
+                
+    for name in ['eeg']:
+        if session[name+'_data'] is not None:
+            # Download EEG patients
+            app.logger.info("Downloading "+name+" Data...")
+            credential_info = open(session[name+'_data'], 'r').read()
+            bucket_name = credential_info.split(",")[0]
+            cmd = ["aws", "s3",
+                   "cp", ("s3://%s/"+name)%(bucket_name),
+                   os.path.join(session['basepath'], name), "--recursive"]
+            app.logger.info(name+" Data Downloaded")
+            call(cmd)
 
+            # Make plots
+            run_modality(name, os.path.basename(session['basepath']))
+
+    '''
     if session['eeg_data'] is not None:
         # Download EEG patients
         app.logger.info("Downloading EEG Data...")
@@ -337,6 +358,7 @@ def upload():
         # Make plots
         eeg.run_eeg(os.path.basename(session['basepath']))
 
+    '''
     if session['fmri_data'] is not None:
         # Download EEG patients
         app.logger.info("Downloading fMRI Data...")
@@ -350,6 +372,7 @@ def upload():
 
         # Make plots
         fmri.run_fmri(os.path.basename(session['basepath']))
+   
 
     if session['eeg_data'] is not None:
         return redirect(url_for('meda_modality', ds_name=filedir, modality='eeg', mode='none', plot_name='default'))

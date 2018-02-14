@@ -167,3 +167,25 @@ DS Name is: test6
 Plot Name is: spatialtimeseries
 DS Name is: test6
 Plot Name is: spatialtimeseries
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data\test_fmri\test_eeg.csv
+Downloading fMRI Data...
+fMRI Data Downloaded
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data\test1\test_eeg.csv
+Downloading eeg Data...
+Target route: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data
+Accept incoming file: test_eeg.csv
+Save it to: C:\Users\Ronak Mehta\Desktop\NeuroData\lemur\app\data\test2\test_eeg.csv
+Downloading eeg Data...
+eeg Data Downloaded
+DS Name is: test2
+Plot Name is: default
+DS Name is: test2
+Plot Name is: evheat
+DS Name is: test2
+Plot Name is: spatialtimeseries
+DS Name is: test2
+Plot Name is: spatialtimeseries
