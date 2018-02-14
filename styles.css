@@ -48,3 +48,9 @@ footer p {
 .lemur-dark {
   background-color: #9D1C00;
 }
+
+code {
+  background-color: rgb(47, 47, 49);
+  padding: 4px;
+  width: 100%;
+}

@@ -10,7 +10,7 @@
     <link href="styles.css" rel="stylesheet">
 
 </head>
-<body>
+<body class=" lemur-dark">
 
     <main role="main">
       <section class="lemur-light">
@@ -22,19 +22,26 @@
           </div>
       </section>
 
-      <section class="album py-5 lemur-dark follow-jumbo">
+      <section class="album py-5 follow-jumbo">
           <div class="container d-flex h-100">
               <div class="row justify-content-center align-self-center">
 
                   <div class="col-md-6">
                     <div class="card mb-4 box-shadow lemur-light">
-                        <img class="card-img-top" data-src="">
+                        <img class="card-img-top">
                         <div class="card-body">
                             <h5 class="card-title"><b>Lemur Data Visualization Package</b></h5>
-                            <p class="card-text">Red Lemur (Lemur for short) is a visualization package for multimodal datasets.</p>
+                            <div class="card-text">
+                                <p>Red Lemur (Lemur for short) is a visualization package for multimodal datasets.</p>
+                                <p><b>Quickstart:</b></p>
+                                <p><code>pip install redlemur-offbrand</code></p>
+                                <p>Or, if Python3 is not your default version:</p>
+                                <p><code>pip3 install redlemur-offbrand</code></p>
+                                <p>Check out some of the links below for more detailed information about our project!</p>
+                            </div>
                             <a role="button" href="https://github.com/NeuroDataDesign/lemur"  class="btn btn-dark">Github</a>
                             <a role="button" href="pkg" class="btn btn-dark">Documentation</a>
-                            <a role="button" href="https://pypi.python.org/pypi/redlemur" class="btn btn-dark">PyPi Release</a>
+                            <!--<a role="button" href="https://pypi.python.org/pypi/redlemur" class="btn btn-dark">PyPi Release</a>-->
                         </div>
                     </div>
                   </div>
@@ -44,9 +51,15 @@
                           <img class="card-img-top" data-src="">
                           <div class="card-body">
                               <h5 class="card-title"><b>Docker Container</b></h5>
-                              <p class="card-text">Web service that utilizes Lemur to generate visualizations for its users.</p>
+                              <div class="card-text">
+                                  <p>Web service that utilizes Lemur to generate visualizations for its users.</p>
+                                  <p><b>Quickstart:</b></p>
+                                  <p><code>docker pull nkumarcc/redlemur</code></p>
+                                  <p><code>docker run -p 5000:5000 nkumarcc/redlemur</code></p>
+                                  <p>Access the service at <a href="localhost:5000">localhost:5000</a>! (This link will only work after you have run the service with quickstart instructions)</p>
+                              </div>
                               <a role="button" href="https://hub.docker.com/r/rymarr/lemur/"  class="btn btn-dark">Dockerhub</a>
-                              <a role="button" href="https://github.com/NeuroDataDesign/lemur" class="btn btn-dark">Documentation</a>
+                              <!--<a role="button" href="https://github.com/NeuroDataDesign/lemur" class="btn btn-dark">Documentation</a>-->
                           </div>
                       </div>
                   </div>
