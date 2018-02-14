@@ -180,4 +180,63 @@ ggplot(mydata, aes(y=cbcl_p, x=study, colour=study)) + geom_violin(draw_quantile
   geom_jitter(alpha=1/5, width = 0.25)+ xlab("Study")+ylab("CBCL p-factor") 
 
 ```
-Currently in the bi-factor model, only CBCL information is used to predict p-factor score. We need more information about what is going on in this bi-factor model.
+# What we have done
+- Clean up the code to match the need of our datasets
+- Data imputation (code not included in this markdown)
+- Run through the codes using our own datasets
+
+# Problems
+- Currently in the bi-factor model, only CBCL information is used to predict p-factor score, which is the same as the classical model. We need more information about what is going on in the bi-factor model.
+- lavaan gives warning to the bi-factor model saying 
+```{r warning message}
+lavaan WARNING: could not compute standard errors!
+lavaan NOTE: this may be a symptom that the model is not identified.
+lavaan WARNING: could not compute scaled test statistic
+```
+which seems to be a problem inside the structure of model.
+
+----------------------------------------------------------------------
+lavaan (0.5-23.1097) converged normally after  73 iterations
+
+  Number of observations                           661
+
+  Estimator                                       DWLS      Robust
+  Minimum Function Test Statistic               22.527          NA
+  Degrees of freedom                                25          25
+  P-value (Chi-square)                           0.605          NA
+  Scaling correction factor                                     NA
+  Shift parameter                                     
+    for simple second-order correction (Mplus variant)
+
+Model test baseline model:
+
+  Minimum Function Test Statistic             5001.749    1592.829
+  Degrees of freedom                                45          45
+  P-value                                        0.000       0.000
+
+User model versus baseline model:
+
+  Comparative Fit Index (CFI)                    1.000          NA
+  Tucker-Lewis Index (TLI)                       1.001          NA
+
+  Robust Comparative Fit Index (CFI)                            NA
+  Robust Tucker-Lewis Index (TLI)                               NA
+
+Root Mean Square Error of Approximation:
+
+  RMSEA                                          0.000          NA
+  90 Percent Confidence Interval          0.000  0.027          NA     NA
+  P-value RMSEA <= 0.05                          1.000          NA
+
+  Robust RMSEA                                                  NA
+  90 Percent Confidence Interval                                NA     NA
+
+Standardized Root Mean Square Residual:
+
+  SRMR                                           0.026       0.026
+
+Parameter Estimates:
+
+  Information                                 Expected
+  Standard Errors                           Robust.sem
+
