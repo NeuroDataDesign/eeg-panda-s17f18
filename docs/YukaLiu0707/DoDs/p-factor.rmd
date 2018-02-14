@@ -180,4 +180,4 @@ ggplot(mydata, aes(y=cbcl_p, x=study, colour=study)) + geom_violin(draw_quantile
   geom_jitter(alpha=1/5, width = 0.25)+ xlab("Study")+ylab("CBCL p-factor") 
 
 ```
-# Currently in the bi-factor model, only CBCL information is used to predict p-factor score. We need more information about what is going on in this bi-factor model.
+Currently in the bi-factor model, only CBCL information is used to predict p-factor score. We need more information about what is going on in this bi-factor model.
