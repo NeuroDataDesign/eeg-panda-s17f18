@@ -959,10 +959,6 @@ class SpectrogramPlotter(TimeSeriesPlotter):
     def plot(self, channel = 0, sample_freq = 500):
         """Constructs a spectrogram plot of the time series.
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 00caf8609c7d30af4715a3e6000f88feccf868e2
         Parameters
         ----------
         sample_freq : int
