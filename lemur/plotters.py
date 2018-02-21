@@ -49,7 +49,7 @@ class MatrixPlotter:
             An plotly figure.
 
         """
-        
+
         if self.plot_mode == "notebook":
             iplot(fig)
         if self.plot_mode == "savediv":
@@ -114,7 +114,7 @@ class TimeSeriesPlotter:
             An plotly figure.
 
         """
-        
+
         if self.plot_mode == "notebook":
             iplot(fig)
         if self.plot_mode == "savediv":
@@ -345,11 +345,11 @@ class LocationLines(MatrixPlotter):
         D = self.DS.D.as_matrix().T
         means = np.mean(D, axis=1)
         medians = np.median(D, axis=1)
-        trace0 = go.Scatter(x = self.DS.D.columns, 
-                            y = means, 
+        trace0 = go.Scatter(x = self.DS.D.columns,
+                            y = means,
                             name="means")
-        trace1 = go.Scatter(x = self.DS.D.columns, 
-                            y = medians, 
+        trace1 = go.Scatter(x = self.DS.D.columns,
+                            y = medians,
                             name="medians")
         layout = dict(title=title,
                       xaxis=dict(title="Dimensions",
@@ -431,7 +431,7 @@ class CorrelationMatrix(MatrixPlotter):
         fig = dict(data=[trace], layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
 
-class ScreePlotter(MatrixPlotter): 
+class ScreePlotter(MatrixPlotter):
     titlestring = "%s Scree Plot"
     shortname = "scree"
 
@@ -531,7 +531,7 @@ class HGMMPlotter(MatrixPlotter):
         elif X.shape[0] == 1:
             gmm = GaussianMixture(n_components=1, random_state=random_state)
             gmm.fit(X)
-            return [(X, int(np.rint(p * gmm.weights_[0])), gmm.means_[0, :],)] 
+            return [(X, int(np.rint(p * gmm.weights_[0])), gmm.means_[0, :],)]
 
     def hgmml0(X, random_state):
         gmm = GaussianMixture(n_components=1, random_state=random_state)
@@ -714,7 +714,7 @@ class DistanceMatrixPlotter:
             An plotly figure.
 
         """
-        
+
         if self.plot_mode == "notebook":
             iplot(fig)
         if self.plot_mode == "html":
@@ -737,7 +737,7 @@ class CSVPlotter:
             An plotly figure.
 
         """
-        
+
         if self.plot_mode == "notebook":
             iplot(fig)
         if self.plot_mode == "html":
@@ -837,7 +837,7 @@ class EmbeddingParallelCoordinatePlotter(DistanceMatrixPlotter):
         Parameters
         ----------
         embedder : :obj:`BaseEmbedder`
-            
+
 
         """
         title = self.titlestring % (self.dataset_name, embedder.embedding_name, self.metric_name)
@@ -877,7 +877,7 @@ class SparkLinePlotter(TimeSeriesPlotter):
         """Constructs a downsampled spark line plot of the time series.
 
         If there are more than 500 time points, the time series will be down sampled to
-        500 column variables by windowed averaging. This is done by splitting the time series 
+        500 column variables by windowed averaging. This is done by splitting the time series
         into 500 equal sized segments in the time domain, then plotting the mean for each segment.
 
         Parameters
@@ -992,11 +992,11 @@ class SpectrogramPlotter(TimeSeriesPlotter):
 
         fig= dict(data=[trace], layout=layout)
         iplot(fig)
-        
+
 class SpatialTimeSeries(TimeSeriesPlotter):
     titlestring = "Intensity by Time and Channel Location for %s"
     shortname = "spatialtimeseries"
-    
+
     def plot(self, spatial, downsample = 1000):
         """Constructs a plot of the channel locations, and their intensities at different times.
 
@@ -1009,14 +1009,14 @@ class SpatialTimeSeries(TimeSeriesPlotter):
         title = self.titlestring % (self.resource_name)
         # Time series containing EEG data.
         mts = self.data.T
-        
+
         # Set variables
         num_obs = mts.shape[0]
         num_channels = mts.shape[1]
 
         # Verify that 'locations' exist for exactly each channel.
         if (num_channels != spatial.shape[0]):
-            raise TypeError("""Error: Ensure that the number of channels in the Multivariate Time Series (columns) 
+            raise TypeError("""Error: Ensure that the number of channels in the Multivariate Time Series (columns)
                             is equal to the number of points (rows) in locations.""")
 
         # Sets up data frame containing the different plots.
@@ -1066,7 +1066,7 @@ class SpatialTimeSeries(TimeSeriesPlotter):
 class SpatialPeriodogram(TimeSeriesPlotter):
     titlestring = "Density by Frequency and Channel Location for %s"
     shortname = "spatialpgram"
-    
+
     def plot(self, spatial, downsample = 1000):
         """Constructs a plot of the channel locations, and their densities at different frequencies.
 
@@ -1079,7 +1079,7 @@ class SpatialPeriodogram(TimeSeriesPlotter):
         title = self.titlestring % (self.resource_name)
         # Time series containing EEG data.
         mts = self.data.T
-       
+
         # Set variables
         num_obs = mts.shape[0]
         num_channels = mts.shape[1]
@@ -1095,7 +1095,7 @@ class SpatialPeriodogram(TimeSeriesPlotter):
 
         # Verify that 'locations' exist for exactly each channel.
         if (num_channels != spatial.shape[0]):
-            raise TypeError("""Error: Ensure that the number of channels in the Multivariate Time Series (columns) 
+            raise TypeError("""Error: Ensure that the number of channels in the Multivariate Time Series (columns)
                             is equal to the number of points (rows) in locations.""")
 
         # Sets up data frame containing the different plots.

@@ -22,23 +22,6 @@ import lemur.plotters as lpl
 import lemur.embedders as leb
 
 def run_pheno(name):
-    '''
-    # Create a lemur dataset based on the phenotypic data
-    CDS = lds.CSVDataSet("data/pheno/hbn_cleaned.csv",
-                         name = "HBN Phenotypic")
-    metadata = CDS.saveMetaData("data/pheno/metadata.json")
-    CDS.imputeColumns("mean")
-    DM = lds.DistanceMatrix(CDS, lms.VectorDifferenceNorm)
-
-    # Create an embedded distance matrix object under MDS
-    MDSEmbedder = leb.MDSEmbedder(num_components=10)
-    HBN_Embedded = MDSEmbedder.embed(DM)
-
-
-    # Attempt at using this file, consistent with EEG and fMRI
-    # file structure. In app.py, EEG nad FMRI calls a different
-    # Python file, but pheno is in that file itself.
-    '''
 
     # Create a lemur dataset based on the phenotypic data
     DATASET = os.path.split(os.path.split(name)[0])[1]
@@ -58,26 +41,6 @@ def run_pheno(name):
     os.makedirs(out_base + "/agg", exist_ok=True)
     os.makedirs(out_emb_base + "/agg", exist_ok=True)
 
-    '''
-    for _, lemurname, plotname in aggregate_options['pheno']:
-        tosave = getattr(lpl, lemurname)(CDS, mode='div').plot()
-        plotfilename = "%s.html"%(plotname)
-        plotpath = os.path.join(out_base + "/agg", plotfilename)
-        with open(plotpath, "w") as f:
-            app.logger.info('Writing to file: %s', plotfilename)
-            f.write(tosave)
-            f.close()
-
-    for _, lemurname, plotname in embedded_options['pheno']:
-        tosave = getattr(lpl, lemurname)(HBN_Embedded, mode='div').plot()
-        plotfilename = "%s.html"%(plotname)
-        plotpath = os.path.join(out_emb_base + "/agg", plotfilename)
-        with open(plotpath, "w") as f:
-            app.logger.info('Writing to file: %s', plotfilename)
-            f.write(tosave)
-            f.close()
-        '''
-    # --------------------------------------
 
 
     # In[ ]:

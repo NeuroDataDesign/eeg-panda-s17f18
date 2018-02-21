@@ -214,6 +214,9 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
         for subj in subjs:
             tasks.append([task_di for task_di in os.listdir(os.path.join(base_path, subj))
                           if os.path.isdir(os.path.join(base_path, subj, task_di))])
+            if modality == 'fmri':
+                tasks.append([task_di for task_di in os.listdir(os.path.join(base_path, subj, 'Nifti4DPlotter'))
+                              if os.path.isdir(os.path.join(base_path, subj, 'Nifti4DPlotter', task_di))])
         todisp = None
     elif plot_name is not None:
         plot_filename = "%s.html"%(plot_name)
@@ -222,6 +225,15 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
             todisp = f.read()
     else:
         todisp = "<h1> Choose a plot! </h1>"
+
+    '''
+    # To be incorporated  in the ABOVE IF-BLOCK with FMRI one-to-one plot.
+    elif plot_name is not None and mode == "one":
+        plot_filename = "%s.gif"%(plot_name)
+        plot_path = os.path.join(base_path, plot_filename)
+        todisp = '<img src="%s" />'%(plot_path)
+    elif plot_name is not None: ...
+    '''
 
     plot_title = ""
     if mode == "one":
@@ -237,31 +249,6 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
                            One_to_One = one_to_one_options[modality],
                            Modality = modality
                        )
-
-@app.route('/MEDA/plot/<ds_name>/pheno/<plot_name>')
-def meda_pheno(ds_name=None, plot_name=None):
-    app.logger.info('DS Name is: %s', ds_name)
-    app.logger.info('Plot Name is: %s', plot_name)
-
-    base_path = os.path.join(APP_ROOT, 'data', ds_name, 'pheno')
-
-    if plot_name == "default":
-        todisp = "<h1> Choose a plot! </h1>"
-    elif plot_name is not None:
-        plot_filename = "%s.html"%(plot_name)
-        plot_path = os.path.join(base_path, plot_filename)
-        with open(plot_path, "r") as f:
-            todisp = f.read()
-    else:
-        todisp = "<h1> Choose a plot! </h1>"
-
-    return render_template('meda_pheno.html',
-                           plot=todisp,
-                           total_plots={
-                               'MEDA Options': aggregate_options['pheno'],
-                               'MEDA Embedded Options': embedded_options['pheno']
-                                       }
-                           )
 
 @app.route('/MEDA/plot/<ds_name>/fmri/<mode>/<plot_name>')
 def meda_fmri(ds_name=None, mode=None, plot_name=None):
@@ -338,6 +325,7 @@ def upload():
     # print(request.files['file[]'])
 
     file_names = ['pheno', 'eeg', 'fmri']
+
     for name in file_names:
         files = request.files.getlist(name)
         # app.logger.info('Input type: %s, File name: %s', name, file.filename)
@@ -355,43 +343,7 @@ def upload():
         else:
             session[name + '_data'] = None
 
-    '''
-    if session['pheno_data'] is not None:
-        # Create the dataset object
-        csv_ds = lds.CSVDataSet(session['pheno_data'], name = filedir)
-
-        # Clean the dataset object
-        csv_ds.imputeColumns("mean")
-
-        # Save metadata
-        csv_ds.saveMetaData(os.path.join(dspath, "metadata.json"))
-
-        # Create a lemur distance matrix based on the EEG data
-        DM = lds.DistanceMatrix(csv_ds, lms.VectorDifferenceNorm)
-
-        # Compute an embedding for the more intensive plots
-        MDSEmbedder = leb.MDSEmbedder(num_components=3)
-        csv_embedded = MDSEmbedder.embed(DM)
-        phenopath = os.path.join(dspath, 'pheno')
-        for _, lemurname, plotname in aggregate_options['pheno']:
-            tosave = getattr(lpl, lemurname)(csv_ds, mode='div').plot()
-            plotfilename = "%s.html"%(plotname)
-            plotpath = os.path.join(phenopath, plotfilename)
-            with open(plotpath, "w") as f:
-                app.logger.info('Writing to file: %s', plotfilename)
-                f.write(tosave)
-                f.close()
-
-        for _, lemurname, plotname in embedded_options['pheno']:
-            tosave = getattr(lpl, lemurname)(csv_embedded, mode='div').plot()
-            plotfilename = "%s.html"%(plotname)
-            plotpath = os.path.join(phenopath, plotfilename)
-            with open(plotpath, "w") as f:
-                app.logger.info('Writing to file: %s', plotfilename)
-                f.write(tosave)
-                f.close()
-    '''
-
+    # For modalities in which you upload S3 credentials.
     for name in ['eeg', 'fmri']:
         if session[name+'_data'] is not None:
             # Download EEG patients
@@ -405,47 +357,10 @@ def upload():
             call(cmd)
             run_modality(name, os.path.basename(session['basepath']))
 
+    # For modalities in which you upload the dataset itself.
     if session['pheno_data'] is not None:
         pheno.run_pheno(session['pheno_data'])
 
-    '''
-    if session['pheno_data'] is not None:
-        # Create a lemur dataset based on the phenotypic data
-        DATASET = filedir
-        CDS = lds.CSVDataSet(session['pheno_data'], name = DATASET)
-        metadata = CDS.saveMetaData(os.path.join("data", DATASET, "metadata.json"))
-        CDS.imputeColumns("mean")
-        DM = lds.DistanceMatrix(CDS, lms.VectorDifferenceNorm)
-
-        # Create an embedded distance matrix object under MDS
-        MDSEmbedder = leb.MDSEmbedder(num_components=10)
-        HBN_Embedded = MDSEmbedder.embed(DM)
-
-        # Set output paths for saved plots.
-        BASE = "data"
-        out_base = os.path.join(BASE, DATASET, "pheno_derivatives")
-        out_emb_base = os.path.join(BASE, DATASET, "pheno_embedded_deriatives")
-        os.makedirs(out_base + "/agg", exist_ok=True)
-        os.makedirs(out_emb_base + "/agg", exist_ok=True)
-
-        for _, lemurname, plotname in aggregate_options['pheno']:
-            tosave = getattr(lpl, lemurname)(CDS, mode='div').plot()
-            plotfilename = "%s.html"%(plotname)
-            plotpath = os.path.join(out_base + "/agg", plotfilename)
-            with open(plotpath, "w") as f:
-                app.logger.info('Writing to file: %s', plotfilename)
-                f.write(tosave)
-                f.close()
-
-        for _, lemurname, plotname in embedded_options['pheno']:
-            tosave = getattr(lpl, lemurname)(HBN_Embedded, mode='div').plot()
-            plotfilename = "%s.html"%(plotname)
-            plotpath = os.path.join(out_emb_base + "/agg", plotfilename)
-            with open(plotpath, "w") as f:
-                app.logger.info('Writing to file: %s', plotfilename)
-                f.write(tosave)
-                f.close()
-    '''
     '''
     if session['fmri_data'] is not None:
         # Download EEG patients
@@ -462,7 +377,7 @@ def upload():
         fmri.run_fmri(os.path.basename(session['basepath']))
     '''
 
-    for name in ['pheno', 'eeg', 'fmri']:
+    for name in file_names:
         if session[name+'_data'] is not None:
             return redirect(url_for('meda_modality', ds_name=filedir, modality=name, mode='none', plot_name='default'))
     '''

@@ -48,10 +48,11 @@ def run_fmri(name):
 
   # In[17]:
 
-
+  '''
   for i in range(fds.n):
-      lpl.Nifti4DPlotter(fds.getResource(i)).plot(downsample=50,
-                                              out_base=out_base)
+      lpl.Nifti4DPlotter(fds.getResource(i)).plot(downsample=5,
+      out_base=out_base)
+  '''
 
 
   # In[5]:
@@ -137,4 +138,3 @@ def run_fmri(name):
   #lpl.HGMMClusterMeansLevelLines(fMRI_Embedded,
   #                               mode="savediv",
   #                               base_path=out_emb_base).plot(level=2)
-
