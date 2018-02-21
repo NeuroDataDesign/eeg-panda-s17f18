@@ -654,6 +654,30 @@ class HGMMPairsPlot(MatrixPlotter):
         return self.makeplot(fig, "agg/" + self.shortname)
 
 
+class ClusterPairsPlot(MatrixPlotter):
+    titlestring = "%s Clustered Pairs Plot, Level %d"
+    shortname = "cpp"
+
+    def plot(self):
+        title = self.titlestring % (self.DS.name, self.DS.levels)
+        data = []
+        colors = get_spaced_colors(len(self.DS.clusters[self.DS.levels]))
+        samples = []
+        labels = []
+        for i, c in enumerate(self.DS.clusters[self.DS.levels]):
+            samples.append(c.T)
+            labels.append(c.shape[0] * [i])
+        samples = np.hstack(samples)[:3, :]
+        labels = np.hstack(labels)
+        df = pd.DataFrame(samples.T, columns=["Dim %d"%i for i in range(samples.shape[0])])
+        df["label"] = ["Cluster %d"%i for i in labels]
+        fig = ff.create_scatterplotmatrix(df, diag='box', index="label", colormap=colors)
+        fig["layout"]["title"] = title
+        del fig.layout["width"]
+        del fig.layout["height"]
+        return self.makeplot(fig, "agg/" + self.shortname)
+
+
 class DistanceMatrixPlotter:
     """A generic aggregate plotter acting on a distance matrix to be extended.
 

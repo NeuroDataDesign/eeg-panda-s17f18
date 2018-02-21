@@ -1,5 +1,53 @@
 import numpy as np
 from sklearn.mixture import GaussianMixture
+import sklearn.cluster as skcl
+
+class SpectralClustering:
+    def __init__(self, DS, levels=1, random_state=None):
+        """
+        Parameters
+        ----------
+        DS :obj:`Dataset`
+        level : int
+            Number of levels to cluster
+        random_state : int (optional)
+            Initialize Gaussian Mixture Model with specified random state
+        """
+        self.DS = DS
+        self.name = DS.name
+        self.levels = levels
+        self.columns = DS.D.columns
+
+        X = self.DS.D.as_matrix()
+        clusters = []
+        n = X.shape[0]
+        specClust = skcl.SpectralClustering(n_clusters=levels,random_state=random_state, affinity="precomputed")
+        y = specClust.fit_predict(X)
+        self.clusters = y
+
+class KMeans:
+    def __init__(self, DS,  n_clusters=8, random_state=None):
+        """
+        Parameters
+        ----------
+        DS :obj:`Dataset`
+        level : int
+            Number of levels to cluster
+        random_state : int (optional)
+            Initialize Gaussian Mixture Model with specified random state
+        """
+        self.DS = DS
+        self.name = DS.name
+        self.levels = 1
+        self.columns = DS.D.columns
+
+        X = self.DS.D.as_matrix()
+        self.clusters = [[]]
+        n = X.shape[0]
+        specClust = skcl.KMeans(n_clusters=n_clusters,random_state=random_state)
+        y = specClust.fit_predict(X)
+        self.clusters.append([(X[y == i, :]) for i in range(n_clusters)])
+
 
 class HGMMClustering:
     def __init__(self, DS, levels=1, random_state=None):
