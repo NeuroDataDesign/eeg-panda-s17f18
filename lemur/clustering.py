@@ -1,7 +1,6 @@
 import numpy as np
 from sklearn.mixture import GaussianMixture
 
-
 class HGMMClustering:
     def __init__(self, DS, levels=1, random_state=None):
         """

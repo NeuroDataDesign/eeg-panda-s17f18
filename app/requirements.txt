@@ -1,7 +1,7 @@
 boto3==1.4.7
 Flask==0.12.2
 botocore==1.5.92
-redlemur-offbrand==0.06
+redlemur==0.10
 scipy==1.0.0
 matplotlib==2.1.0
 plotly==2.2.2
