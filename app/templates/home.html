@@ -10,7 +10,7 @@
                     <th>Dataset Name</th>
                     <th>Samples</th>
                     <th>Dimensions</th>
-                    <!-- empty header -->
+                    <th></th>
                 <tr>
             </thead>
             <tbody>
@@ -20,7 +20,7 @@
                     <td><a  href="/MEDA/plot/{{ meta.name }}/pheno/default">{{ meta.name }}</a></td>
                     <td>{{ meta.n }}</td>
                     <td>{{ meta.d }}</td>
-                    <!-- button here -->
+                    <td><a  href='/MEDA/home/delete/{{ meta.name }}'>Delete</a></td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -32,6 +32,7 @@
             <tr>
                 <th>#</th>
                 <th>Dataset Name</th>
+                <th></th>
             <tr>
             </thead>
             <tbody>
@@ -39,6 +40,7 @@
                 <tr>
                     <td>{{loop.index}}</td>
                     <td><a  href="/MEDA/plot/{{ eeg }}/eeg/none/default">{{ eeg }}</a></td>
+                    <td><a  href='/MEDA/home/delete/{{ eeg }}'>Delete</a></td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -50,6 +52,7 @@
             <tr>
                 <th>#</th>
                 <th>Dataset Name</th>
+                <th></th>
             <tr>
             </thead>
             <tbody>
@@ -57,6 +60,7 @@
                 <tr>
                     <td>{{loop.index}}</td>
                     <td><a  href="/MEDA/plot/{{ fmri }}/fmri/none/default">{{ fmri }}</a></td>
+                    <td><a  href='/MEDA/home/delete/{{ fmri }}'>Delete</a></td>
                 </tr>
             {% endfor %}
             </tbody>
