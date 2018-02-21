@@ -9,6 +9,7 @@ from subprocess import call
 
 import eeg
 import fmri
+import pheno
 
 import sys
 sys.path.append(os.path.abspath(os.path.join('..')))
@@ -22,16 +23,26 @@ app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-MEDA_options = {
+aggregate_options = {
     'pheno': [
         #'NameOfPlotInLemur': 'name-of-plot-file-name'
         ('Heatmap', 'Heatmap', 'heatmap'),
-        ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheatmap'),
+        ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
         ('Location Lines', 'LocationLines', 'locationlines'),
-        ('Location Heatmap', 'LocationHeatmap', 'locationheatmap'),
-        ('Scree Plot', 'ScreePlotter', 'screeplot')
+        ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+        ('Scree Plot', 'ScreePlotter', 'scree')
     ],
     'eeg': [
+        #'NameOfPlotInLemur': 'name-of-plot-file-name'
+        ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
+        ('Heatmap', 'Heatmap', 'squareheat'),
+        ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
+        ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
+        ('Location Lines', 'LocationLines', 'locationlines'),
+        ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+        ('Scree Plot', 'ScreePlotter', 'scree')
+    ],
+    'fmri': [
         #'NameOfPlotInLemur': 'name-of-plot-file-name'
         ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
         ('Heatmap', 'Heatmap', 'squareheat'),
@@ -44,30 +55,69 @@ MEDA_options = {
 }
 
 # EEG and FMRI One-to-One options.
-One_to_One_options = {
-    'eeg': [
+one_to_one_options = {
+    'pheno' : [
+    ],
+    'eeg' : [
         ('Connected Scatter', 'ConnectedScatter', 'connectedscatter'),
         ('Sparkline', 'Sparkline', 'sparkline'),
         ('Spatial Time Series', 'SpatialTimeSeries', 'spatialtimeseries'),
         ('Spatial Periodogram', 'SpatialPeriodogram', 'spatialpgram')
     ],
-    'fmri': [
+    'fmri' : [
         ('Time Elapse of fMRI Signal', 'TimeElapse', 'orth_epi')
     ]
 }
 
 # Embed for EEG and FMRI
-Embed = [
-   #'NameOfPlotInLemur': 'name-of-plot-file-name'
-   ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
-   ('Heatmap', 'Heatmap', 'heatmap'),
-   ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
-   ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
-   ('Location Lines', 'LocationLines', 'locationlines'),
-   ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
-   ('Scree Plot', 'ScreePlotter', 'scree')
-]
+embedded_options = {
+    'pheno' : [
+        ('Heatmap', 'Heatmap', 'heatmap'),
+        ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
+        ('Location Lines', 'LocationLines', 'locationlines'),
+        ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+        ('Scree Plot', 'ScreePlotter', 'scree'),
+        ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
+        ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
+        ('HGMM Stacked Cluster Means Heatmap',
+         'HGMMStackedClusterMeansHeatmap',
+         'hgmmscmh'),
+        ('HGMM Cluster Means Dendrogram',
+         'HGMMClusterMeansDendrogram',
+         'hgmmcmd'),
+        ('HGMM Pairs Plot',
+         'HGMMPairsPlot',
+          'hgmmpp'),
+        ('HGMM Cluster Means Level Lines',
+         'HGMMClusterMeansLevelLines',
+          'hgmmcmll'),
+        ('HGMM Cluster Means Level Heatmap',
+         'HGMMClusterMeansLevelHeatmap',
+         'hgmmcmlh')
+    ],
+    'eeg' : [
+       #'NameOfPlotInLemur': 'name-of-plot-file-name'
+       ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
+       ('Heatmap', 'Heatmap', 'heatmap'),
+       ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
+       ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
+       ('Location Lines', 'LocationLines', 'locationlines'),
+       ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+       ('Scree Plot', 'ScreePlotter', 'scree')
+    ],
+    'fmri' : [
+       #'NameOfPlotInLemur': 'name-of-plot-file-name'
+       ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
+       ('Heatmap', 'Heatmap', 'heatmap'),
+       ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
+       ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
+       ('Location Lines', 'LocationLines', 'locationlines'),
+       ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+       ('Scree Plot', 'ScreePlotter', 'scree')
+    ]
+}
 
+'''
 # Used for phenotypic
 MEDA_Embedded_options = [
     ('Heatmap', 'Heatmap', 'embheatmap'),
@@ -93,6 +143,7 @@ MEDA_Embedded_options = [
      'HGMMClusterMeansLevelHeatmap',
      'hgmmclustermeanslevelheatmap'),
 ]
+'''
 
 # REMOVE AFTER INTEGRATION
 # fMRI
@@ -137,8 +188,12 @@ def uploadrender():
 def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
     app.logger.info('DS Name is: %s', ds_name)
     app.logger.info('Plot Name is: %s', plot_name)
-    subj_name = request.args.get('subj_name')
-    test_name = request.args.get('test_name')
+    try:
+        subj_name = request.args.get('subj_name')
+        test_name = request.args.get('test_name')
+    except:
+        subj_name = None
+        test_name = None
     if mode == 'embed':
         base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_embedded_deriatives', 'agg')
     elif mode == 'one' and subj_name == 'none':
@@ -170,16 +225,17 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
 
     plot_title = ""
     if mode == "one":
-        for title, _, tag in One_to_One_options[modality]:
+        for title, _, tag in one_to_one_options[modality]:
             if tag == plot_name: plot_title = title
 
-    return render_template('meda_'+modality+'.html',
+    return render_template('meda_modality.html',
                            interm=zip(subjs, tasks),
                            one_title=plot_title,
                            plot=todisp,
-                           MEDA_options = MEDA_options[modality],
-                           MEDA_Embedded_options = Embed,
-                           One_to_One = One_to_One_options[modality]
+                           MEDA_options = aggregate_options[modality],
+                           MEDA_Embedded_options = embedded_options[modality],
+                           One_to_One = one_to_one_options[modality],
+                           Modality = modality
                        )
 
 @app.route('/MEDA/plot/<ds_name>/pheno/<plot_name>')
@@ -202,8 +258,8 @@ def meda_pheno(ds_name=None, plot_name=None):
     return render_template('meda_pheno.html',
                            plot=todisp,
                            total_plots={
-                               'MEDA Options': MEDA_options['pheno'],
-                               'MEDA Embedded Options': MEDA_Embedded_options
+                               'MEDA Options': aggregate_options['pheno'],
+                               'MEDA Embedded Options': embedded_options['pheno']
                                        }
                            )
 
@@ -256,9 +312,9 @@ def meda_fmri(ds_name=None, mode=None, plot_name=None):
                            interm=zip(subjs, tasks),
                            one_title=plot_title,
                            plot=todisp,
-                           MEDA_options = MEDA_options['eeg'],
-                           MEDA_Embedded_options = Embed,
-                           One_to_One = fmri_One_to_One
+                           MEDA_options = aggregate_options['fmri'],
+                           MEDA_Embedded_options = embedded_options['fmri'],
+                           One_to_One = one_to_one_options['fmri']
                        )
 # Pass modality as string, and base path.
 def run_modality(modality, basepath):
@@ -269,7 +325,7 @@ def run_modality(modality, basepath):
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    
+
     target = os.path.join(APP_ROOT,'data')
     app.logger.info('Target route: %s', target)
 
@@ -285,8 +341,7 @@ def upload():
     for name in file_names:
         files = request.files.getlist(name)
         # app.logger.info('Input type: %s, File name: %s', name, file.filename)
-        print(files)
-        if len(files) != 0:
+        if len(files) != 0 and files[0].filename != '':
             file = files[0]
             app.logger.info('Input type in loop: %s', name)
             dirpath = os.path.join(dspath, name)
@@ -299,7 +354,8 @@ def upload():
             session[name + '_data'] = destination
         else:
             session[name + '_data'] = None
-    
+
+    '''
     if session['pheno_data'] is not None:
         # Create the dataset object
         csv_ds = lds.CSVDataSet(session['pheno_data'], name = filedir)
@@ -317,7 +373,7 @@ def upload():
         MDSEmbedder = leb.MDSEmbedder(num_components=3)
         csv_embedded = MDSEmbedder.embed(DM)
         phenopath = os.path.join(dspath, 'pheno')
-        for _, lemurname, plotname in MEDA_options['pheno']:
+        for _, lemurname, plotname in aggregate_options['pheno']:
             tosave = getattr(lpl, lemurname)(csv_ds, mode='div').plot()
             plotfilename = "%s.html"%(plotname)
             plotpath = os.path.join(phenopath, plotfilename)
@@ -326,7 +382,7 @@ def upload():
                 f.write(tosave)
                 f.close()
 
-        for _, lemurname, plotname in MEDA_Embedded_options:
+        for _, lemurname, plotname in embedded_options['pheno']:
             tosave = getattr(lpl, lemurname)(csv_embedded, mode='div').plot()
             plotfilename = "%s.html"%(plotname)
             plotpath = os.path.join(phenopath, plotfilename)
@@ -334,8 +390,9 @@ def upload():
                 app.logger.info('Writing to file: %s', plotfilename)
                 f.write(tosave)
                 f.close()
-                
-    for name in ['eeg']:
+    '''
+
+    for name in ['eeg', 'fmri']:
         if session[name+'_data'] is not None:
             # Download EEG patients
             app.logger.info("Downloading "+name+" Data...")
@@ -346,25 +403,49 @@ def upload():
                    os.path.join(session['basepath'], name), "--recursive"]
             app.logger.info(name+" Data Downloaded")
             call(cmd)
-
-            # Make plots
             run_modality(name, os.path.basename(session['basepath']))
 
+    if session['pheno_data'] is not None:
+        pheno.run_pheno(session['pheno_data'])
+
     '''
-    if session['eeg_data'] is not None:
-        # Download EEG patients
-        app.logger.info("Downloading EEG Data...")
-        credential_info = open(session['eeg_data'], 'r').read()
-        bucket_name = credential_info.split(",")[0]
-        cmd = ["aws", "s3",
-               "cp", "s3://%s/eeg"%(bucket_name),
-               os.path.join(session['basepath'], 'eeg'), "--recursive"]
-        app.logger.info("EEG Data Downloaded")
-        call(cmd)
+    if session['pheno_data'] is not None:
+        # Create a lemur dataset based on the phenotypic data
+        DATASET = filedir
+        CDS = lds.CSVDataSet(session['pheno_data'], name = DATASET)
+        metadata = CDS.saveMetaData(os.path.join("data", DATASET, "metadata.json"))
+        CDS.imputeColumns("mean")
+        DM = lds.DistanceMatrix(CDS, lms.VectorDifferenceNorm)
 
-        # Make plots
-        eeg.run_eeg(os.path.basename(session['basepath']))
+        # Create an embedded distance matrix object under MDS
+        MDSEmbedder = leb.MDSEmbedder(num_components=10)
+        HBN_Embedded = MDSEmbedder.embed(DM)
 
+        # Set output paths for saved plots.
+        BASE = "data"
+        out_base = os.path.join(BASE, DATASET, "pheno_derivatives")
+        out_emb_base = os.path.join(BASE, DATASET, "pheno_embedded_deriatives")
+        os.makedirs(out_base + "/agg", exist_ok=True)
+        os.makedirs(out_emb_base + "/agg", exist_ok=True)
+
+        for _, lemurname, plotname in aggregate_options['pheno']:
+            tosave = getattr(lpl, lemurname)(CDS, mode='div').plot()
+            plotfilename = "%s.html"%(plotname)
+            plotpath = os.path.join(out_base + "/agg", plotfilename)
+            with open(plotpath, "w") as f:
+                app.logger.info('Writing to file: %s', plotfilename)
+                f.write(tosave)
+                f.close()
+
+        for _, lemurname, plotname in embedded_options['pheno']:
+            tosave = getattr(lpl, lemurname)(HBN_Embedded, mode='div').plot()
+            plotfilename = "%s.html"%(plotname)
+            plotpath = os.path.join(out_emb_base + "/agg", plotfilename)
+            with open(plotpath, "w") as f:
+                app.logger.info('Writing to file: %s', plotfilename)
+                f.write(tosave)
+                f.close()
+    '''
     '''
     if session['fmri_data'] is not None:
         # Download EEG patients
@@ -379,13 +460,17 @@ def upload():
 
         # Make plots
         fmri.run_fmri(os.path.basename(session['basepath']))
-   
+    '''
 
-    if session['eeg_data'] is not None:
-        return redirect(url_for('meda_modality', ds_name=filedir, modality='eeg', mode='none', plot_name='default'))
+    for name in ['pheno', 'eeg', 'fmri']:
+        if session[name+'_data'] is not None:
+            return redirect(url_for('meda_modality', ds_name=filedir, modality=name, mode='none', plot_name='default'))
+    '''
     if session['fmri_data'] is not None:
         return redirect(url_for('meda_fmri', ds_name=filedir, mode='none', plot_name='default'))
-    return redirect(url_for('meda_pheno', ds_name=filedir, mode='none', plot_name='default'))
+    return redirect(url_for('meda_modality', ds_name=filedir, modality = 'pheno', mode='none', plot_name='default'))
+    # return redirect(url_for('meda_pheno', ds_name=filedir, mode='none', plot_name='default'))
+    '''
 
 @app.route('/s3upload', methods=['POST'])
 def s3upload():

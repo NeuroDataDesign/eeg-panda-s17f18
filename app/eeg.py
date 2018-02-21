@@ -178,4 +178,3 @@ def run_eeg(name):
   lpl.ScreePlotter(DM, mode="savediv", base_path=out_base).plot()
   lpl.ScreePlotter(EEG_Embedded, mode="savediv",
                    base_path=out_emb_base).plot()
-
