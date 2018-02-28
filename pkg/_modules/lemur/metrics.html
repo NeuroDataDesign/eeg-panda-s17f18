@@ -2,20 +2,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>lemur.metrics &#8212; Lemur 0.1 documentation</title>
+    <title>lemur.metrics &#8212; Lemur 0.05 documentation</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '0.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
@@ -31,8 +23,7 @@
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-  </head>
-  <body>
+  </head><body>
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -45,7 +36,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           Lemur</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.05</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -145,8 +136,8 @@
 <span class="sd">            The correlation matrix of each object in the dataset.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">j</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">getResource</span><span class="p">(</span><span class="n">j</span><span class="p">))),</span> <span class="nb">range</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">N</span><span class="p">)))</span></div>
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">):</span></div>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">j</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">getMatrix</span><span class="p">(</span><span class="n">j</span><span class="p">))),</span> <span class="nb">range</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">n</span><span class="p">)))</span>
 
 <div class="viewcode-block" id="FroCorr.compare"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.FroCorr.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute the euclidian distance of two correlation matricies.</span>
@@ -163,8 +154,8 @@
 <span class="sd">        float</span>
 <span class="sd">            The distance.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span></div></div>
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
 
 <div class="viewcode-block" id="DiffAve"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.DiffAve">[docs]</a><span class="k">class</span> <span class="nc">DiffAve</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;A MRI distance. The euclidian distance of the average voxel intensity volumes.</span>
@@ -190,8 +181,8 @@
 <span class="sd">            The average of each object in the dataset.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">j</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">getResource</span><span class="p">(</span><span class="n">j</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">N</span><span class="p">)))</span></div>
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">):</span></div>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">j</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">getMatrix</span><span class="p">(</span><span class="n">j</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">n</span><span class="p">)))</span>
 
 <div class="viewcode-block" id="DiffAve.compare"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.DiffAve.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute the euclidian distance of two average volumes.</span>
@@ -208,15 +199,15 @@
 <span class="sd">        float</span>
 <span class="sd">            The distance.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span></div></div>
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
 
-<div class="viewcode-block" id="NanDotProduct"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.NanDotProduct">[docs]</a><span class="k">class</span> <span class="nc">NanDotProduct</span><span class="p">:</span>
+<div class="viewcode-block" id="NanNorm"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.NanNorm">[docs]</a><span class="k">class</span> <span class="nc">NanNorm</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;The dot product between two vectors, except nans are just treated as 0.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
         
-<div class="viewcode-block" id="NanDotProduct.parameterize"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.NanDotProduct.parameterize">[docs]</a>    <span class="k">def</span> <span class="nf">parameterize</span><span class="p">(</span><span class="n">D</span><span class="p">):</span>
+<div class="viewcode-block" id="NanNorm.parameterize"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.NanNorm.parameterize">[docs]</a>    <span class="k">def</span> <span class="nf">parameterize</span><span class="p">(</span><span class="n">D</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Identity function.</span>
 
 <span class="sd">        Parameters</span>
@@ -230,10 +221,10 @@
 <span class="sd">            The a list of each vector in the dataset.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+</div>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">j</span><span class="p">:</span> <span class="n">D</span><span class="o">.</span><span class="n">getResource</span><span class="p">(</span><span class="n">j</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">n</span><span class="p">)))</span>
 
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">j</span><span class="p">:</span> <span class="n">D</span><span class="o">.</span><span class="n">getResource</span><span class="p">(</span><span class="n">j</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">N</span><span class="p">)))</span></div>
-
-<div class="viewcode-block" id="NanDotProduct.compare"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.NanDotProduct.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<div class="viewcode-block" id="NanNorm.compare"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.NanNorm.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute the euclidian distance of two correlation matricies.</span>
 
 <span class="sd">        Parameters</span>
@@ -248,8 +239,45 @@
 <span class="sd">        float</span>
 <span class="sd">            The distance.</span>
 
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">))</span>
+
+<div class="viewcode-block" id="VectorDifferenceNorm"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.VectorDifferenceNorm">[docs]</a><span class="k">class</span> <span class="nc">VectorDifferenceNorm</span><span class="p">:</span>
+        
+<div class="viewcode-block" id="VectorDifferenceNorm.parameterize"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.VectorDifferenceNorm.parameterize">[docs]</a>    <span class="k">def</span> <span class="nf">parameterize</span><span class="p">(</span><span class="n">D</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Identity function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        D : :obj:`DataSet`</span>
+<span class="sd">            A dataset.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`list` of :obj:`ndarray`</span>
+<span class="sd">            The a list of each vector in the dataset.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span></div></div>
+</div>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">j</span><span class="p">:</span> <span class="n">D</span><span class="o">.</span><span class="n">getResource</span><span class="p">(</span><span class="n">j</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">n</span><span class="p">)))</span>
+
+<div class="viewcode-block" id="VectorDifferenceNorm.compare"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.VectorDifferenceNorm.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute the euclidian distance of two correlation matricies.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : :obj:`ndarray`</span>
+<span class="sd">            The left vector argument.</span>
+<span class="sd">        y : :obj:`ndarray`</span>
+<span class="sd">            The left vector argument.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The distance.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">))</span>
 
 <div class="viewcode-block" id="Coh"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.Coh">[docs]</a><span class="k">class</span> <span class="nc">Coh</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;An implementation of the coherence metric.</span>
@@ -286,13 +314,13 @@
         <span class="k">for</span> <span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">dat</span><span class="p">),</span> <span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">coherence_pars</span><span class="p">,</span> <span class="n">coherence_vals</span><span class="p">):</span>
             <span class="n">coherence</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
             <span class="n">coherence</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-
-        <span class="k">return</span> <span class="n">coherence</span></div>
+</div>
+        <span class="k">return</span> <span class="n">coherence</span>
 
 <div class="viewcode-block" id="Coh.get_coh"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.Coh.get_coh">[docs]</a>    <span class="k">def</span> <span class="nf">get_coh</span><span class="p">(</span><span class="n">tup</span><span class="p">):</span>
         <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">dat</span> <span class="o">=</span> <span class="n">tup</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">tup</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">coherence</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">dat</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="p">:],</span> <span class="n">fs</span><span class="o">=</span><span class="mi">500</span><span class="p">)[</span><span class="mi">1</span><span class="p">]))</span></div>
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">):</span></div>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">coherence</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">dat</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="p">:],</span> <span class="n">fs</span><span class="o">=</span><span class="mi">500</span><span class="p">)[</span><span class="mi">1</span><span class="p">]))</span>
 
 <div class="viewcode-block" id="Coh.compare"><a class="viewcode-back" href="../../lemur.html#lemur.metrics.Coh.compare">[docs]</a>    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute the euclidian distance of two correlation matricies.</span>
@@ -309,8 +337,8 @@
 <span class="sd">        float</span>
 <span class="sd">            The distance.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span></div></div>
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
 
 </pre></div>
 
@@ -325,8 +353,8 @@
       
     </p>
     <p>
-        &copy; Copyright 2017, Team Red Lemur.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.<br/>
+        &copy; Copyright 2018, Team Red Lemur.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.1.<br/>
     </p>
   </div>
 </footer>
