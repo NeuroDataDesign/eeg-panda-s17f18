@@ -11,7 +11,7 @@ git push origin master
 cd ../../..
 # switch branches and pull the data we want
 git checkout gh-pages
-rm -rf ./*
+rm -r ./*
 touch .nojekyll
 git checkout master docs/web/
 mkdir pkg
