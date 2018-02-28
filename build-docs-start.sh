@@ -2,6 +2,7 @@
 # build the lemur docs
 cd docs/web/pkg
 make clean
+mkdir _static
 make html
 cd ..
 # commit and push
