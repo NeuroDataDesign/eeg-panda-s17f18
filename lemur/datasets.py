@@ -278,6 +278,7 @@ class CSVDataSet(DataSet):
             del D[index_column]
 
         self.D = D
+        print(D)
 
         # Remove all columns which have all null values
         keep = []
