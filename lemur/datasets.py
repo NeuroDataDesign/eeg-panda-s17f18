@@ -119,6 +119,25 @@ class EEGDataSet:
         DS = DataSet(D, name)
         return DS
 
+class GraphDataSet:
+
+    def __init__(self, dataframe_descriptor, name="fmri"):
+        self.D = dataframe_descriptor
+        self.D.index = self.D["subjects"].astype(str) + "-" + self.D["tasks"].astype(str)
+        self.D.index.name = "index"
+        self.name = name
+        self.n = self.D.shape[0]
+
+    def getResource(self, index):
+        resource = self.D.ix[index]
+        return resource
+
+    def getMatrix(self, index):
+        resource_path = self.D.ix[index][0]
+        try:
+            return nx.read_graphml(files)
+        except:
+            return nx.read_gpickle(files)
 
 
 class DiskDataSet:
@@ -278,7 +297,6 @@ class CSVDataSet(DataSet):
             del D[index_column]
 
         self.D = D
-        print(D)
 
         # Remove all columns which have all null values
         keep = []

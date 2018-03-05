@@ -19,6 +19,8 @@ from nilearn import plotting as nilplot
 import nibabel as nib
 
 from lemur import embedders as leb
+from lemur.utils import qa_graphs as qg
+from lemur.utils import qa_graphs_plotting as qgp
 
 def get_spaced_colors(n):
     max_value = 255
@@ -129,6 +131,28 @@ class TimeSeriesPlotter:
             return plot(fig, output_type='div', include_plotlyjs=False)
 
 
+class GraphPlotter:
+    """
+    Visualization of summary statistics of a list of graphs
+
+    Parameters
+    ----------
+    fs : list
+        List of strings of filenames of graphs to be analyzed
+    outf: string
+        name of plotly html output file
+    """
+    def __init__(self, fs, outf):
+
+        self.file_list = fs
+        self.outf = outf
+
+    def makeplot(self, modality='dwi', atlas = None, log = True):
+
+        statsDict = qg.compute_metrics(fs, modality)
+        qpg.make_panel_plot(statsDict, outf, atlas, log, modality)
+
+
 class SquareHeatmap(MatrixPlotter):
     titlestring = "%s Heatmap"
     shortname = "squareheat"
@@ -179,37 +203,6 @@ class Scatterplot(MatrixPlotter):
         trace = go.Scatter(x = self.DS.D.as_matrix()[:, 0],
                            y = self.DS.D.as_matrix()[:, 1],
                            mode = "markers")
-        data = [trace]
-        fig = dict(data=data, layout=layout)
-        return self.makeplot(fig, "agg/" + self.shortname)
-
-class ThreeDScatterplot(MatrixPlotter):
-    titlestring = "%s 3D Scatter Plot"
-    shortname = "3sp"
-
-    def plot(self):
-        title = self.titlestring % (self.DS.name)
-
-        if self.DS.d < 3:
-            print("Scatter plot must get at least 3 dimensional dataset")
-            return
-        xaxis = go.XAxis(title=list(self.DS.D)[0])
-        yaxis = go.YAxis(title=list(self.DS.D)[1])
-        zaxis = go.ZAxis(title=list(self.DS.D)[2])
-        layout = dict(title=title, scene=dict(
-            xaxis=xaxis,
-            yaxis=yaxis,
-            zaxis=zaxis
-        ))
-        trace = go.Scatter3d(
-            x=self.DS.D.as_matrix()[:, 0],
-            y=self.DS.D.as_matrix()[:, 1],
-            z=self.DS.D.as_matrix()[:, 2],
-            mode='markers',
-            marker=dict(
-                size=4
-            )
-        )
         data = [trace]
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
