@@ -5,6 +5,7 @@ from PIL import ImageDraw, Image, ImageFont
 from plotly.offline import iplot, plot
 import plotly.graph_objs as go
 import plotly.figure_factory as ff
+from plotly import tools
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -37,6 +38,12 @@ class MatrixPlotter:
         self.DS = DS
         self.plot_mode = mode
         self.base_path = base_path
+
+        Reds = cl.scales['8']['seq']['Reds']
+        self.Reds = list(zip(np.linspace(0, 1, len(Reds)), Reds))
+
+        BuRd = cl.scales['11']['div']['RdBu'][::-1]
+        self.BuRd = list(zip(np.linspace(0, 1, len(BuRd)), BuRd))
 
     def makeplot(self, fig, local_path=None):
         """Make the plotly figure visable to the user in the way they want.
@@ -161,6 +168,7 @@ class SquareHeatmap(MatrixPlotter):
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
 
+
 class Scatterplot(MatrixPlotter):
     titlestring = "%s Scatterplot"
     shortname = "scatter"
@@ -182,6 +190,7 @@ class Scatterplot(MatrixPlotter):
         data = [trace]
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
+
 
 class SpatialConnectivity(MatrixPlotter):
     titlestring = "%s Spatial Connectivity"
@@ -329,7 +338,8 @@ class LocationHeatmap(MatrixPlotter):
                 showticklabels=showticklabels)
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         trace = go.Heatmap(x = self.DS.D.columns,
-                           z = z)
+                           z = z,
+                           colorscale=self.Reds)
         data = [trace]
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
@@ -367,24 +377,37 @@ class HistogramHeatmap(MatrixPlotter):
         d, n = D.shape
         D = (D - np.mean(D, axis=1).reshape(d, 1)) / np.std(D, axis=1).reshape(d, 1)
         D = np.nan_to_num(D) # only nan if std all 0 -> all values 0
-        num_bins = int(np.sqrt(n))
-        bins = np.linspace(-5, 5, num_bins + 1)
+
+        num_bins = int(np.sqrt(2*n))
+        if num_bins > 15:
+            num_bins = 15
+
+        min_val = np.floor(np.min(D))
+        if min_val < -5:
+            min_val = -5
+
+        max_val = np.ceil(np.max(D))
+        if max_val > 5:
+            max_val = 5
+
+        bins = np.linspace(min_val, max_val, (max_val - min_val) * num_bins + 1)
         bin_centers = (bins[1:] + bins[:-1]) / 2
         H = []
         for i in range(D.shape[0]):
-            hist = np.histogram(D[i, :], bins = bins)[0]
+            hist = np.histogram(D[i, :], bins=bins)[0]
             H.append(hist)
         z = np.vstack(H)
         trace = go.Heatmap(y = self.DS.D.columns,
-                           z = z)
+                           z = z,
+                           x = bins,
+                           colorscale=self.Reds,
+                           colorbar=go.ColorBar(title='Counts'))
         data = [trace]
         xaxis = go.XAxis(
                 title="Normalized Value",
-                ticktext = list(map(lambda x: "%0.4f"%x, bin_centers)),
-                ticks = "",
+                ticks = "outside",
                 showticklabels=True,
-                mirror=True,
-                tickvals = [i for i in range(len(bin_centers))])
+                )
         yaxis = go.YAxis(
                 title="Dimensions",
                 ticks = "",
@@ -393,6 +416,7 @@ class HistogramHeatmap(MatrixPlotter):
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data = data, layout = layout)
         return self.makeplot(fig, "agg/" + self.shortname)
+
 
 class CorrelationMatrix(MatrixPlotter):
     titlestring = "%s Correlation Matrix"
@@ -425,9 +449,11 @@ class CorrelationMatrix(MatrixPlotter):
                            y = self.DS.D.columns,
                            z = C,
                            zmin = -1,
-                           zmax = 1)
+                           zmax = 1,
+                           colorscale=self.BuRd)
         fig = dict(data=[trace], layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
+
 
 class ScreePlotter(MatrixPlotter):
     titlestring = "%s Scree Plot"
@@ -460,6 +486,7 @@ class ScreePlotter(MatrixPlotter):
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
 
+
 class EigenvectorHeatmap(MatrixPlotter):
     titlestring = "%s Eigenvector Heatmap"
     shortname = "evheat"
@@ -491,6 +518,7 @@ class EigenvectorHeatmap(MatrixPlotter):
         data = [trace]
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
+
 
 class HGMMClusterMeansDendrogram(MatrixPlotter):
     titlestring = "%s HGMM Cluster Means Dendrogram, Level %d"
@@ -537,7 +565,8 @@ class HGMMStackedClusterMeansHeatmap(MatrixPlotter):
         y_labels = np.tile(self.DS.columns, X.shape[0] // len(self.DS.columns))[::-1]
         trace = go.Heatmap(z = X,
                            zmin = -np.max(X),
-                           zmax = np.max(X))
+                           zmax = np.max(X),
+                           colorscale=self.BuRd)
         data = [trace]
         xaxis = go.XAxis(
                 title="Clusters",
@@ -576,9 +605,12 @@ class HGMMClusterMeansLevelHeatmap(MatrixPlotter):
         for i, c in enumerate(self.DS.clusters[self.DS.levels]):
             means += [c[2]] * freq[i]
         X = np.column_stack(means)
-
-        trace = go.Heatmap(y = self.DS.columns,
-                           z = X)
+        print(X.shape)
+        trace = go.Heatmap(y = self.DS.columns[::-1],
+                           z = np.flipud(X),
+                           zmin = -np.max(X),
+                           zmax = np.max(X),
+                           colorscale=self.BuRd)
         data = [trace]
         xaxis = go.XAxis(
                 title="Clusters",
