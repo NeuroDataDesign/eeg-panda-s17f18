@@ -5,7 +5,7 @@
 
 from argparse import ArgumentParser
 from plotly.offline import download_plotlyjs, init_notebook_mode, iplot, plot
-from lemurs.utils import plotly_helper as pp
+from . import plotly_helper as pp
 import pickle
 import numpy as np
 import os

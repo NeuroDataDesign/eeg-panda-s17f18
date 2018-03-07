@@ -1,8 +1,47 @@
+from abc import ABCMeta, abstractmethod
 import numpy as np
 from sklearn.mixture import GaussianMixture
 import sklearn.cluster as skcl
 
-class SpectralClustering:
+
+class Clustering(metaclass=ABCMeta):
+    def __init__(self, DS, levels=1, random_state=None):
+        self.DS = DS
+        self.name = DS.name
+        self.columns = DS.D.columns
+        self.X = self.DS.D.as_matrix()
+        self.levels = levels
+        self.random_state = random_state
+        self.clusters = []
+
+    @abstractmethod
+    def cluster(self):
+        pass
+
+class KMeans(Clustering):
+    def __init__(self, DS, n_clusters=8, random_state=None):
+        """
+        Parameters
+        ----------
+        DS :obj:`Dataset`
+        level : int
+            Number of levels to cluster
+        random_state : int (optional)
+            Initialize Gaussian Mixture Model with specified random state
+        """
+        Clustering.__init__(self, DS, 1, random_state)
+        self.n_clusters = n_clusters
+        self.clustname = 'KMeans'
+        self.shortclustname = 'km'
+
+    def cluster(self):
+        self.clusters = [[self.X]]
+        clust = skcl.KMeans(n_clusters=self.n_clusters,random_state=self.random_state)
+        y = clust.fit_predict(self.X)
+        self.clusters.append([(self.X[y == i, :]) for i in range(self.n_clusters)])
+
+
+class HGMMClustering(Clustering):
     def __init__(self, DS, levels=1, random_state=None):
         """
         Parameters
@@ -13,75 +52,28 @@ class SpectralClustering:
         random_state : int (optional)
             Initialize Gaussian Mixture Model with specified random state
         """
-        self.DS = DS
-        self.name = DS.name
-        self.levels = levels
-        self.columns = DS.D.columns
+        Clustering.__init__(self, DS, levels, random_state)
+        self.clustname = 'HGMM'
+        self.shortclustname = 'hgmm'
 
-        X = self.DS.D.as_matrix()
+    def cluster(self):
         clusters = []
-        n = X.shape[0]
-        specClust = skcl.SpectralClustering(n_clusters=levels,random_state=random_state, affinity="precomputed")
-        y = specClust.fit_predict(X)
-        self.clusters = y
-
-class KMeans:
-    def __init__(self, DS,  n_clusters=8, random_state=None):
-        """
-        Parameters
-        ----------
-        DS :obj:`Dataset`
-        level : int
-            Number of levels to cluster
-        random_state : int (optional)
-            Initialize Gaussian Mixture Model with specified random state
-        """
-        self.DS = DS
-        self.name = DS.name
-        self.levels = 1
-        self.columns = DS.D.columns
-
-        X = self.DS.D.as_matrix()
-        self.clusters = [[]]
-        n = X.shape[0]
-        specClust = skcl.KMeans(n_clusters=n_clusters,random_state=random_state)
-        y = specClust.fit_predict(X)
-        self.clusters.append([(X[y == i, :]) for i in range(n_clusters)])
-
-
-class HGMMClustering:
-    def __init__(self, DS, levels=1, random_state=None):
-        """
-        Parameters
-        ----------
-        DS :obj:`Dataset`
-        level : int
-            Number of levels to cluster
-        random_state : int (optional)
-            Initialize Gaussian Mixture Model with specified random state
-        """
-        self.DS = DS
-        self.name = DS.name
-        self.levels = levels
-        self.columns = DS.D.columns
-        
-        X = self.DS.D.as_matrix()
-        clusters = []
-        n = X.shape[0]
-        l0 = self.hgmml0(X, random_state)
+        n = self.X.shape[0]
+        l0 = self.hgmml0(self.X, self.random_state)
         clusters.append(l0)
-        li = self.gmmBranch(l0[0], random_state)
+        li = self.gmmBranch(l0[0], self.random_state)
         clusters.append(li)
-        while (len(li) < n) and (len(clusters) - 1 < levels):
+        while (len(li) < n) and (len(clusters) - 1 < self.levels):
             lip = []
             for c in li:
-                q = self.gmmBranch(c, random_state)
+                q = self.gmmBranch(c, self.random_state)
                 if q is not None:
                     lip.extend(q)
             clusters.append(lip)
             li = lip
 
-        self.clusters = clusters
+        self.clusters = [list(map(lambda x: x[0], c)) for c in clusters]
+        self.hierarch = clusters
 
     def gmmBranch(self, level, random_state):
         X, p, mu = level
