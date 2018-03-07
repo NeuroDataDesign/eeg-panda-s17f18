@@ -19,8 +19,8 @@ from nilearn import plotting as nilplot
 import nibabel as nib
 
 from lemur import embedders as leb
-from lemur.utils import qa_graphs as qg
-from lemur.utils import qa_graphs_plotting as qgp
+from .utils import qa_graphs as qg
+from .utils import qa_graphs_plotting as qgp
 
 def get_spaced_colors(n):
     max_value = 255
@@ -203,6 +203,37 @@ class Scatterplot(MatrixPlotter):
         trace = go.Scatter(x = self.DS.D.as_matrix()[:, 0],
                            y = self.DS.D.as_matrix()[:, 1],
                            mode = "markers")
+        data = [trace]
+        fig = dict(data=data, layout=layout)
+        return self.makeplot(fig, "agg/" + self.shortname)
+
+class ThreeDScatterplot(MatrixPlotter):
+    titlestring = "%s 3D Scatter Plot"
+    shortname = "3sp"
+
+    def plot(self):
+        title = self.titlestring % (self.DS.name)
+
+        if self.DS.d < 3:
+            print("Scatter plot must get at least 3 dimensional dataset")
+            return
+        xaxis = go.XAxis(title=list(self.DS.D)[0])
+        yaxis = go.YAxis(title=list(self.DS.D)[1])
+        zaxis = go.ZAxis(title=list(self.DS.D)[2])
+        layout = dict(title=title, scene=dict(
+            xaxis=xaxis,
+            yaxis=yaxis,
+            zaxis=zaxis
+        ))
+        trace = go.Scatter3d(
+            x=self.DS.D.as_matrix()[:, 0],
+            y=self.DS.D.as_matrix()[:, 1],
+            z=self.DS.D.as_matrix()[:, 2],
+            mode='markers',
+            marker=dict(
+                size=4
+            )
+        )
         data = [trace]
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
@@ -516,15 +547,17 @@ class EigenvectorHeatmap(MatrixPlotter):
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
 
-class HGMMClusterMeansDendrogram(MatrixPlotter):
-    titlestring = "%s HGMM Cluster Means Dendrogram, Level %d"
-    shortname = "hgmmcmd"
+class HierarchicalClusterMeansDendrogram(MatrixPlotter):
+
+    titlestring = "%s %s Cluster Means Dendrogram, Level %d"
+    shortname = "cmd"
 
     def plot(self):
-        title = self.titlestring % (self.DS.name, self.DS.levels)
+        title = self.titlestring % (self.DS.name, self.DS.clustname, self.DS.levels)
+        self.shortname = self.DS.shortclustname + self.shortname
         means = []
         for c in self.DS.clusters[self.DS.levels]:
-            means.append(c[2])
+            means.append(np.average(c, axis=0))
         X = np.column_stack(means).T
         fig = ff.create_dendrogram(X)
         fig["layout"]["title"] = title
@@ -535,25 +568,26 @@ class HGMMClusterMeansDendrogram(MatrixPlotter):
         return self.makeplot(fig, "agg/" + self.shortname)
 
 
-class HGMMStackedClusterMeansHeatmap(MatrixPlotter):
-    titlestring = "%s HGMM Stacked Cluster Means, Level %d"
-    shortname = "hgmmscmh"
+class HierarchicalStackedClusterMeansHeatmap(MatrixPlotter):
+    titlestring = "%s %s Stacked Cluster Means, Level %d"
+    shortname = "scmh"
 
     def plot(self, showticklabels=False):
-        title = self.titlestring % (self.DS.name, self.DS.levels)
+        title = self.titlestring % (self.DS.name, self.DS.clustname, self.DS.levels)
+        self.shortname = self.DS.shortclustname + self.shortname
 
         Xs = []
         for l in self.DS.clusters[1:self.DS.levels + 1]:
             #When number of samples is too high, need to downsample
-            freq = [c[1] for c in l]
+            freq = [c.shape[0] for c in l]
             if sum(freq) > 500:
                 freq = [round((x / sum(freq)) * 500) for x in freq]
                 if sum(freq) != 500: #Rounding can give numbers not exactly 500
-                    freq[freq.index(max(freq))] += 1
+                    freq[freq.index(max(freq))] += (500 - sum(freq))
 
             means = []
             for i, c in enumerate(l):
-                means += [c[2]] * freq[i]
+                means += [np.average(c, axis=0)] * freq[i]
 
             X = np.column_stack(means)
             Xs.append(X)
@@ -576,7 +610,7 @@ class HGMMStackedClusterMeansHeatmap(MatrixPlotter):
                 ticktext = y_labels,
                 tickvals = [i for i in range(len(y_labels))],
                 mirror=True)
-        emb_size = len(self.DS.clusters[0][0][2])
+        emb_size = len(np.average(self.DS.clusters[0][0], axis=0))
         bar_locations = np.arange(0, X.shape[0]  + emb_size - 1, emb_size) - 0.5
         shapes = [dict(type="line",x0=-0.5, x1=X.shape[1] - 0.5, y0=b, y1=b) for b in bar_locations]
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis, shapes=shapes)
@@ -584,21 +618,22 @@ class HGMMStackedClusterMeansHeatmap(MatrixPlotter):
         return self.makeplot(fig, "agg/" + self.shortname)
 
 
-class HGMMClusterMeansLevelHeatmap(MatrixPlotter):
-    titlestring = "%s HGMM Cluster Means, Level %d"
-    shortname = "hgmmcmlh"
+class ClusterMeansLevelHeatmap(MatrixPlotter):
+    titlestring = "%s %s Cluster Means, Level %d"
+    shortname = "cmlh"
 
     def plot(self, showticklabels=False):
-        title = self.titlestring % (self.DS.name, self.DS.levels)
+        title = self.titlestring % (self.DS.name, self.DS.clustname, self.DS.levels)
+        self.shortname = self.DS.shortclustname + self.shortname
 
         #When number of samples is too high, need to downsample
-        freq = [c[1] for c in self.DS.clusters[self.DS.levels]]
+        freq = [c.shape[0] for c in self.DS.clusters[self.DS.levels]]
         if sum(freq) > 500:
             freq = [round((x / sum(freq)) * 500) for x in freq]
 
         means = []
         for i, c in enumerate(self.DS.clusters[self.DS.levels]):
-            means += [c[2]] * freq[i]
+            means += [np.average(c, axis=0)] * freq[i]
         X = np.column_stack(means)
 
         trace = go.Heatmap(y = self.DS.columns,
@@ -620,22 +655,23 @@ class HGMMClusterMeansLevelHeatmap(MatrixPlotter):
         return self.makeplot(fig, "agg/" + self.shortname)
 
 
-class HGMMClusterMeansLevelLines(MatrixPlotter):
-    titlestring = "%s HGMM Cluster Means, Level %d"
-    shortname = "hgmmcmll"
+class ClusterMeansLevelLines(MatrixPlotter):
+    titlestring = "%s %s Cluster Means, Level %d"
+    shortname = "cmll"
 
     def plot(self, showticklabels=False):
-        title = self.titlestring % (self.DS.name, self.DS.levels)
+        title = self.titlestring % (self.DS.name, self.DS.clustname, self.DS.levels)
+        self.shortname = self.DS.shortclustname + self.shortname
         data = []
         colors = get_spaced_colors(len(self.DS.clusters[self.DS.levels]))
 
         #When number of samples is too high, need to downsample
-        freq = [c[1] for c in self.DS.clusters[self.DS.levels]]
+        freq = [c.shape[0] for c in self.DS.clusters[self.DS.levels]]
         if sum(freq) > 300:
             freq = [round((x / sum(freq)) * 300) for x in freq]
 
         for i, c in enumerate(self.DS.clusters[self.DS.levels]):
-            data.append(go.Scatter(x = c[2],
+            data.append(go.Scatter(x = np.average(c, axis=0),
                                    y = self.DS.columns,
                                    mode="lines",
                                    line=dict(width=np.sqrt(freq[i]), color=colors[i]),
@@ -653,36 +689,13 @@ class HGMMClusterMeansLevelLines(MatrixPlotter):
         return self.makeplot(fig, "agg/" + self.shortname)
 
 
-class HGMMPairsPlot(MatrixPlotter):
-    titlestring = "%s HGMM Classification Pairs Plot, Level %d"
-    shortname = "hgmmpp"
-
-    def plot(self):
-        title = self.titlestring % (self.DS.name, self.DS.levels)
-        data = []
-        colors = get_spaced_colors(len(self.DS.clusters[self.DS.levels]))
-        samples = []
-        labels = []
-        for i, c in enumerate(self.DS.clusters[self.DS.levels]):
-            samples.append(c[0].T)
-            labels.append(c[0].shape[0] * [i])
-        samples = np.hstack(samples)[:3, :]
-        labels = np.hstack(labels)
-        df = pd.DataFrame(samples.T, columns=["Dim %d"%i for i in range(samples.shape[0])])
-        df["label"] = ["Cluster %d"%i for i in labels]
-        fig = ff.create_scatterplotmatrix(df, diag='box', index="label", colormap=colors)
-        fig["layout"]["title"] = title
-        del fig.layout["width"]
-        del fig.layout["height"]
-        return self.makeplot(fig, "agg/" + self.shortname)
-
-
 class ClusterPairsPlot(MatrixPlotter):
-    titlestring = "%s Clustered Pairs Plot, Level %d"
+    titlestring = "%s %s Classification Pairs Plot, Level %d"
     shortname = "cpp"
 
     def plot(self):
-        title = self.titlestring % (self.DS.name, self.DS.levels)
+        title = self.titlestring % (self.DS.name, self.DS.clustname, self.DS.levels)
+        self.shortname = self.DS.shortclustname + self.shortname
         data = []
         colors = get_spaced_colors(len(self.DS.clusters[self.DS.levels]))
         samples = []

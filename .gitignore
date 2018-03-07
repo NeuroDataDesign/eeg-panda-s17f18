@@ -1,6 +1,7 @@
 .idea/*
 data/*
 app/data/*
+app/credentials
 app/foo.log
 app/foo.log.1
 credentials/*

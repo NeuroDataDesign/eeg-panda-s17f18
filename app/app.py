@@ -88,7 +88,7 @@ embedded_options = {
          'hgmmcmd'),
         ('HGMM Pairs Plot',
          'HGMMPairsPlot',
-          'hgmmpp'),
+          'hgmmcpp'),
         ('HGMM Cluster Means Level Lines',
          'HGMMClusterMeansLevelLines',
           'hgmmcmll'),

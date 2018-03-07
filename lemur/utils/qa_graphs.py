@@ -4,10 +4,10 @@
 # Edited by Coleman Zhang
 # Email: gkiar@jhu.edu
 
+from __future__ import print_function
 from argparse import ArgumentParser
 from collections import OrderedDict
 from scipy.stats import gaussian_kde, rankdata
-from __future__ import print_function
 
 import numpy as np
 import nibabel as nb
