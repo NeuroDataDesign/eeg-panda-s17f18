@@ -19,8 +19,8 @@ from nilearn import plotting as nilplot
 import nibabel as nib
 
 from lemur import embedders as leb
-from lemur.utils import qa_graphs as qg
-from lemur.utils import qa_graphs_plotting as qgp
+from .utils import qa_graphs as qg
+from .utils import qa_graphs_plotting as qgp
 
 def get_spaced_colors(n):
     max_value = 255
