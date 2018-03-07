@@ -1,8 +1,9 @@
-
+#Pfactor Distance Matrix
 y = matrix( c(1.631981049, 1.985156054, 1.324180567, 1.906069835, 1.971683558))
 r = dist(y, method = "euclidean", diag = TRUE, upper = TRUE, p = 2)
 r
 
+#Incidence Edgelist to Adjacency Matrix
 os <- list()
 m <- 1
 files <- list.files(path = "~/edgelists/")
@@ -22,6 +23,7 @@ for (f in 1:length(files)){
   cat("Adjacency matrix for file", f,"produced.\n")
 }
 
+#Connectome Distance Matrix 
 m <- length(os)
 D <- matrix( rep(0, m*m), nrow = m )
 D[1,1] <- 0
@@ -39,6 +41,7 @@ for (i in 2:m) {
 
 View(D)
 
+#Run MGC on 2 Distance Matrices 
 require(mgc)
 require(ggplot2)
 require(latex2exp)
