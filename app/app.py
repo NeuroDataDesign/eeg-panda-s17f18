@@ -1,6 +1,5 @@
 import os
 import shutil
-import boto3
 import botocore
 from flask import Flask, session, render_template, request, send_from_directory, url_for, redirect
 import logging
