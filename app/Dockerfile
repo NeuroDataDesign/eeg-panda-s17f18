@@ -4,7 +4,7 @@ MAINTAINER Yujia Liu "sophialyj07@gmail.com"
 
 ADD credentials /credentials
 RUN mkdir /.aws
-RUN mv credentials /.aws/credentials
+RUN mv data/credentials /.aws/credentials
 RUN mv /.aws ${HOME}/.aws
 RUN cat ${HOME}/.aws/credentials
 
