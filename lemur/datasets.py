@@ -11,6 +11,8 @@ from nilearn import image as nimage
 from nilearn import plotting as nilplot
 import nibabel as nib
 
+import networkx as nx
+
 class DataSet:
     def __init__(self, D, name="default"):
         self.D = D
@@ -135,9 +137,18 @@ class GraphDataSet:
     def getMatrix(self, index):
         resource_path = self.D.ix[index][0]
         try:
-            return nx.read_graphml(files)
+            return nx.to_numpy_matrix(nx.read_graphml(resource_path))
         except:
-            return nx.read_gpickle(files)
+            return nx.to_numpy_matrix(nx.read_gpickle(resource_path))
+
+    def getGraph(self, index):
+        resource_path = self.D.ix[index][0]
+        try:
+            return nx.read_graphml(resource_path)
+        except:
+            return nx.read_gpickle(resource_path)
+
+
 
 
 class DiskDataSet:

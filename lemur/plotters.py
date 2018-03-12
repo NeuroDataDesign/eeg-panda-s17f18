@@ -149,8 +149,8 @@ class GraphPlotter:
 
     def makeplot(self, modality='dwi', atlas = None, log = True):
 
-        statsDict = qg.compute_metrics(fs, modality)
-        qpg.make_panel_plot(statsDict, outf, atlas, log, modality)
+        statsDict = qg.compute_metrics(self.fs, modality)
+        qgp.make_panel_plot(statsDict, self.outf, atlas, log, modality)
 
 
 class SquareHeatmap(MatrixPlotter):
@@ -724,7 +724,7 @@ class DistanceMatrixPlotter:
     primary_label : string
         The name of the column of the dataset which contains the primary label. By default, this is the `resource_path` column which is just the path to the data point resource.
     Attributes
-    ----------
+    ---------
     dataset_name : string
         The name of the dataset from which this distance matrix was computed.
     dm : :obj:`ndarray`
