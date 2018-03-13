@@ -1,5 +1,6 @@
 import os
 import imageio
+from itertools import product
 from PIL import ImageDraw, Image, ImageFont
 
 from plotly.offline import iplot, plot
@@ -12,6 +13,7 @@ import hashlib
 from ipywidgets import interact
 import random
 import scipy.signal as signal
+import scipy.stats as stats
 import colorlover as cl
 
 from nilearn import image as nimage
@@ -448,6 +450,53 @@ class HistogramHeatmap(MatrixPlotter):
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data = data, layout = layout)
         return self.makeplot(fig, "agg/" + self.shortname)
+
+class RidgeLine(MatrixPlotter):
+    titlestring = "%s Ridgeline Plot"
+    shortname = "ridgeline"
+    
+    def plot(self):
+        title = self.titlestring % (self.DS.name)
+        D = self.DS.D.as_matrix().T
+        columns = self.DS.D.columns
+        d, n = D.shape
+        D = (D - np.mean(D, axis=1).reshape(d, 1)) / np.std(D, axis=1).reshape(d, 1)
+        D = np.nan_to_num(D) # only nan if std all 0 -> all values 0
+        
+        min_val = np.floor(np.min(D))
+        if min_val < -5:
+            min_val = -5
+        max_val = np.ceil(np.max(D))
+        if max_val > 5:
+            max_val = 5
+            
+        x_range = np.linspace(min_val, max_val, 100)
+        # calculate guassian KDEs
+        kdes = []
+        for row in D:
+            kde = stats.kde.gaussian_kde(row)
+            kdes.append(kde(x_range))
+        
+        rows = int(np.ceil(d / 4))
+        fig = tools.make_subplots(rows=rows, cols=4, shared_xaxes=True, 
+                                  print_grid=False, horizontal_spacing=0.01,
+                                  subplot_titles=columns)
+        
+        plot_indicies = list(product(np.arange(1, rows+1, dtype=np.int), np.arange(1, 5, dtype=np.int)))
+        for idx, y in enumerate(kdes):
+            r, c = plot_indicies[idx]
+            trace = go.Scatter(
+                    x = x_range,
+                    y = y,
+                    mode = 'lines')
+            fig.append_trace(trace, r, c)
+            fig['layout']['yaxis{}'.format(idx+1)]['showticklabels'] = False
+            fig['layout']['xaxis{}'.format(c)]['title'] = 'Normalized Values'
+            fig['layout']['xaxis{}'.format(c)]['titlefont']['size'] = 12
+
+        fig['layout']['showlegend'] = False
+        return self.makeplot(fig, "agg/" + self.shortname)
+
 
 class CorrelationMatrix(MatrixPlotter):
     titlestring = "%s Correlation Matrix"
