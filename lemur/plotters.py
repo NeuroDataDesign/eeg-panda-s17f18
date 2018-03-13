@@ -101,9 +101,10 @@ class TimeSeriesPlotter:
 
     """
 
-    def __init__(self, DS, mode = "notebook", base_path=None):
+    def __init__(self, DS, mode="notebook", base_path=None):
         self.data = DS.D.as_matrix().T
         self.d, self.n = self.data.shape
+        self.d_names = DS.D.columns
         self.row_name = "Channels"
         self.col_name = "Time Points"
         self.resource_name = DS.name
@@ -301,20 +302,40 @@ class Heatmap(MatrixPlotter):
     titlestring = "%s Heatmap"
     shortname = "heatmap"
 
-    def plot(self):
+    def plot(self, showticklabels=False):
+        maximum = self.DS.D.max().max()
+        minimum = self.DS.D.min().min()
+        max_sign = np.sign(maximum) if np.sign(maximum) != 0 else 1
+        min_sign = np.sign(minimum) if np.sign(minimum) != 0 else 1
+
+        if max_sign == min_sign:
+            self.colorbar = self.Reds
+        else:
+            pos_prop = maximum / (maximum-minimum)
+            min_prop = -minimum / (maximum-minimum)
+            neg_spacing = np.linspace(0, 1 - pos_prop, 5)
+            pos_spacing = np.linspace(1 - pos_prop, 1, 5)
+            spacing = np.concatenate([neg_spacing, pos_spacing])
+            self.colorbar = list(zip(spacing, cl.scales['11']['div']['RdBu'][::-1]))
+
         title = self.titlestring % (self.DS.name)
         xaxis = go.XAxis(
-                title="observaions",
+                title="Observations",
                 ticktext = self.DS.D.index,
+                ticks="",
                 showticklabels=False,
                 tickvals = [i for i in range(len(self.DS.D.index))])
         yaxis = go.YAxis(
-                title="dimensions",
+                title="Dimensions",
                 ticktext = self.DS.D.columns,
-                showticklabels=False,
+                ticks="",
+                showticklabels=showticklabels,
                 tickvals = [i for i in range(len(self.DS.D.columns))])
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
-        trace = go.Heatmap(z = self.DS.D.as_matrix().T)
+        trace = go.Heatmap(z = self.DS.D.as_matrix().T,
+                           zmin = -maximum,
+                           zmax = maximum,
+                           colorscale=self.BuRd)
         data = [trace]
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
@@ -371,7 +392,7 @@ class HistogramHeatmap(MatrixPlotter):
     titlestring = "%s Histogram Heatmap"
     shortname = "histogramheat"
 
-    def plot(self, showticklabels=False):
+    def plot(self, showticklabels=False, scale=None):
         title = self.titlestring % (self.DS.name)
         D = self.DS.D.as_matrix().T
         d, n = D.shape
@@ -379,24 +400,25 @@ class HistogramHeatmap(MatrixPlotter):
         D = np.nan_to_num(D) # only nan if std all 0 -> all values 0
 
         num_bins = int(np.sqrt(2*n))
-        if num_bins > 15:
-            num_bins = 15
-
+        if num_bins > 20:
+            num_bins = 20
         min_val = np.floor(np.min(D))
         if min_val < -5:
             min_val = -5
-
         max_val = np.ceil(np.max(D))
         if max_val > 5:
             max_val = 5
-
         bins = np.linspace(min_val, max_val, (max_val - min_val) * num_bins + 1)
         bin_centers = (bins[1:] + bins[:-1]) / 2
         H = []
         for i in range(D.shape[0]):
             hist = np.histogram(D[i, :], bins=bins)[0]
             H.append(hist)
-        z = np.vstack(H)
+        z = np.vstack(H).astype(np.float)
+
+        if scale == 'log':
+            z[z > 0] = np.log(z[z > 0], dtype=np.float)
+
         trace = go.Heatmap(y = self.DS.D.columns,
                            z = z,
                            x = bins,
