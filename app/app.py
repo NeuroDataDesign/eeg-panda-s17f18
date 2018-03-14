@@ -120,13 +120,13 @@ embedded_options = {
 
 @app.route('/')
 def index():
-    return redirect(url_for('medahome'))
+    return redirect(url_for('uploadrender'))
 
 @app.route('/documentation')
 def documentation():
     return render_template('documentation.html')
 
-@app.route('/MEDA/home')
+@app.route('/MEDA/datasets')
 def medahome():
     basedir = os.path.join(APP_ROOT, 'data')
     if not os.path.exists(basedir):
@@ -156,7 +156,7 @@ def delete_dataset(dataset = None):
     shutil.rmtree(datadir+"/")
     return redirect(url_for('medahome'))
 
-@app.route('/MEDA/upload')
+@app.route('/MEDA/home')
 def uploadrender():
     return render_template("upload.html")
 
