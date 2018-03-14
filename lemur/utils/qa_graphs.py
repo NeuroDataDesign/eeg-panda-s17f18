@@ -12,7 +12,7 @@ from scipy.stats import gaussian_kde, rankdata
 import numpy as np
 import nibabel as nb
 import networkx as nx
-import pickle
+import pickle as pkl
 import sys
 import os
 
@@ -38,12 +38,12 @@ def loadGraphs(filenames, atlas = None, verb=False):
         #  Adds graphs to dictionary with key being filename
         fname = os.path.basename(files)
         try:
-            gstruct[fname] = nx.read_graphml(files)
+            gstruct[fname] = nx.read_weighted_edgelist(files)
         except:
             gstruct[fname] = nx.read_gpickle(files)
     return gstruct
 
-def compute_metrics(fs, verb=False, modality='dwi'):
+def compute_metrics(fs, verb=False, modality='dwi', thresh=0.1):
     """
     Given a set of files and a directory to put things, loads graphs and
     performs set of analyses on them, storing derivatives in a pickle format
@@ -62,16 +62,16 @@ def compute_metrics(fs, verb=False, modality='dwi'):
     """
     gr = loadGraphs(fs, verb=verb)
     if modality == 'func':
-        graphs = binGraphs(gr)
+        graphs = binGraphs(gr, thr=thresh)
     else:
         graphs = gr
  
-    nodes = nx.number_of_nodes(graphs.values()[0])
+    # nodes = nx.number_of_nodes(graphs.values()[0])
     #  Number of non-zero edges (i.e. binary edge count)
     print("Computing: NNZ")
     nnz = OrderedDict((subj, len(nx.edges(graphs[subj]))) for subj in graphs)
     statsDict = {'number_non_zeros': nnz}
-    print("Sample Mean: %.2f" % np.mean(nnz.values()))
+    print("Sample Mean: %.2f" % np.mean(list(nnz.values())))
 
     # Scan Statistic-1
     print("Computing: Max Local Statistic Sequence")
@@ -97,19 +97,23 @@ def compute_metrics(fs, verb=False, modality='dwi'):
 
     #  Degree sequence
     print("Computing: Degree Sequence")
-    total_deg = OrderedDict((subj, np.array(nx.degree(graphs[subj],
-                                                      **wt_args).values()))
+    total_deg = OrderedDict((subj, list(dict(nx.degree(graphs[subj],
+                                                      **wt_args)).values()))
                             for subj in graphs)
     ipso_deg = OrderedDict()
     contra_deg = OrderedDict()
     for subj in graphs:  # TODO GK: remove forloop and use comprehension maybe?
         g = graphs[subj]
+        node_list = list(g.nodes())
         N = len(g.nodes())
-        LLnodes = g.nodes()[0:N/2]  # TODO GK: don't assume hemispheres
+
+
+
+        LLnodes = node_list[0:int(N/2)]  # TODO GK: don't assume hemispheres
         LL = g.subgraph(LLnodes)
         LLdegs = [LL.degree(**wt_args)[n] for n in LLnodes]
 
-        RRnodes = g.nodes()[N/2:N]  # TODO GK: don't assume hemispheres
+        RRnodes = node_list[int(N/2):N]  # TODO GK: don't assume hemispheres
         RR = g.subgraph(RRnodes)
         RRdegs = [RR.degree(**wt_args)[n] for n in RRnodes]
 
@@ -124,28 +128,32 @@ def compute_metrics(fs, verb=False, modality='dwi'):
            'ipso_deg': ipso_deg,
            'contra_deg': contra_deg}
     statsDict['degree_distribution'] = deg
+    # print(list(total_deg.keys()))
+    # TODO: Figure out the issue with this
+    # pkl.dump(total_deg, open('../../../data/test_deg.pkl', 'w'))
+    print(total_deg)
     show_means(total_deg)
 
     #  Edge Weights
-    if modality == 'dwi':
-        print("Computing: Edge Weight Sequence")
-        temp_ew = OrderedDict((s, [graphs[s].get_edge_data(e[0], e[1])['weight']
-                               for e in graphs[s].edges()]) for s in graphs)
-        ew = temp_ew
-        statsDict['edge_weight'] = ew
-        show_means(temp_ew)
-    else:
-        temp_pl = OrderedDict()
-        print("Computing: Path Length Sequence")
-        nxappl = nx.all_pairs_dijkstra_path_length
-        for s in graphs:
-            apd = nxappl(graphs[s])
-            # iterate over the nodes to find the average distance to each node
-            avg_path = [np.nanmean(v.values()) for k, v in apd.iteritems()]
-            temp_pl[s] = np.array(avg_path)
-        pl = temp_pl
-        statsDict['path_length'] = pl
-        show_means(pl)
+    #if modality == 'dwi':
+    print("Computing: Edge Weight Sequence")
+    temp_ew = OrderedDict((s, [graphs[s].get_edge_data(e[0], e[1])['weight']
+                           for e in graphs[s].edges()]) for s in graphs)
+    ew = temp_ew
+    statsDict['edge_weight'] = ew
+    show_means(temp_ew)
+    # else:
+    #     temp_pl = OrderedDict()
+    #     print("Computing: Path Length Sequence")
+    #     nxappl = nx.all_pairs_dijkstra_path_length
+    #     for s in graphs:
+    #         apd = nxappl(graphs[s])
+    #         # iterate over the nodes to find the average distance to each node
+    #         avg_path = [np.nanmean(np.array(list(v.values()))) for k, v in apd]
+    #         temp_pl[s] = np.array(avg_path)
+    #     pl = temp_pl
+    #     statsDict['path_length'] = pl
+    #     show_means(pl)
 
     # Eigen Values
     print("Computing: Eigen Value Sequence")
@@ -170,8 +178,8 @@ def compute_metrics(fs, verb=False, modality='dwi'):
     print("Computing: Mean Connectome")
     nxnp = nx.to_numpy_matrix
     adj = OrderedDict((subj, nxnp(graph, nodelist=sorted(graph.nodes())))
-                      for subj, graph in graphs.iteritems())
-    mat = np.zeros(adj.values()[0].shape)
+                      for subj, graph in graphs.items())
+    mat = np.zeros(list(adj.values())[0].shape)
     for subj in adj:
         mat += adj[subj]
     mat = mat/len(adj.keys())
@@ -180,8 +188,8 @@ def compute_metrics(fs, verb=False, modality='dwi'):
 
 
 def show_means(data):
-    print("Subject Means: " + ", ".join(["%.2f" % np.mean(data[key])
-                                         for key in data.keys()]))
+    print("Subject Means: " + ", ".join(["%.2f" % np.mean(list(value))
+                                         for value in data.values()]))
 
 def binGraphs(graphs, thr=0.1):
     """
@@ -194,7 +202,7 @@ def binGraphs(graphs, thr=0.1):
               .1 is chosen as default according to discriminability results.
     """
     binGraphs = {}
-    for subj, graph in graphs.iteritems():
+    for subj, graph in graphs.items():
         bin_graph = nx.Graph()
         for (u, v, d) in graph.edges(data=True):
             if d['weight'] > thr:
@@ -211,7 +219,7 @@ def rankGraphs(graphs):
             - a list of graphs.
     """
     rankGraphs = {}
-    for subj, graph in graphs.iteritems():
+    for subj, graph in graphs.items():
         rgraph = nx.Graph()
         edge_ar = np.asarray([x[2]['weight'] for x in graph.edges(data=True)])
         rank_edge = rankdata(edge_ar)  # rank the edges

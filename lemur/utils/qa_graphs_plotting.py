@@ -6,11 +6,9 @@
 from argparse import ArgumentParser
 from plotly.offline import download_plotlyjs, init_notebook_mode, iplot, plot
 from . import plotly_helper as pp
-import pickle
 import numpy as np
-import os
 
-def make_panel_plot(statsDict, outf, dataset=None, atlas = None, minimal=True, 
+def make_panel_plot(statsDict, outf, dataset=None, atlas = None, minimal=True,
                     log=True, hemispheres=True, modality='dwi'):
 
     """
@@ -48,17 +46,26 @@ def make_panel_plot(statsDict, outf, dataset=None, atlas = None, minimal=True,
     
     for idx, curr in enumerate(dictKeys):
         dat = statsDict[dictKeys[idx]]
+        # print(dat)
         if dictKeys[idx] == 'number_non_zeros':
-            fig = pp.plot_rugdensity(dat.values())
+            fig = pp.plot_rugdensity(list(dat.values()))
         elif dictKeys[idx] == 'edge_weight':
             edges = np.max([len(dat[i]) for i in dat.keys()])
-            fig = pp.plot_series(dat.values(), sort=True)
+            fig = pp.plot_series(list(dat.values()), sort=True)
         elif dictKeys[idx] == 'degree_distribution':
             fig = pp.plot_degrees(dat, hemi=hemispheres)
             if hemispheres:
-                maxdat = np.max([np.max(dat[key][k]) 
-                                 for key in dat.keys()
-                                 for k in dat[key]])
+                # maxdat = 0
+                # for val in dat.values():
+                #     for v in val.values():
+                #         print(type(v))
+                #         print(v)
+                #         for deg in v:
+                #             if deg > maxdat:
+                #                 maxdat = deg
+                maxdat = np.max([np.max(list(v))
+                                  for val in dat.values()
+                                  for v in val.values()])
                 anno = [dict(x=dims/3,
                              y=4*float(maxdat/7),
                              xref='x3',
@@ -80,9 +87,11 @@ def make_panel_plot(statsDict, outf, dataset=None, atlas = None, minimal=True,
                 dat = np.log10(dat+1)
             fig = pp.plot_heatmap(dat, name=labs[idx])
         else:
-            dims = len(dat.values()[0])
-            fig = pp.plot_series(dat.values())
-        traces += [fig_to_trace(fig)]
+            dims = len(list(dat.values())[0])
+            fig = pp.plot_series(list(dat.values()))
+        # print('fig ' + dictKeys[idx])
+        # print(fig)
+        traces += [pp.fig_to_trace(fig)]
 
     multi = pp.traces_to_panels(traces)
     for idx, curr, in enumerate(dictKeys):
@@ -145,3 +154,4 @@ def make_panel_plot(statsDict, outf, dataset=None, atlas = None, minimal=True,
         multi = pp.panel_invisible(multi, 8)
 
     plot(multi, validate=False, filename=outf+'.html')
+    # iplot(multi, validate=False)

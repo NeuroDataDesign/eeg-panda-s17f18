@@ -72,7 +72,7 @@ def plot_series(dats, name=None, ylab=None, xlab=None, sort=False):
         data += [
                  Scatter(
                          x=np.linspace(1, len(ys), len(ys)),
-                         y=ys,
+                         y=list(ys),
                          line=Line(
                                    color='rgba(0,0,0,%1.2f)' % (4.0/len(dats))
                                   ),

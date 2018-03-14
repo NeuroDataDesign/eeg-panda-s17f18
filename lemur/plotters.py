@@ -149,8 +149,8 @@ class GraphPlotter:
 
     def makeplot(self, modality='dwi', atlas = None, log = True):
 
-        statsDict = qg.compute_metrics(self.fs, modality)
-        qgp.make_panel_plot(statsDict, self.outf, atlas, log, modality)
+        statsDict = qg.compute_metrics(self.file_list, modality=modality)
+        qgp.make_panel_plot(statsDict, self.outf, atlas=atlas, log=log, modality=modality)
 
 
 class SquareHeatmap(MatrixPlotter):
