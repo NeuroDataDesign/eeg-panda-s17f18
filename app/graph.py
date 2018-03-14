@@ -22,7 +22,7 @@ def run_graph(name):
   DATASET = "%s/graph"%(name)
   root = os.path.join(BASE, DATASET)
   bp = lds.BIDSParser(root)
-  dataset_descriptor = bp.getModalityFrame("func", ".edgelist").iloc[:6]
+  dataset_descriptor = bp.getModalityFrame("func", ".edgelist")
   print(dataset_descriptor)
   out_base = os.path.join(BASE, name, "graph_derivatives")
   out_emb_base = os.path.join(BASE, name, "graph_embedded_deriatives")
