@@ -24,29 +24,22 @@
                 Welcome to Red Lemur!
             </center>
         </h1>
-        <!-- <h4>
-            <center>
-                Phenotypic Data
-            </center>
-        </h4>
-        <h4>
-            <center>
-                EEG and fMRI Data
-            </center>
-        </h4>-->
+        <br />
     </div>
-
 
     <div class="container top-buffer">
         <center>
             <h1>Upload Data</h1>
+            <h5>Ingest EEG and FMRI data directly from an Amazon S3 bucket! See <a  href='https://docs.google.com/document/d/1YNnyyvqTaP9zB6VZcr23gFCxkfceQQQlFtdaQwF3WdQ/edit?usp=sharing'>documentation</a>.</h5><br>
         </center>
+        <br />
         <form class="form-group" id="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
             <div class="row form-inline">
                 <div class="col-sm-4">
                     <h4><b>Phenotypic:</b></h4>
                     <p>Stored data in a CSV, subjects as rows, tests as columns</p>
                     <strong>Phenotypic data (.csv) </strong><br>
+
                     <label style="margin-right:20px" class="btn btn-light">
                         <input id="file-picker" type="file" name="pheno" accept="text/csv">
                     </label>
