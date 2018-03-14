@@ -122,6 +122,10 @@ embedded_options = {
 def index():
     return redirect(url_for('medahome'))
 
+@app.route('/documentation')
+def documentation():
+    return render_template('documentation.html')
+
 @app.route('/MEDA/home')
 def medahome():
     basedir = os.path.join(APP_ROOT, 'data')
