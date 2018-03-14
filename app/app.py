@@ -62,7 +62,8 @@ aggregate_options = {
         ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
         ('Location Lines', 'LocationLines', 'locationlines'),
         ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
-        ('Scree Plot', 'ScreePlotter', 'scree')
+        ('Scree Plot', 'ScreePlotter', 'scree'),
+        ('Graph Stats', 'GraphStats', 'gr_stats')
     ]
 }
 

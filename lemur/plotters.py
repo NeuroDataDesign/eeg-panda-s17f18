@@ -152,15 +152,21 @@ class GraphPlotter:
     outf: string
         name of plotly html output file
     """
-    def __init__(self, fs, outf):
+    def __init__(self, DS, base_path = None):
 
-        self.file_list = fs
-        self.outf = outf
+        self.file_list = list(DS.D['resource_path'])
+        self.outf = "agg/gr_stats"
+        self.base_path = base_path
 
     def makeplot(self, modality='dwi', atlas = None, log = True):
 
         statsDict = qg.compute_metrics(self.file_list, modality=modality)
-        qgp.make_panel_plot(statsDict, self.outf, atlas=atlas, log=log, modality=modality)
+        div = qgp.make_panel_plot(statsDict, self.outf, atlas=atlas, log=log, modality=modality)
+        path = os.path.join(self.base_path, self.outf + ".html")
+        os.makedirs("/".join(path.split("/")[:-1]), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(div)
+            f.close()
 
 
 class SquareHeatmap(MatrixPlotter):

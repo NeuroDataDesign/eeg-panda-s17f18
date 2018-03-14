@@ -153,5 +153,5 @@ def make_panel_plot(statsDict, outf, dataset=None, atlas = None, minimal=True,
         multi.layout['y'+key]['title'] = ''
         multi = pp.panel_invisible(multi, 8)
 
-    plot(multi, validate=False, filename=outf+'.html')
+    return plot(multi, validate=False, output_type='div', include_plotlyjs=False)
     # iplot(multi, validate=False)

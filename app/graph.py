@@ -130,3 +130,5 @@ def run_graph(name):
       lpl.ClusterMeansLevelLines(hgmm, mode="savediv", base_path=out_emb_base).plot()
   except:
       print("Number components was greater than number of data points.")
+
+  lpl.GraphPlotter(gds, base_path=out_base).makeplot(modality='func')
