@@ -375,6 +375,8 @@ class Heatmap(MatrixPlotter):
                 showticklabels=showticklabels,
                 tickvals = [i for i in range(len(self.DS.D.columns))])
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+
+        maximum = self.DS.D.max().max()
         trace = go.Heatmap(z = self.DS.D.as_matrix().T,
                            zmin = -maximum,
                            zmax = maximum,
