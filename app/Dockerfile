@@ -2,9 +2,9 @@ FROM ubuntu:latest
   
 MAINTAINER Yujia Liu "sophialyj07@gmail.com"
 
-ADD credentials /credentials
+ADD data/credentials /credentials
 RUN mkdir /.aws
-RUN mv data/credentials /.aws/credentials
+RUN mv credentials /.aws/credentials
 RUN mv /.aws ${HOME}/.aws
 RUN cat ${HOME}/.aws/credentials
 
