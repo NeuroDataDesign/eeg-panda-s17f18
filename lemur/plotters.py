@@ -361,21 +361,6 @@ class Heatmap(MatrixPlotter):
     shortname = "heatmap"
 
     def plot(self, showticklabels=False):
-        maximum = self.DS.D.max().max()
-        minimum = self.DS.D.min().min()
-        max_sign = np.sign(maximum) if np.sign(maximum) != 0 else 1
-        min_sign = np.sign(minimum) if np.sign(minimum) != 0 else 1
-
-        if max_sign == min_sign:
-            self.colorbar = self.Reds
-        else:
-            pos_prop = maximum / (maximum-minimum)
-            min_prop = -minimum / (maximum-minimum)
-            neg_spacing = np.linspace(0, 1 - pos_prop, 5)
-            pos_spacing = np.linspace(1 - pos_prop, 1, 5)
-            spacing = np.concatenate([neg_spacing, pos_spacing])
-            self.colorbar = list(zip(spacing, cl.scales['11']['div']['RdBu'][::-1]))
-
         title = self.titlestring % (self.DS.name)
         xaxis = go.XAxis(
                 title="Observations",
