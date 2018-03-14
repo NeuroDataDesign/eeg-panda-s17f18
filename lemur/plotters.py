@@ -219,6 +219,38 @@ class Scatterplot(MatrixPlotter):
         return self.makeplot(fig, "agg/" + self.shortname)
 
 
+class ThreeDScatterplot(MatrixPlotter):
+    titlestring = "%s 3D Scatter Plot"
+    shortname = "3sp"
+
+    def plot(self):
+        title = self.titlestring % (self.DS.name)
+
+        if self.DS.d < 3:
+            print("Scatter plot must get at least 3 dimensional dataset")
+            return
+        xaxis = go.XAxis(title=list(self.DS.D)[0])
+        yaxis = go.YAxis(title=list(self.DS.D)[1])
+        zaxis = go.ZAxis(title=list(self.DS.D)[2])
+        layout = dict(title=title, scene=dict(
+            xaxis=xaxis,
+            yaxis=yaxis,
+            zaxis=zaxis
+        ))
+        trace = go.Scatter3d(
+            x=self.DS.D.as_matrix()[:, 0],
+            y=self.DS.D.as_matrix()[:, 1],
+            z=self.DS.D.as_matrix()[:, 2],
+            mode='markers',
+            marker=dict(
+                size=4
+            )
+        )
+        data = [trace]
+        fig = dict(data=data, layout=layout)
+        return self.makeplot(fig, "agg/" + self.shortname)
+
+
 class SpatialConnectivity(MatrixPlotter):
     titlestring = "%s Spatial Connectivity"
     shortname = "spatialconn"
@@ -568,9 +600,9 @@ class EigenvectorHeatmap(MatrixPlotter):
         return self.makeplot(fig, "agg/" + self.shortname)
 
 
-class HGMMClusterMeansDendrogram(MatrixPlotter):
-    titlestring = "%s HGMM Cluster Means Dendrogram, Level %d"
-    shortname = "hgmmcmd"
+class HierarchicalClusterMeansDendrogram(MatrixPlotter):
+    titlestring = "%s %s Cluster Means Dendrogram, Level %d"
+    shortname = "cmd"
 
     def plot(self):
         title = self.titlestring % (self.DS.name, self.DS.clustname, self.DS.levels)
