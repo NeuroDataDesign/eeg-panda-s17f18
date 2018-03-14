@@ -43,6 +43,12 @@ class MatrixPlotter:
         self.plot_mode = mode
         self.base_path = base_path
 
+        Reds = cl.scales['8']['seq']['Reds']
+        self.Reds = list(zip(np.linspace(0, 1, len(Reds)), Reds))
+
+        BuRd = cl.scales['11']['div']['RdBu'][::-1]
+        self.BuRd = list(zip(np.linspace(0, 1, len(BuRd)), BuRd))
+
     def makeplot(self, fig, local_path=None):
         """Make the plotly figure visable to the user in the way they want.
 
@@ -99,9 +105,10 @@ class TimeSeriesPlotter:
 
     """
 
-    def __init__(self, DS, mode = "notebook", base_path=None):
+    def __init__(self, DS, mode="notebook", base_path=None):
         self.data = DS.D.as_matrix().T
         self.d, self.n = self.data.shape
+        self.d_names = DS.D.columns
         self.row_name = "Channels"
         self.col_name = "Time Points"
         self.resource_name = DS.name
@@ -188,6 +195,7 @@ class SquareHeatmap(MatrixPlotter):
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
 
+
 class Scatterplot(MatrixPlotter):
     titlestring = "%s Scatterplot"
     shortname = "scatter"
@@ -209,6 +217,7 @@ class Scatterplot(MatrixPlotter):
         data = [trace]
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
+
 
 class ThreeDScatterplot(MatrixPlotter):
     titlestring = "%s 3D Scatter Plot"
@@ -240,6 +249,7 @@ class ThreeDScatterplot(MatrixPlotter):
         data = [trace]
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
+
 
 class SpatialConnectivity(MatrixPlotter):
     titlestring = "%s Spatial Connectivity"
@@ -350,20 +360,27 @@ class Heatmap(MatrixPlotter):
     titlestring = "%s Heatmap"
     shortname = "heatmap"
 
-    def plot(self):
+    def plot(self, showticklabels=False):
         title = self.titlestring % (self.DS.name)
         xaxis = go.XAxis(
-                title="observaions",
+                title="Observations",
                 ticktext = self.DS.D.index,
+                ticks="",
                 showticklabels=False,
                 tickvals = [i for i in range(len(self.DS.D.index))])
         yaxis = go.YAxis(
-                title="dimensions",
+                title="Dimensions",
                 ticktext = self.DS.D.columns,
-                showticklabels=False,
+                ticks="",
+                showticklabels=showticklabels,
                 tickvals = [i for i in range(len(self.DS.D.columns))])
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
-        trace = go.Heatmap(z = self.DS.D.as_matrix().T)
+
+        maximum = self.DS.D.max().max()
+        trace = go.Heatmap(z = self.DS.D.as_matrix().T,
+                           zmin = -maximum,
+                           zmax = maximum,
+                           colorscale=self.BuRd)
         data = [trace]
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
@@ -387,7 +404,8 @@ class LocationHeatmap(MatrixPlotter):
                 showticklabels=showticklabels)
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         trace = go.Heatmap(x = self.DS.D.columns,
-                           z = z)
+                           z = z,
+                           colorscale=self.Reds)
         data = [trace]
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
@@ -419,30 +437,44 @@ class HistogramHeatmap(MatrixPlotter):
     titlestring = "%s Histogram Heatmap"
     shortname = "histogramheat"
 
-    def plot(self, showticklabels=False):
+    def plot(self, showticklabels=False, scale=None):
         title = self.titlestring % (self.DS.name)
         D = self.DS.D.as_matrix().T
         d, n = D.shape
         D = (D - np.mean(D, axis=1).reshape(d, 1)) / np.std(D, axis=1).reshape(d, 1)
         D = np.nan_to_num(D) # only nan if std all 0 -> all values 0
-        num_bins = int(np.sqrt(n))
-        bins = np.linspace(-5, 5, num_bins + 1)
+
+        num_bins = int(np.sqrt(2*n))
+        if num_bins > 20:
+            num_bins = 20
+        min_val = np.floor(np.min(D))
+        if min_val < -5:
+            min_val = -5
+        max_val = np.ceil(np.max(D))
+        if max_val > 5:
+            max_val = 5
+        bins = np.linspace(min_val, max_val, (max_val - min_val) * num_bins + 1)
         bin_centers = (bins[1:] + bins[:-1]) / 2
         H = []
         for i in range(D.shape[0]):
-            hist = np.histogram(D[i, :], bins = bins)[0]
+            hist = np.histogram(D[i, :], bins=bins)[0]
             H.append(hist)
-        z = np.vstack(H)
+        z = np.vstack(H).astype(np.float)
+
+        if scale == 'log':
+            z[z > 0] = np.log(z[z > 0], dtype=np.float)
+
         trace = go.Heatmap(y = self.DS.D.columns,
-                           z = z)
+                           z = z,
+                           x = bins,
+                           colorscale=self.Reds,
+                           colorbar=go.ColorBar(title='Counts'))
         data = [trace]
         xaxis = go.XAxis(
                 title="Normalized Value",
-                ticktext = list(map(lambda x: "%0.4f"%x, bin_centers)),
-                ticks = "",
+                ticks = "outside",
                 showticklabels=True,
-                mirror=True,
-                tickvals = [i for i in range(len(bin_centers))])
+                )
         yaxis = go.YAxis(
                 title="Dimensions",
                 ticks = "",
@@ -451,6 +483,7 @@ class HistogramHeatmap(MatrixPlotter):
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data = data, layout = layout)
         return self.makeplot(fig, "agg/" + self.shortname)
+
 
 class RidgeLine(MatrixPlotter):
     titlestring = "%s Ridgeline Plot"
@@ -530,9 +563,11 @@ class CorrelationMatrix(MatrixPlotter):
                            y = self.DS.D.columns,
                            z = C,
                            zmin = -1,
-                           zmax = 1)
+                           zmax = 1,
+                           colorscale=self.BuRd)
         fig = dict(data=[trace], layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
+
 
 class ScreePlotter(MatrixPlotter):
     titlestring = "%s Scree Plot"
@@ -564,6 +599,7 @@ class ScreePlotter(MatrixPlotter):
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
+
 
 class EigenvectorHeatmap(MatrixPlotter):
     titlestring = "%s Eigenvector Heatmap"
@@ -597,8 +633,8 @@ class EigenvectorHeatmap(MatrixPlotter):
         fig = dict(data=data, layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
 
-class HierarchicalClusterMeansDendrogram(MatrixPlotter):
 
+class HierarchicalClusterMeansDendrogram(MatrixPlotter):
     titlestring = "%s %s Cluster Means Dendrogram, Level %d"
     shortname = "cmd"
 
@@ -645,7 +681,8 @@ class HierarchicalStackedClusterMeansHeatmap(MatrixPlotter):
         y_labels = np.tile(self.DS.columns, X.shape[0] // len(self.DS.columns))[::-1]
         trace = go.Heatmap(z = X,
                            zmin = -np.max(X),
-                           zmax = np.max(X))
+                           zmax = np.max(X),
+                           colorscale=self.BuRd)
         data = [trace]
         xaxis = go.XAxis(
                 title="Clusters",
@@ -685,9 +722,12 @@ class ClusterMeansLevelHeatmap(MatrixPlotter):
         for i, c in enumerate(self.DS.clusters[self.DS.levels]):
             means += [np.average(c, axis=0)] * freq[i]
         X = np.column_stack(means)
-
-        trace = go.Heatmap(y = self.DS.columns,
-                           z = X)
+        print(X.shape)
+        trace = go.Heatmap(y = self.DS.columns[::-1],
+                           z = np.flipud(X),
+                           zmin = -np.max(X),
+                           zmax = np.max(X),
+                           colorscale=self.BuRd)
         data = [trace]
         xaxis = go.XAxis(
                 title="Clusters",
