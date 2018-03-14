@@ -1,12 +1,12 @@
 import os
 import shutil
-import boto3
 import botocore
 from flask import Flask, session, render_template, request, send_from_directory, url_for, redirect
 import logging
 from logging.handlers import RotatingFileHandler
 import json
-from subprocess import call
+from subprocess import Popen, call, PIPE
+import pexpect
 
 import eeg
 import fmri
@@ -88,7 +88,7 @@ embedded_options = {
          'hgmmcmd'),
         ('HGMM Pairs Plot',
          'HGMMPairsPlot',
-          'hgmmpp'),
+          'hgmmcpp'),
         ('HGMM Cluster Means Level Lines',
          'HGMMClusterMeansLevelLines',
           'hgmmcmll'),
@@ -121,6 +121,10 @@ embedded_options = {
 @app.route('/')
 def index():
     return redirect(url_for('medahome'))
+
+@app.route('/documentation')
+def documentation():
+    return render_template('documentation.html')
 
 @app.route('/MEDA/home')
 def medahome():
@@ -269,13 +273,31 @@ def upload():
         if session[name+'_data'] is not None:
             # Download EEG patients
             app.logger.info("Downloading "+name+" Data...")
-            credential_info = open(session[name+'_data'], 'r').read()
-            bucket_name = credential_info.split(",")[0]
+
+            # Collect AWS credentials,
+            credential_info = open(session[name+'_data'], 'r').read().split(",")
+            bucket_name = credential_info[0]
+            ACCESS_KEY = str(credential_info[1])
+            SECRET_KEY = str(credential_info[2])
+
+            # Download files
+            '''
+            s3 = boto3.resource('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY, region_name='us-east-1')
+            bucket = s3.Bucket(bucket_name)
+            for elem in bucket.list():
+                key = elem.name.encode('utf-8')
+                bucket.download_file(key, os.path.join(session['basepath'], name)+"/"+str(key.split('/')[-1]))
+            '''
+
+            # Configre AWS Credentials
+
             cmd = ["aws", "s3",
                    "cp", ("s3://%s/"+name)%(bucket_name),
                    os.path.join(session['basepath'], name), "--recursive"]
             app.logger.info(name+" Data Downloaded")
             call(cmd)
+
+
             run_modality(name, os.path.basename(session['basepath']))
 
     # For modalities in which you upload the dataset itself.

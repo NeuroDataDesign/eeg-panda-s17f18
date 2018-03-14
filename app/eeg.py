@@ -21,7 +21,6 @@ def run_eeg(name):
   BASE = "data"
   DATASET = "%s/eeg"%(name)
   root = os.path.join(BASE, DATASET)
-  print(root)
   bp = lds.BIDSParser(root)
   dataset_descriptor = bp.getModalityFrame("preprocessed", ".pkl").iloc[:6]
   print(dataset_descriptor)

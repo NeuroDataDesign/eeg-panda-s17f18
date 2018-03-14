@@ -19,6 +19,7 @@ sys.path.append(".")
 import lemur.datasets as lds
 import lemur.metrics as lms
 import lemur.plotters as lpl
+import lemur.clustering as lcl
 import lemur.embedders as leb
 
 def run_pheno(name):
@@ -91,31 +92,35 @@ def run_pheno(name):
     lpl.EigenvectorHeatmap(HBN_Embedded, mode="savediv", base_path=out_base).plot()
 
 
-    # In[ ]:
-
-
-    lpl.HGMMPairsPlot(HBN_Embedded, mode="savediv", base_path=out_emb_base).plot(level=1)
-
+    ##### Clustering
+    hgmm = lcl.HGMMClustering(HBN_Embedded, 4)
+    hgmm.cluster()
 
     # In[ ]:
 
 
-    lpl.HGMMClusterMeansDendrogram(HBN_Embedded, mode="savediv", base_path=out_emb_base).plot(level=1)
-
-
-    # In[ ]:
-
-
-    lpl.HGMMStackedClusterMeansHeatmap(HBN_Embedded, mode="savediv", base_path=out_emb_base).plot(level=4)
+    lpl.ClusterPairsPlot(hgmm, mode="savediv", base_path=out_emb_base).plot()
 
 
     # In[ ]:
 
 
-    lpl.HGMMClusterMeansLevelHeatmap(HBN_Embedded, mode="savediv", base_path=out_emb_base).plot(level=4)
+    lpl.HierarchicalClusterMeansDendrogram(hgmm, mode="savediv", base_path=out_emb_base).plot()
 
 
     # In[ ]:
 
 
-    lpl.HGMMClusterMeansLevelLines(HBN_Embedded, mode="savediv", base_path=out_emb_base).plot(level=4)
+    lpl.HierarchicalStackedClusterMeansHeatmap(hgmm, mode="savediv", base_path=out_emb_base).plot()
+
+
+    # In[ ]:
+
+
+    lpl.ClusterMeansLevelHeatmap(hgmm, mode="savediv", base_path=out_emb_base).plot()
+
+
+    # In[ ]:
+
+
+    lpl.ClusterMeansLevelLines(hgmm, mode="savediv", base_path=out_emb_base).plot()

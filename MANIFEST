@@ -8,3 +8,8 @@ lemur/embedders.py
 lemur/get-pip.py
 lemur/metrics.py
 lemur/plotters.py
+lemur/utils/__init__.py
+lemur/utils/plotly_helper.py
+lemur/utils/qa_graphs.py
+lemur/utils/qa_graphs_plotting.py
+lemur/utils/toy.py

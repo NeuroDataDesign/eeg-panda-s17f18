@@ -11,6 +11,8 @@ from nilearn import image as nimage
 from nilearn import plotting as nilplot
 import nibabel as nib
 
+import networkx as nx
+
 class DataSet:
     def __init__(self, D, name="default"):
         self.D = D
@@ -118,6 +120,28 @@ class EEGDataSet:
         name = "%s/%s"%(resource[1], resource[2])
         DS = DataSet(D, name)
         return DS
+
+class GraphDataSet:
+
+    def __init__(self, dataframe_descriptor, name="fmri"):
+        self.D = dataframe_descriptor
+        self.D.index = self.D["subjects"].astype(str) + "-" + self.D["tasks"].astype(str)
+        self.D.index.name = "index"
+        self.name = name
+        self.n = self.D.shape[0]
+
+    def getResource(self, index):
+        resource = self.D.ix[index]
+        return resource
+
+    def getMatrix(self, index):
+        resource_path = self.D.ix[index][0]
+        return nx.to_numpy_matrix(nx.read_weighted_edgelist(resource_path))
+
+    def getGraph(self, index):
+        resource_path = self.D.ix[index][0]
+        return nx.read_weighted_edgelist(resource_path)
+
 
 
 
