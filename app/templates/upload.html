@@ -67,6 +67,17 @@
                     </label>
                     <div id="msg"></div>
                 </div>
+                <div class="col-sm-4">
+                    <h4><b>Graphs:</b></h4>
+                    <p>Store credentials to an AWS bucket in a CSV as follows:</p>
+                    <p style="font-size:14px">AWS_bucket_name,AWS_access_key,AWS_secret_key</p>
+                    <p>Bucket must be in <a href="http://bids.neuroimaging.io/bids_spec.pdf">BIDS Format</a></p>
+                    <strong>AWS Credentials (.csv)</strong><br>
+                    <label style="margin-right:20px" class="btn btn-light">
+                        <input id="file-picker" type="file" name="graph" accept="text/csv">
+                    </label>
+                    <div id="msg"></div>
+                </div>
             </div>
             <div class="row top-buffer">
                 <div class="col-sm-4 offset-sm-4">

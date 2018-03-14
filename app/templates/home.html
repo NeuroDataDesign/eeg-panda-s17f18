@@ -20,7 +20,7 @@
                     <td><a  href="/MEDA/plot/{{ meta.name }}/pheno/None/default">{{ meta.name }}</a></td>
                     <td>{{ meta.n }}</td>
                     <td>{{ meta.d }}</td>
-                    <td><a  href='/MEDA/home/delete/{{ meta.name }}'>Delete</a></td>
+                    <td><a  href='/MEDA/datasets/delete/{{ meta.name }}'>Delete</a></td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -40,7 +40,7 @@
                 <tr>
                     <td>{{loop.index}}</td>
                     <td><a  href="/MEDA/plot/{{ eeg }}/eeg/none/default">{{ eeg }}</a></td>
-                    <td><a  href='/MEDA/home/delete/{{ eeg }}'>Delete</a></td>
+                    <td><a  href='/MEDA/datasets/delete/{{ eeg }}'>Delete</a></td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -60,7 +60,27 @@
                 <tr>
                     <td>{{loop.index}}</td>
                     <td><a  href="/MEDA/plot/{{ fmri }}/fmri/none/default">{{ fmri }}</a></td>
-                    <td><a  href='/MEDA/home/delete/{{ fmri }}'>Delete</a></td>
+                    <td><a  href='/MEDA/datasets/delete/{{ fmri }}'>Delete</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <h1>Graph Datasets</h1>
+        <table class="table">
+            <thead class="thead">
+            <tr>
+                <th>#</th>
+                <th>Dataset Name</th>
+                <th></th>
+            <tr>
+            </thead>
+            <tbody>
+            {% for graph in graphs  %}
+                <tr>
+                    <td>{{loop.index}}</td>
+                    <td><a  href="/MEDA/plot/{{ graph }}/graph/none/default">{{ graph }}</a></td>
+                    <td><a  href='/MEDA/datasets/delete/{{ graph }}'>Delete</a></td>
                 </tr>
             {% endfor %}
             </tbody>

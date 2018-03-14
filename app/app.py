@@ -11,6 +11,7 @@ import pexpect
 import eeg
 import fmri
 import pheno
+import graph
 
 import sys
 sys.path.append(os.path.abspath(os.path.join('..')))
@@ -53,6 +54,16 @@ aggregate_options = {
         ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
         ('Scree Plot', 'ScreePlotter', 'scree')
     ],
+    'graph': [
+        #'NameOfPlotInLemur': 'name-of-plot-file-name'
+        ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
+        ('Heatmap', 'Heatmap', 'squareheat'),
+        ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
+        ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
+        ('Location Lines', 'LocationLines', 'locationlines'),
+        ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+        ('Scree Plot', 'ScreePlotter', 'scree')
+    ]
 }
 
 # EEG and FMRI One-to-One options.
@@ -67,7 +78,8 @@ one_to_one_options = {
     ],
     'fmri' : [
         ('Time Elapse of fMRI Signal', 'TimeElapse', 'orth_epi')
-    ]
+    ],
+    'graph' : []
 }
 
 # Embed for EEG and FMRI
@@ -115,7 +127,31 @@ embedded_options = {
        ('Location Lines', 'LocationLines', 'locationlines'),
        ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
        ('Scree Plot', 'ScreePlotter', 'scree')
-    ]
+    ],
+    'graph' : [
+        ('Heatmap', 'Heatmap', 'heatmap'),
+        ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
+        ('Location Lines', 'LocationLines', 'locationlines'),
+        ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+        ('Scree Plot', 'ScreePlotter', 'scree'),
+        ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
+        ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
+        ('HGMM Stacked Cluster Means Heatmap',
+         'HGMMStackedClusterMeansHeatmap',
+         'hgmmscmh'),
+        ('HGMM Cluster Means Dendrogram',
+         'HGMMClusterMeansDendrogram',
+         'hgmmcmd'),
+        ('HGMM Pairs Plot',
+         'HGMMPairsPlot',
+          'hgmmcpp'),
+        ('HGMM Cluster Means Level Lines',
+         'HGMMClusterMeansLevelLines',
+          'hgmmcmll'),
+        ('HGMM Cluster Means Level Heatmap',
+         'HGMMClusterMeansLevelHeatmap',
+         'hgmmcmlh')
+    ],
 }
 
 @app.route('/')
@@ -135,6 +171,7 @@ def medahome():
     metas = []
     eegs = []
     fmris = []
+    graphs = []
     for d in datasets:
         print(os.path.join(basedir, d, "metadata.json"))
         if os.path.exists(os.path.join(basedir, d, "metadata.json")):
@@ -147,10 +184,12 @@ def medahome():
             eegs.append(d)
         if os.path.exists(os.path.join(basedir, d, 'fmri')):
             fmris.append(d)
-    return render_template('home.html', metas = metas, eegs = eegs, fmris = fmris)
+        if os.path.exists(os.path.join(basedir, d, 'graph')):
+            graphs.append(d)
+    return render_template('home.html', metas = metas, eegs = eegs, fmris = fmris, graphs = graphs)
 
 # Delete dataset from app.
-@app.route('/MEDA/home/delete/<dataset>')
+@app.route('/MEDA/home/datasets/<dataset>')
 def delete_dataset(dataset = None):
     datadir = os.path.join(APP_ROOT, 'data', dataset)
     shutil.rmtree(datadir+"/")
@@ -234,6 +273,8 @@ def run_modality(modality, basepath):
         eeg.run_eeg(basepath)
     elif modality == 'fmri':
         fmri.run_fmri(basepath)
+    elif modality == 'graph':
+        graph.run_graph(basepath)
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -249,7 +290,7 @@ def upload():
     # print(request.files.getlist('file'))
     # print(request.files['file[]'])
 
-    file_names = ['pheno', 'eeg', 'fmri']
+    file_names = ['pheno', 'eeg', 'fmri', 'graph']
 
     for name in file_names:
         files = request.files.getlist(name)
@@ -269,7 +310,7 @@ def upload():
             session[name + '_data'] = None
 
     # For modalities in which you upload S3 credentials.
-    for name in ['eeg', 'fmri']:
+    for name in ['eeg', 'fmri', 'graph']:
         if session[name+'_data'] is not None:
             # Download EEG patients
             app.logger.info("Downloading "+name+" Data...")
