@@ -189,7 +189,7 @@ def medahome():
     return render_template('home.html', metas = metas, eegs = eegs, fmris = fmris, graphs = graphs)
 
 # Delete dataset from app.
-@app.route('/MEDA/home/datasets/<dataset>')
+@app.route('/MEDA/datasets/delete/<dataset>')
 def delete_dataset(dataset = None):
     datadir = os.path.join(APP_ROOT, 'data', dataset)
     shutil.rmtree(datadir+"/")

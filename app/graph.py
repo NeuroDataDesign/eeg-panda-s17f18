@@ -31,6 +31,7 @@ def run_graph(name):
 
   gds = lds.GraphDataSet(dataset_descriptor)
   print(gds.n)
+  print(gds.D["subjects"].astype(str))
   # Create a lemur distance matrix based on the graph data
   DM = lds.DistanceMatrix(gds, lms.FroCorr)
   DM.name = "graph-DistanceMatrix"
@@ -39,8 +40,12 @@ def run_graph(name):
   MDSEmbedder = leb.MDSEmbedder(num_components=10)
   Graph_Embedded = MDSEmbedder.embed(DM)
 
+# In[1]:
 
-    # In[9]:
+
+  lpl.SquareHeatmap(DM, mode="savediv", base_path=out_base).plot()
+  lpl.Heatmap(Graph_Embedded, mode="savediv", base_path=out_emb_base).plot()
+  # In[9]:
 
 
   lpl.EigenvectorHeatmap(DM, mode="savediv", base_path=out_base).plot()
