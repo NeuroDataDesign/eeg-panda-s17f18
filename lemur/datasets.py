@@ -136,17 +136,11 @@ class GraphDataSet:
 
     def getMatrix(self, index):
         resource_path = self.D.ix[index][0]
-        try:
-            return nx.to_numpy_matrix(nx.read_graphml(resource_path))
-        except:
-            return nx.to_numpy_matrix(nx.read_gpickle(resource_path))
+        return nx.to_numpy_matrix(nx.read_weighted_edgelist(resource_path))
 
     def getGraph(self, index):
         resource_path = self.D.ix[index][0]
-        try:
-            return nx.read_graphml(resource_path)
-        except:
-            return nx.read_gpickle(resource_path)
+        return nx.read_weighted_edgelist(resource_path)
 
 
 
