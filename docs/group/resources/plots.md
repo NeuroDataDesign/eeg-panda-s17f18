@@ -17,11 +17,14 @@
 - Scree Plot
 - Correlation Matrix
 - Eigenvector Heatmap
-- HGMM Stacked Cluster Means Heatmap
-- HGMM Cluster Means Dendrogram
-- HGMM Pairs Plot
-- HGMM Cluster Means Level Lines
-- HGMM Cluster Means Level Heatmap
+
+### Clustering Plots:
+
+- Stacked Cluster Means Heatmap
+- Cluster Means Dendrogram
+- Pairs Plot
+- Cluster Means Level Lines
+- Cluster Means Level Heatmap
 
 ## One-to-One:
 
