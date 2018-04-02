@@ -30,3 +30,4 @@
 
 - Sparklines
 - Spatial Timeseries
+- Graph Stats
