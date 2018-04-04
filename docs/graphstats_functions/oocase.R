@@ -19,7 +19,7 @@ if(!require(FlashGraphR)){
 #' \item{options}{A named list with the supplied options and some information
 #'   about the performed calculation, including an ARPACK exit code.}
 #' @name fm.oocase
-
+#'
 fm.spectral.embedding <- function(fm, nev, which=c("A, Aug, L, nL"), tol=1.0e-12)
 {
   ptm <- proc.time()

@@ -4,7 +4,7 @@
 #' @param X [m, n] Data matrix.
 #' @return Number of clusters.
 #' @export
-
+#'
 numclust <- function(X)
 {
   out <- which.max(X)

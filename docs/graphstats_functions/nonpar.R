@@ -1,6 +1,7 @@
 # Load 'gmmase' package by Youngser Park <youngser@jhu.edu>.
 if(!require(gmmase)){
   if (!require(devtools)) {
+    install.packages("devtools")
     suppressMessages(require(devtools)) 
   }
   devtools::install_github("youngser/gmmase")
