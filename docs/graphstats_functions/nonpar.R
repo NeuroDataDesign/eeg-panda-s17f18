@@ -31,8 +31,34 @@ if(!require(gmmase)){
 #' 
 nonpar <- function(Xhat1, Xhat2, sigma=0.5) {
   
-  return(nonpar(Xhat1,Xhat2,sigma))
+  Sij1 <- kernel.stat(Xhat1, Xhat2, sigma)
+  return(Sij1)
   
 }
 
-# TO DO: Include code from R package, or leave the import in case the package is updated.
+
+kernel.stat <- function(X,Y,sigma=0.2){
+  n <- nrow(X)
+  m <- nrow(Y)
+  
+  tmpXX <- sum(exp(-(as.matrix(stats::dist(X))^2)/(2*sigma^2))) - n
+  tmpYY <- sum(exp(-(as.matrix(stats::dist(Y))^2)/(2*sigma^2))) - m
+  tmpXY <- sum(exp(-(rect.dist(X,Y))/(2*sigma^2)))
+  
+  tmp <- tmpXX/(n*(n-1)) + tmpYY/(m*(m-1)) - 2*tmpXY/(m*n)
+  
+  return((m+n)*tmp)
+}
+
+rect.dist <- function(X,Y){
+  X <- as.matrix(X)
+  Y <- as.matrix(Y)
+  n <- nrow(X)
+  m <- nrow(Y)
+  tmp1 <- X%*%t(Y)
+  tmp2 <- outer(rep(1, n), rowSums(Y^2))
+  tmp3 <- outer(rowSums(X^2), rep(1,m))
+  
+  D <- tmp2 - 2*tmp1 + tmp3
+  return(D)
+}

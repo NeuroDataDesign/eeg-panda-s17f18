@@ -1,12 +1,3 @@
-# Load 'gmmase' package by Youngser Park <youngser@jhu.edu>.
-if(!require(gmmase)){
-  if (!require(devtools)) {
-    install.packages("devtools")
-    suppressMessages(require(devtools)) 
-  }
-  devtools::install_github("youngser/gmmase")
-  suppressMessages(library(gmmase))
-}
 if(!require(igraph)){
   install.packages("igraph")
   suppressMessages(library(igraph))
@@ -27,7 +18,22 @@ ptr <- function(g) {
   if (class(g) == "dgCMatrix") { g = igraph::graph_from_adjacency_matrix(g) }
   if (class(g) != 'igraph') { stop("Input object 'g' is not an igraph graph.") }
   
-  g <- ptr(g)
+  if (class(g) != "igraph") {
+    if (!is.matrix(g)) stop("the input has to be either an igraph object or a matrix!")
+    else {
+      if (ncol(g)==2) g <- graph_from_edgelist(g)
+      else if (nrow(g)==ncol(g)) g <- graph_from_adjacency_matrix(g, weighted = TRUE)
+      else stop("the input matrix is not a graph format!")
+    }
+  }
+  
+  if (is.weighted(g)) {
+    W <- E(g)$weight
+  } else { # no-op!
+    W <- rep(1,ecount(g))
+  }
+  
+  E(g)$weight <- rank(W)*2 / (ecount(g)+1)
   out <- as.matrix(g[])
   return(out)
 }
