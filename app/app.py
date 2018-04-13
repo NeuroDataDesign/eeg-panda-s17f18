@@ -13,6 +13,8 @@ import fmri
 import pheno
 import graph
 
+import db.mongo_update as mongo_update
+
 import sys
 sys.path.append(os.path.abspath(os.path.join('..')))
 from lemur import datasets as lds, metrics as lms, plotters as lpl, embedders as leb
@@ -338,6 +340,8 @@ def upload():
                    os.path.join(session['basepath'], name), "--recursive"]
             app.logger.info(name+" Data Downloaded")
             call(cmd)
+
+            mongo_update.build_database(filedir, bucket_name)
 
 
             run_modality(name, os.path.basename(session['basepath']))
