@@ -35,7 +35,6 @@ scan_count = 0
 
 #################
 # Database Functions
-
 def init_database():
     try:
         client = MongoClient("mongodb://localhost:27017/")
@@ -83,8 +82,6 @@ def build_database(dataset, bucket_name):
         for datatype, derivs in datatypes.items():
             for deriv, links in derivs.items():
                 build_derivative(lims, dataset, datatype, deriv, links)
-
-    # build_metadata(lims)
 
 def build_dataset(lims, dataset):
     lims.update_one(
@@ -158,13 +155,14 @@ def build_derivative(lims, dataset, datatype, derivative, links):
         )
     print("Updated Scan Count: " + str(scan_count))
 
-def build_metadata(lims, filename):
+def build_metadata(filename):
+    lims = init_database()
     metadata_list = parse_csv(filename)
 
     for metadata in metadata_list:
 
         # Try to get subject ID, no other way besides brute force right now
-        subid = metadata.pop("SUBID", -1)
+        subid = metadata.pop("\ufeffEID", -1)
         if (subid == -1):
             subid = metadata.pop("URSI", -1)
         if (subid == -1):
@@ -205,4 +203,4 @@ def get_subject(link_header):
 
 
 if __name__ == "__main__":
-    build_database('test_new_BIDS')
+    build_metadata('/home/nitin/hopkins/fall2017/ndd/lemur/data/HBN_R1_1_Pheno.csv')

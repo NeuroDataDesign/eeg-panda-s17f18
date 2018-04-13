@@ -335,20 +335,26 @@ def upload():
 
             # Configre AWS Credentials
 
-            cmd = ["aws", "s3",
-                   "cp", ("s3://%s/"+name)%(bucket_name),
-                   os.path.join(session['basepath'], name), "--recursive"]
-            app.logger.info(name+" Data Downloaded")
-            call(cmd)
-
-            mongo_update.build_database(filedir, bucket_name)
+            try:
+                cmd = ["aws", "s3",
+                       "cp", ("s3://%s/"+name)%(bucket_name),
+                       os.path.join(session['basepath'], name), "--recursive"]
+                app.logger.info(name+" Data Downloaded")
+                call(cmd)
+                mongo_update.build_database(filedir, bucket_name)
+            except:
+                print("Download from S3/database synchronization failed!")
 
 
             run_modality(name, os.path.basename(session['basepath']))
 
     # For modalities in which you upload the dataset itself.
     if session['pheno_data'] is not None:
-        pheno.run_pheno(session['pheno_data'])
+        try:
+            pheno.run_pheno(session['pheno_data'])
+            mongo_update.build_metadata('/home/nitin/hopkins/fall2017/ndd/lemur/data/HBN_R1_1_Pheno.csv')
+        except:
+            print("Running plots/synchronization failed!")
 
     for name in file_names:
         if session[name+'_data'] is not None:
