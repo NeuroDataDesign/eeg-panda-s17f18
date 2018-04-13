@@ -82,7 +82,9 @@ one_to_one_options = {
     'fmri' : [
         ('Time Elapse of fMRI Signal', 'TimeElapse', 'orth_epi')
     ],
-    'graph' : []
+    'graph' : [
+        ('Graph Stats', 'GraphStats', 'gr_stats')
+    ]
 }
 
 # Embed for EEG and FMRI
