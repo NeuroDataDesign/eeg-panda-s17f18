@@ -590,7 +590,7 @@ class RidgeLine(MatrixPlotter):
                 tickcolor='rgb(204, 204, 204)')
             
         layout = go.Layout(showlegend=False,
-                           height=max(45*len(data), 500),
+                           height=max(42*len(data), 600),
                            xaxis=xaxis,
                            yaxis=yaxis,
                            title=title)
