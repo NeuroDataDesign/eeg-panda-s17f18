@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Ronak Mehta" />
+
+<meta name="date" content="2018-04-20" />
+
+<title>Adjacency Spectral Embedding</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Adjacency Spectral Embedding</h1>
+<h4 class="author"><em>Ronak Mehta</em></h4>
+<h4 class="date"><em>2018-04-20</em></h4>
+
+
+
+<p>Here, we present the <code>ase</code> function, used for representing graphs in lower-dimensions. We demonstrate its effectiveness in recovering the block assignements of nodes in a 2-SBM.</p>
+<div id="random-dot-product-graph" class="section level2">
+<h2>Random Dot-Product Graph</h2>
+<p>We base this technique on the theory of random dot-product graphs. Each node has a latent position vector in R^d associated with it, where the dot-product of these vector i and j indicates the edge probability of node i and j. By embedding the adjacency matrix down to R^d, we can estimate these latent vectors. Finally, by clustering the vectors, we can estimate the block assignments of the nodes associated with those vectors.</p>
+</div>
+<div id="generating-the-stochastic-blockmodel" class="section level2">
+<h2>Generating the Stochastic Blockmodel</h2>
+<p>We start with latent vectors [0.85, 0] and [0.3, 0.8]. These make edge probability within a block approximately 0.75, and between blocks approximately 0.25.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create latent vectors, and edge probability matrix.</span>
+block0 &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">c</span>(<span class="fl">0.85</span>, <span class="dv">0</span>), <span class="dt">nrow =</span> <span class="dv">2</span>)
+block1 &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">c</span>(<span class="fl">0.3</span>, <span class="fl">0.8</span>), <span class="dt">nrow =</span> <span class="dv">2</span>)
+block_probs &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">t</span>(block0) %*%<span class="st"> </span>block0,
+                        <span class="kw">t</span>(block0) %*%<span class="st"> </span>block1,
+                        <span class="kw">t</span>(block1) %*%<span class="st"> </span>block0,
+                        <span class="kw">t</span>(block1) %*%<span class="st"> </span>block1), <span class="dt">ncol =</span> <span class="dv">2</span>)
+
+<span class="co"># Create Adjacency matrix. Use higher edge probability if nodes are from same block.</span>
+n &lt;-<span class="st"> </span><span class="dv">60</span>
+blocks &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rep</span>(<span class="dv">0</span>, n/<span class="dv">2</span>), <span class="kw">rep</span>(<span class="dv">1</span>, n/<span class="dv">2</span>))
+A &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="dv">0</span>, n*n), <span class="dt">nrow =</span> n)
+for (i in <span class="dv">2</span>:n) {
+  for (j in <span class="dv">1</span>:(i<span class="dv">-1</span>)) {
+    if (blocks[i] ==<span class="st"> </span><span class="dv">0</span> &amp;&amp;<span class="st"> </span>blocks[j] ==<span class="st"> </span><span class="dv">0</span>) {
+      A[i, j] &lt;-<span class="st"> </span><span class="kw">rbinom</span>(<span class="dv">1</span>, <span class="dv">1</span>, block_probs[<span class="dv">1</span>, <span class="dv">1</span>])
+    } else if (blocks[i] ==<span class="st"> </span><span class="dv">1</span> &amp;&amp;<span class="st"> </span>blocks[j] ==<span class="st"> </span><span class="dv">1</span>) {
+      A[i, j] &lt;-<span class="st"> </span><span class="kw">rbinom</span>(<span class="dv">1</span>, <span class="dv">1</span>, block_probs[<span class="dv">2</span>, <span class="dv">2</span>])
+    } else {
+      A[i, j] &lt;-<span class="st"> </span><span class="kw">rbinom</span>(<span class="dv">1</span>, <span class="dv">1</span>, block_probs[<span class="dv">1</span>, <span class="dv">2</span>])
+    }
+    A[j, i] &lt;-<span class="st"> </span>A[i, j]
+  }
+}
+
+<span class="co"># Define graph.</span>
+g &lt;-<span class="st"> </span>igraph::<span class="kw">graph_from_adjacency_matrix</span>(A)
+<span class="kw">plot</span>(g)</code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAeAAAAFQCAMAAABQwF3SAAAByFBMVEUAAAAAACAAADgAAE4AAFkAAGMAAHEAAHcAAHsAAIQAAIcAAIsAAI0AAI4AAJEAAJMAAJUAAJ8AALMAEIsAGXgAG5kAH04AIZMAIZgAJE4AJpUAJpsALXEAOscAPzgARJkARJ8AZtoQG5sbAIsbJosbJpMmAIsmAJEmJpsmRJ8mX5smX6QxEIsxMYs0AGM0AHc0AIs0JE40Pzg0WiA0Wk41aKk6AIs6AJU6Osc6RJ86eak6kO1EAItEAJFEAJVEG5FEJpVEJptERJ9EeaREealSJotSRJFSealSkalWRItcAGNcAHdcAItcJE5cPzhccgBfIYtfJotfJpVfaJVfealfkZ9fkalmAItmALNmtv9oRJV5Oo55RIt5RJB5RJF5RJV5qZ95qal9X5F9qamBJGOBJIuBWneBcgCBiQCQOouQOrOQtv+Q2/+RX4+RX5GReZWRkZuRkaSRqZ+RqamkP2OkP3ekP4uknwCknzipeZWpeZupkZupkaSpqZ+pqaSpqam2Zou2Zp+2///FWnfFcmPFnwDFnyDbkJ/b///mcjjmck7mcmPmiSDmiU7mnwDmnyDmnzj/trP/tsf/28f/2+3//9r//+3///+ZLVC5AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAXH0lEQVR4nO2d/WObR1LHVxJCwAMlLa/GJCS8pAeBa0MgHDQc1zvzduerCZSUggkXqO/cIwhogo3OKE+pMelh9Ng5kz7/LruzO/vy7EqywfbqGc33hzqSZVXP89Hszs7MzoqaRVoi9wdgXawYMHExYOJiwMTFgImLARMXAyYuBkxcDJi4GDBxMWDiYsDExYCJiwETFwMmLgZMXAyYuBgwcTFg4mLAxMWAiYsBExcDJi4GTFwMmLgYMHExYOJiwMTFgImLARMXAyYuBkxcDJi4GDBxMWDiYsDExYCJiwETFwMmLgZMXAyYuBgwcTFg4mLAxMWAiYsBExcDJi4GTFwMmLgYMHExYOJiwMTFgImLARMXAyYuBkxcDJi4GDBxMWDiYsDExYCJiwETFwMmLgZMXAyYuBgwcTFg4mLAxMWAiYsBExcDJi4GTFwMmLgYMHExYOJiwMTFgImLARMXAyYuBkxcDJi4GHBKZe4PcH5iwAmVDLjtmo6wrCshqsv8LBerpQWsFD9/crMoulUliqJ46/I/1UVoSQEbwhHkoSS7UVU718TL92gQXnrAAePxlytRVdXk87uievHaJ/k+3vmJAZfecyOw3+qwv1uJk7vvZ/x856ZlBRyP0fKfz+7LEfqaBDzY9gG32qdeWsDKV/b4Iu4jZcPH6ytyiH71sf1drg95DlpGwC/fKwqJt+pKe10rGxI70oQnb8pf4Ryc9rfboiUE/PIvPqkHcpY9/uquGF551CTcV8skIYfrWwasA9xGzksI+H8+ravu17ar/z6oxPHvPmgCHm3A4D1c/bT5m1Ya8jIAjrmIya9XoN4vNxnufe4JuFvStMPFFPJtGeUlAJywvN7tA+A76T0J4N4sitUn8POWAZoA3C7CywE4ZFIOi0LOwVW1XxTxHBwQjS1Y/2wPZPqAFRE/fwCoBsUdZcFiqE31tMI/BzNuhykvA+BRTyjHuH5x9VM0yWdFx/OVZwoXzIknc1/aaUQecFmOixWYcbv3Vt2Mu6l95XIzWgh7Gt/TC+aBXBUXr6C/vWcyTvLZFgQzlwDw04EG3P+mAVyjr+x+pvl+8VEJC+Z1Bdh+O0zG6bAvXr63+ISpA5YDtNgHwIcbA81oZGiNfGqpofjfnpSwYP7ubiWqEY7lJuN0tLUhn5SD/oKLPODxlzXg43eqweoUc8WhWOX5wznZLpjFQxyhTcZp8sZ2JfZefzz/I+QVccBl+TePKhiin+6K/SmAcShWef7xvVu+PeOCueq+bf7WZpxUSnF8b039Xxa5yIc64L135ZpIAp58S66JLOBwOMahGPL8I7Uy1n63mnn1grkSh55lQ8ZJAhbVWE3CL+DFvbtFcSP35SZEHHD9MVAqNnb0zzU3HHfuewYNQzEY5d7NNeN3gz3/gFkwP/Rj1irjpACX7sUqaLKQTjV1wLUKXK0emPzBEzccS9fYAwxDMeT5FTPwu7U9/6heMI/fDkb3freaDIR0wl9/YJz043fMKL1oi+MlAFzj0Kx+4nAsNVix0HTsEvL8o1ceaL/b2POvwYJ5FPpeow3R2VqDdzRO+qEcF/Tvcl9tQ8sG2POM9/1MA8QuIc9/5Rva7zb2/PPwomCE1qvn0eoT6WMZJ/1oS/7l9QXkuxSAG04zesYBYC92afzu4/Ufl9B+5I/Ub70RGjNOYPZr1kmvqs4WlIfkvtimlg8wppL8Ibq0scvh6j8Zv9vY88xsk3XSlR9Wbl5nwFnUpGJSSUHcw+X5N43ffapchP/icnR98fguAeCYihmOYUpWK2KMWWKevwz87rnCF5ejNQZ82YqKMrTdwXCsXGCIUQyi4koNFup2UMmsofdiPQjkvt5YtAGXZVxYZVNIm6sfQYzisK9CjhEzZ8+YIEyU2dbuxTAI5L7gWJQBWwSebApJRbR+cAArHJUWmjkW6wThlDLbEPjCiTBgZ2NTpGMUJi0Ulc86mQThlDJbx3YR+RIGPNPSNDcXsWqO0aU/6ZoEYbrM1gO8cGFKJaqA5+K1iUSdFgoA+/nh6zZBGJfZNgEvoogCjs0weogxCpsWcnxtfnjFRC+OtA3PLLPNfclTRBOwJmiK43o3IUyMD4X0mRQmjFHYtJDljwmJo6076H7BlrTZZba5r3mKaAIGwqY4DjK1a+7hsWeFKkaBaSGT5ddpYkhIHG2tHIihJhpsSWvTME0UcG19X8jUlt7D9a4btCFGodNCJnFv0sQ6ITF58xqW6oxOU2ab+6JTogsYfV+TqcWHO2rKDQDrtJCtrlU5CExIHBZ9be2nKrNlwJco6/uaTC0+PF7/jfWkp4TVtSaLCAmJow+69648wihVo8yWAWeVut/G98VMra6VK26Lo/sxYayuRcCQkCg6KqCZYJoOTOe+5qQoA7a+r17ruFq5Udy5wSXuTZp4c0N019f0mqlp7D27RmbAuaRvufF9IVOrHx72hQpkNAF7iXudJlaT7TPlUMdRalNziWvkxeZLHDD6vqM1fAhWufdGc4j1EvfD1X/EyVZN3PEI/VSnKO5EKYrc15wUZcD1Sej7wo9/UCC1YTf4mMT9lCS/nXZHpsrOrZEXmjBZwCd3bZlG4SVsx1/846L4/t1oO2lpE/cJr8oFwUarHxlvzFsjl42eWwslqoCVUgbo1UXb7aQ+YJVneKWZEsQgmPpO/CV6Y3qNjHkJXQyQ+4oTIgy4aYC4jdvURdvtpHOFQTD1nfipPzTemF4jY17i6INdMVxIwnQBNw3QbuPWYchZ20kbsvlg+Z34MfTG9Br5n82A8F/blTj6kDefXaIiA8Rt3CYMOWM7aUM2H4zfCeWNuTWy20L8MQO+BGHXwYQB4iZBFYYMt5NaTamd1DEx/E6ov3NrZLuFuPMh7y68BJXN/mVeQYbexl11JGC7ndRBnV47qYNg9jsB/8E1st0oISZfWMR+DhQBR4V2GJRW27iHkseOLoUern6EtTmqCuCHYW5Fd6lhzv2u/50IhD23/n0h2zlQA5yeRjEo/fDP70lzm9z+DyiFHv7Mb5naHFUF8A09VYO7dP/nkLwpB3EtSuNp22yUeL6IA/SyADZB6fGX7v6stMGV/9Sl0H/7039nFsWqCsCfqjdfQfKmHATzwMkwF2yUUDuIT/4+9+XHWhLA2gBHv3gFFrReKbT2gXf6ux1vqu78ye8g+XdE5TaMpgHr3cKF10J8kUQM8BS+xgD/+uavgEvklUKDD2yqAOxUPZEv1+Tdxv0pXxy9tNZBFDmW577+WPQBOwMc/17xud3OVn/XlUJrHxirAOxU/cCQdxv3raKFFAaqTVOX3HegKVqAZxmbsrcrj0pxWGz4pdDKB7ZVAHqqHq55qx9TDhKwDKibQLWp1st9ByItHeCyG5RCgw9sqwBG6C7tvWtXP15aH89F83P9LlCtSkFy34BYSwUYRuW9N1wptBLW5kjgzl2S3wTs2oHlIF6XSj/X75zv/R4HOi5Yc/hKqBKcsj1TCg3DroIqn9/7BRuZMiPwZlgOYlkGuX4vTsaAL1xzAavSnOtmsF3zC2E3owq6uBTasvRz/aWLkw1WGPDFaj7f08rr2hEUZRmWth5eyzjfg4XsLUwBcPN4ugsUsNS5fu9Z43wz4ItRac+7uQQpllE9vI6TMeALUunOu7l4jRL18NjUhQFfhEo8NOcicMZhq2Y9vJ2lVfXdqwuYMGw54CkHiZ4Pbtii4t7ZskzXwy9gFEup3YA/+/ajchB0OKrB5zoPvHqLSqp30tSeaLlvR0rtBvy9x2XV2bpmOxyp5+ZROLVgi0rcOwnsOjxJiQFfmOTCpdKrUOhwVGu+cpYU6R6FZ5DdMBz2TtJ2HZ6ktMiE2w1Y3lNxtLXR6HAk/Z0e7D2IehSewazdhuGwdxLYtT1JqfmGuW9IrNYDrnTZatjhaL93UCV6FIrem0XRPR1su2E4fGdn1+Lhg4YXxoDPW3BPB9v6fvsdjnRD72aPQgEVVhui0egsKb/Tt/fOzq6r7tvQy9SrwlxIwq0GrPR8zdS9+h2OBrqLbNijUHpL7wCwoz/VvneY2A0tOmoLrn/tGgGIw1swWusqzOsM+IL04q2ynEQdjmCIbvYoFKrCSs3XvQfa9w4Su8qau2H9le30vblmTqjd+4PiCgJ++GdutN5kwBekF4U9V8HvcDREwH6PQgEVVtdUkYb2vf3ErtiRsHauBYRdp2/dWLo6Lpxdj7/02xZw5z7+T3Lfj1jtBvzcZOeDDkfy7u+rZZJfmKOfhyq6DWWU2vd2iV1p0XfkV2Il8Lug/R28szn8CnqoGbse/ZIbrSf2u5X7hsRqN+BmyMqe6Px9v78SFuboMbqqjJUa39smdoWy5mr/TpUskjWus+6hZt7xr37TeWHuVKXc9yNWmwFHIJ5Z7wkM2ivMMYQl4r5eJoHv7RK7Qlnz8dcPkoCN62yqpzXg8a96bVvc/yP3LYnVVsApQyu/o70nFWf6oZ98goU5niSNQ3hmCL63S+xWygNTXndqaYyNpaMeanq0Ht0q65N3GfB5KolXG6mJXO5Pad2tXTEVhJoEiV1x9MG/rvttLL0/8RtLBz3UhtjhsHjtEwZ8rpoO2EQuU4Btvs9UxgaJXWhdmPxW4JI47qGmAOsqzBtm3+riqaWApyI23lPj3LpQtjLWS+yO720IcRy3LbQoD2z1dOr35hPlvikJUQOMkctkg5UZ4ecpbQsd4CeuqjpEawHzoRznqykkTOQy2ueJKURpu0F/OoQ+rUzDA5yqnja2m/tmTFd7Adcpi9TeU6IhIaYQ4dx2jzBk7gczDk2ao9w3Ya5aC/izD68GPRY0Xxu5jBsSQnxan9vuljpdyNyvaOf5/1IEkvs2zFVbAb98T1sk9lgAWe9JRbQG2yEKl2Fy8emqC43774gKR3Czy5cB5xdYJB654WvsWuf4XpMGrM9tR8B64+e/bFddM4KbXb50+LYYMLYEbfZYsPHKRj9Z+EIcr6/IIdpWy+lzWCBCqb8vs9dXbUTcWsCmJWjcY8HEKxWsoJ8spBAb57bDft/DOypCaRIHzQhJNC/HE3XuOzFbbQVcWpPzeyxYw4R4ZdhPdriaKP0QeoQWZQKwHeptcaaZqJs1s7nvxUy1FXBdDw3g5tEJJcYrG/1k5cKpipuZCXH8dbWNPx6i7VBvizPNUqtZM5v7RsxWewE/v2os0vVYsMMoxCsb/WTNwulZ40ydqt+BIRe/L/Y78R1b2OOKM+FbYGtm28C3zYDRIl2PBSsVr/T6ycrXHetO7t657SiTrccRPKwQUD1IveJMHMe9HH/u2zBP7QX8sdqtqW5xfNwcxCtN79CvuBBlskJ2/LZtUlg1Q2Aw1PvFmRawbeGQ+y7MVVsBq22Frz6uT24mIsg2Xqn7yeoQZXTMUUMY+vJDYDDU+8WZOFGrtrUM+FKUCC+6eCWYo9nlEB9zFNixOYujcSaHGur94kzr2LVmhG4zYNwb3Fi1uD5IGrBZLyeOOZorGOr94kycqMe2yU7umzBX7QX82bc/qQf+YRtTpOfNRuujtBrDgR7q/eJMnKhb40O3GfD3HtewjAlWLYkR28ybjdZHTcVRDTvUe8WZOEGbEXqxM8Fa7QUsZfcGqzkxPKLKSc+bUeujBl9z/pG35dQN9VicaSdoM0LnvvxTqd2ATYWdWrVg4Kmx2w/nzdRRwJ6544Fo8ZbT6cp99adTqwFjhZ1atWDgqbHbz8ybzdZHY/80DlP7rjqAh1tO51QA5L78U6nVgGvcG6znRDdi+yveTX0ITlBT51KKxza1BF8WF9UwiYXkITttItxqwM/fD1YtdsR2u/3svBnW1NmUot5PBoaOzf51VAMTC4kmOwz4svTirbqeeKsWO2JPouBlLG3uO95mBtv7XUc1wPuOm+y0jXCLAcPe4NeUdWFcKRyx5wBW5m72k+lnVAdwL6ph485Bkx34IrmpOfc9mK/2AtZ7g2+UXr4Aa6Kn905ybHScOdhPtrnhRzUQ8KS5n0W+xWEP7T73XZir9gI2cjcecwzmzIWk2ao+LCbgYePMuJ9MN/S3UY19W7UZzsECKrsOBAO+HDm+GHhyuYaIr0Sj3GRr7u40DhvttFtObWJhGKSQVRnX029KwFU7CJMBjIEnP9fQWMlKf2ldraPUU94G0in7yZI1XGDAhxtqP3hLBum2A06hMYpWskI5zbqMC808uZ8MAWPFyKY/pwtV6+UA577+uaIDONGvAzLBLnQpwGlWY7Qz852iuJb+ftjAZlgxUomnuwqwalHdBtEAHDywAjfJC11W/eL27tFW3xu1pdu8IpJ9OXSAZBRnInvfqgDw4hsvqP2Aw0e+XImcGYX7kC/ytkJImy5WUp1XZkShzYb/NQacQVMAY+hy1Ic52WtuWOnpNICJ+9CCrU0+8Uro4uncV3sq0QIcErYlchi6hD4NE+c0q30N0AHLN2HcSey2NjniQ6/WqyWEKQOOS+QaTnMSsPtimK1NlrjLPGFtbe7LPYWIAQ4I21p2t8wJmzCkh2gc2t3WJrNT1Wae2gJXiSJgnC/NSnZW6LKq9mMnSwP2tjbpJ2zmKfc1nkkEAavIBix9Nv2mWEnApRD78TJJG6y3tcm0IjWZp9yXeDZRA1yX3a/uVvvS2MxKNgxdRqoGvYPmczB3e1ubTPtpk3nKfYFnFDnAVUdZ29e2T9tPJe7WoufuHVzuInGXecp9iWcSOcDQlUHVzyUbAzfV2KqCgBs7iYG4zTzlvsKziSTgye1o6eNrXrska9QOMBZm7r3+IPcFnlHEAMPSZ1/Vz6UZ+uetTNmp5Bn1MNhxaBbRuS/xjKIDGAFB9KK4kzRg1zHcb3g3x6KB+OMSFtE3FrIf5SzRAewIi+pIbWRICMtlg4Z3dlmVlmkUrP/ZPhECbAlLi9yZWncH5bJ+w7vOB3JZpY7L8v7cGbR530VtFjxflAC7OOXJ9MJo3ZbBNbyrettq+/A1C1VNzx2L27zvYrYKPo1IAQbCKnJ1dXrhO5TLeg3vdDdDadWGqZD/PF7XU7h734zX9P8UPcDzzv+G6njX8A4AK6s2HWd7n9ebSKu2jskN0QLst1+v05yHjbMOK7NwNkO0UNOz5K/m5IzXcX4iBjh2dht8/Q485tBC281QA4YeWwpwpis4Z1EDHHu73vQrxCGmlryGd0Lsb+Ayqa666+oEnUFbiibnihzg2CFS4EwEax8SCD/RaHh32BGVThjLFwuYnvtUDJgg4Fj+hm+/QTyO2i5hrF6LcZLcn/qctAyAa2/Dd9wg3k8Y60PjoWgy92c+Ly0H4BI3fMcN4gPBK9X03OaVb6ilAKy4QQTLNoi3T0fS03Pej3ueWg7AtevvoBrEe0+XdZJzvk963loawLa/Q7l5w3va/DICneuDnruWA3DpRbDKFx5g/Uv/dQy4hSpdBEv++8X7817MgNskf62rHp584dNT/M3Ff65LEn3AtVvr1id3i+LqfL6UtASAa3oT6xm0DIAt4twfI4eWAzA1z+kMWhLANQMmLwbMoigGTFwMmLgYMHExYOJiwMTFgImLARMXAyYuBkxcDJi4GDBxMWDiYsDExYCJiwETFwMmLgZMXAyYuBgwcTFg4mLAxMWAiYsBExcDJi4GTFwMmLgYMHExYOJiwMTFgImLARMXAyYuBkxcDJi4GDBxMWDiYsDExYCJiwETFwMmLgZMXAyYuBgwcTFg4mLAxMWAiYsBExcDJi4GTFwMmLgYMHExYOJiwMTFgImLARMXAyYuBkxcDJi4GDBxMWDiYsDExYCJiwETFwMmLgZMXAyYuBgwcTFg4mLAxMWAiYsBExcDJi4GTFwMmLgYMHExYOJiwMTFgImLARMXAyYuBkxcDJi4GDBxMWDiYsDExYCJiwETFwMmLgZMXAyYuBgwcTFg4mLAxMWAiYsBExcDJq7/BZSAEa8JoqHAAAAAAElFTkSuQmCC" /><!-- --></p>
+</div>
+<div id="embedding-the-graph" class="section level2">
+<h2>Embedding the Graph</h2>
+<p>Now, we call the function to embed the adjacency matrix in R^2. Ideally, we observe two clear clusters in the plotted data. Applying the EM algorithm or K-means should recover these cluster assignments, which would coincide with our initial block assignments. The points are clearly colored correctly, according to their original block.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Embed graph into R^2.</span>
+dim &lt;-<span class="st"> </span><span class="dv">2</span>
+X &lt;-<span class="st"> </span><span class="kw">ase</span>(g, dim)
+<span class="kw">plot</span>(X, 
+     <span class="dt">main =</span> <span class="st">&quot;Latent Vector Estimates of Graph&quot;</span>, 
+     <span class="dt">family =</span> <span class="st">&quot;serif&quot;</span>,
+     <span class="dt">xlab =</span> <span class="st">&quot;PC1 Score&quot;</span>,
+     <span class="dt">ylab =</span> <span class="st">&quot;PC2 Score&quot;</span>,
+     <span class="dt">pch =</span> <span class="dv">19</span>,
+     <span class="dt">col =</span> blocks +<span class="st"> </span><span class="dv">1</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="estimating-the-block-assignments" class="section level2">
+<h2>Estimating the Block Assignments</h2>
+<p>Finally, we cluster the data and check the assignments of a standard algorithm. We recover all of the block assignments.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Cluster using EM algorithm.</span>
+model &lt;-<span class="st"> </span><span class="kw">Mclust</span>(X)</code></pre></div>
+<pre><code>## fitting ...
+## 
+  |                                                                       
+  |                                                                 |   0%
+  |                                                                       
+  |=                                                                |   1%
+  |                                                                       
+  |=                                                                |   2%
+  |                                                                       
+  |==                                                               |   2%
+  |                                                                       
+  |==                                                               |   3%
+  |                                                                       
+  |===                                                              |   4%
+  |                                                                       
+  |===                                                              |   5%
+  |                                                                       
+  |====                                                             |   6%
+  |                                                                       
+  |=====                                                            |   7%
+  |                                                                       
+  |=====                                                            |   8%
+  |                                                                       
+  |======                                                           |   9%
+  |                                                                       
+  |=======                                                          |  10%
+  |                                                                       
+  |=======                                                          |  11%
+  |                                                                       
+  |========                                                         |  12%
+  |                                                                       
+  |========                                                         |  13%
+  |                                                                       
+  |=========                                                        |  13%
+  |                                                                       
+  |=========                                                        |  14%
+  |                                                                       
+  |==========                                                       |  15%
+  |                                                                       
+  |==========                                                       |  16%
+  |                                                                       
+  |===========                                                      |  17%
+  |                                                                       
+  |============                                                     |  18%
+  |                                                                       
+  |============                                                     |  19%
+  |                                                                       
+  |=============                                                    |  20%
+  |                                                                       
+  |==============                                                   |  21%
+  |                                                                       
+  |==============                                                   |  22%
+  |                                                                       
+  |===============                                                  |  23%
+  |                                                                       
+  |===============                                                  |  24%
+  |                                                                       
+  |================                                                 |  24%
+  |                                                                       
+  |================                                                 |  25%
+  |                                                                       
+  |=================                                                |  26%
+  |                                                                       
+  |=================                                                |  27%
+  |                                                                       
+  |==================                                               |  28%
+  |                                                                       
+  |===================                                              |  29%
+  |                                                                       
+  |===================                                              |  30%
+  |                                                                       
+  |====================                                             |  31%
+  |                                                                       
+  |=====================                                            |  32%
+  |                                                                       
+  |=====================                                            |  33%
+  |                                                                       
+  |======================                                           |  34%
+  |                                                                       
+  |=======================                                          |  35%
+  |                                                                       
+  |========================                                         |  36%
+  |                                                                       
+  |========================                                         |  37%
+  |                                                                       
+  |=========================                                        |  38%
+  |                                                                       
+  |=========================                                        |  39%
+  |                                                                       
+  |==========================                                       |  39%
+  |                                                                       
+  |==========================                                       |  40%
+  |                                                                       
+  |===========================                                      |  41%
+  |                                                                       
+  |===========================                                      |  42%
+  |                                                                       
+  |============================                                     |  43%
+  |                                                                       
+  |=============================                                    |  44%
+  |                                                                       
+  |=============================                                    |  45%
+  |                                                                       
+  |==============================                                   |  46%
+  |                                                                       
+  |===============================                                  |  47%
+  |                                                                       
+  |===============================                                  |  48%
+  |                                                                       
+  |================================                                 |  49%
+  |                                                                       
+  |================================                                 |  50%
+  |                                                                       
+  |=================================                                |  50%
+  |                                                                       
+  |=================================                                |  51%
+  |                                                                       
+  |==================================                               |  52%
+  |                                                                       
+  |==================================                               |  53%
+  |                                                                       
+  |===================================                              |  54%
+  |                                                                       
+  |====================================                             |  55%
+  |                                                                       
+  |====================================                             |  56%
+  |                                                                       
+  |=====================================                            |  57%
+  |                                                                       
+  |======================================                           |  58%
+  |                                                                       
+  |======================================                           |  59%
+  |                                                                       
+  |=======================================                          |  60%
+  |                                                                       
+  |=======================================                          |  61%
+  |                                                                       
+  |========================================                         |  61%
+  |                                                                       
+  |========================================                         |  62%
+  |                                                                       
+  |=========================================                        |  63%
+  |                                                                       
+  |=========================================                        |  64%
+  |                                                                       
+  |==========================================                       |  65%
+  |                                                                       
+  |===========================================                      |  66%
+  |                                                                       
+  |============================================                     |  67%
+  |                                                                       
+  |============================================                     |  68%
+  |                                                                       
+  |=============================================                    |  69%
+  |                                                                       
+  |==============================================                   |  70%
+  |                                                                       
+  |==============================================                   |  71%
+  |                                                                       
+  |===============================================                  |  72%
+  |                                                                       
+  |================================================                 |  73%
+  |                                                                       
+  |================================================                 |  74%
+  |                                                                       
+  |=================================================                |  75%
+  |                                                                       
+  |=================================================                |  76%
+  |                                                                       
+  |==================================================               |  76%
+  |                                                                       
+  |==================================================               |  77%
+  |                                                                       
+  |===================================================              |  78%
+  |                                                                       
+  |===================================================              |  79%
+  |                                                                       
+  |====================================================             |  80%
+  |                                                                       
+  |=====================================================            |  81%
+  |                                                                       
+  |=====================================================            |  82%
+  |                                                                       
+  |======================================================           |  83%
+  |                                                                       
+  |=======================================================          |  84%
+  |                                                                       
+  |=======================================================          |  85%
+  |                                                                       
+  |========================================================         |  86%
+  |                                                                       
+  |========================================================         |  87%
+  |                                                                       
+  |=========================================================        |  87%
+  |                                                                       
+  |=========================================================        |  88%
+  |                                                                       
+  |==========================================================       |  89%
+  |                                                                       
+  |==========================================================       |  90%
+  |                                                                       
+  |===========================================================      |  91%
+  |                                                                       
+  |============================================================     |  92%
+  |                                                                       
+  |============================================================     |  93%
+  |                                                                       
+  |=============================================================    |  94%
+  |                                                                       
+  |==============================================================   |  95%
+  |                                                                       
+  |==============================================================   |  96%
+  |                                                                       
+  |===============================================================  |  97%
+  |                                                                       
+  |===============================================================  |  98%
+  |                                                                       
+  |================================================================ |  98%
+  |                                                                       
+  |================================================================ |  99%
+  |                                                                       
+  |=================================================================| 100%</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cat</span>(<span class="st">&quot;The estimate number of classes (blocks) is:&quot;</span>, model$G, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
+<pre><code>## The estimate number of classes (blocks) is: 2</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">predictions &lt;-<span class="st"> </span><span class="kw">round</span>(model$z[,<span class="dv">2</span>])</code></pre></div>
+<p>We also check whether the clusters correspond to the block vectors.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Find cluster means. Rotate the data to the position of the latent vectors, and plot.</span>
+means &lt;-<span class="st"> </span>model$parameters$mean
+latent_vecs &lt;-<span class="st"> </span><span class="kw">cbind</span>(block0, block1)
+M &lt;-<span class="st"> </span><span class="kw">svd</span>(means %*%<span class="st"> </span><span class="kw">t</span>(latent_vecs))
+R &lt;-<span class="st"> </span>M$u %*%<span class="st"> </span><span class="kw">t</span>(M$v)
+X_R &lt;-<span class="st"> </span>X %*%<span class="st"> </span>R
+<span class="kw">plot</span>(X_R, 
+     <span class="dt">main =</span> <span class="st">&quot;Latent Vector Estimates of Graph (rotated)&quot;</span>, 
+     <span class="dt">family =</span> <span class="st">&quot;serif&quot;</span>,
+     <span class="dt">xlab =</span> <span class="st">&quot;PC1 Score&quot;</span>,
+     <span class="dt">ylab =</span> <span class="st">&quot;PC2 Score&quot;</span>,
+     <span class="dt">pch =</span> <span class="dv">19</span>,
+     <span class="dt">col =</span> blocks +<span class="st"> </span><span class="dv">1</span>)
+<span class="kw">points</span>(<span class="kw">t</span>(latent_vecs), <span class="dt">pch =</span> <span class="dv">4</span>, <span class="dt">cex =</span> <span class="dv">3</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Calculate accuracy.</span>
+rate &lt;-<span class="st"> </span><span class="kw">sum</span>(<span class="kw">as.numeric</span>(predictions ==<span class="st"> </span>blocks))/n
+<span class="kw">cat</span>(<span class="st">&quot;The classification accuracy is:&quot;</span>, rate, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre></div>
+<pre><code>## The classification accuracy is: 1</code></pre>
+<p>The rotated data clearly surrounds the latent vectors, and the blocks are consistent within the clusters.</p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
