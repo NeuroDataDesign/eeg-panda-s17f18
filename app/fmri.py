@@ -5,6 +5,7 @@
 
 
 import os
+import pickle as pkl
 
 # Load the lemur library
 import sys
@@ -36,6 +37,9 @@ def run_fmri(name):
   # Create a lemur distance matrix based on the EEG data
   DM = lds.DistanceMatrix(fds, lms.DiffAve)
   DM.name = "fmri-DistanceMatrix"
+
+  with open(os.path.join(BASE, name, 'fmri_dm.pkl'), 'wb') as pkl_loc:
+      pkl.dump(DM, pkl_loc)
 
 
   # In[4]:

@@ -8,6 +8,7 @@
 import pandas as pd
 import numpy as np
 import os
+import pickle as pkl
 
 
 # In[ ]:
@@ -42,6 +43,8 @@ def run_pheno(name):
     os.makedirs(out_base + "/agg", exist_ok=True)
     os.makedirs(out_emb_base + "/agg", exist_ok=True)
 
+    with open(os.path.join(BASE, name, 'pheno_dm.pkl'), 'wb') as pkl_loc:
+        pkl.dump(DM, pkl_loc)
 
 
     # In[ ]:

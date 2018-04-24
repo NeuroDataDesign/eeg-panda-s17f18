@@ -6,6 +6,7 @@
 import os
 import pandas as pd
 import sys
+import pickle as pkl
 
 
 # Load the lemur library
@@ -35,6 +36,9 @@ def run_graph(name):
   # Create a lemur distance matrix based on the graph data
   DM = lds.DistanceMatrix(gds, lms.FroCorr)
   DM.name = "graph-DistanceMatrix"
+
+  with open(os.path.join(BASE, name, 'graph_dm.pkl'), 'wb') as pkl_loc:
+      pkl.dump(DM, pkl_loc)
 
   # Create an embedded distance matrix object under MDS
   MDSEmbedder = leb.MDSEmbedder(num_components=10)

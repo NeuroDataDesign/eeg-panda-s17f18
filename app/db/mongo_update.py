@@ -63,9 +63,11 @@ def build_database(dataset, bucket_name):
     # Read listing of files
     s3 = boto3.resource('s3', aws_access_key_id=creds['access_key'], aws_secret_access_key=creds['secret_key'],
                         region_name='us-east-1')
-    bucket = s3.Bucket('lemur-simple')
+    print(bucket_name)
+    bucket = s3.Bucket(bucket_name)
     subs = dict()
     for elem in bucket.objects.all():
+        print('In elem loop')
         file_structs = elem.key.split('/')
         if len(file_structs) < 4:
             continue
@@ -91,6 +93,7 @@ def build_dataset(lims, dataset):
     )
 
 def update_dataset(lims, dataset, subject):
+    print(subject)
     lims.update_one(
         filter = {"_id": dataset},
         update = {"$addToSet": { "subjects": subject }}
@@ -132,30 +135,34 @@ def build_derivative(lims, dataset, datatype, derivative, links):
         update_dataset(lims, dataset, subject)
         # insert  and subject dataype if needed
 
+        print(dataset)
+
         write_result = lims.update_one(
             filter = {"_id": subject},
-            update = {"$setOnInsert": { datatype + "." + derivative: [{url: ""}]}},
+            update = {"$setOnInsert": { dataset + "." + datatype + "." + derivative: [{url: ""}]}},
             upsert = True
         )
+
+        print(write_result)
 
         if (write_result.upserted_id is not None):
             continue
 
         lims.update_one(
-            filter = {"_id": subject, datatype + "." + derivative: {"$exists": False}},
-            update = { "$set": { datatype + "." + derivative: [] }},
+            filter = {"_id": subject, dataset + "." + datatype + "." + derivative: {"$exists": False}},
+            update = { "$set": { dataset + "." + datatype + "." + derivative: [] }},
         )
         #insert url to derivative list
         #NOTE: no upsert option exists
         lims.update_one(
             filter = {"_id": subject}, #query
             update = {
-                "$push": { datatype + "." + derivative: {url: ""} }
+                "$push": { dataset + "." + datatype + "." + derivative: {url: ""} }
             }
         )
     print("Updated Scan Count: " + str(scan_count))
 
-def build_metadata(filename):
+def build_metadata(filename, dataset):
     lims = init_database()
     metadata_list = parse_csv(filename)
 
@@ -172,23 +179,23 @@ def build_metadata(filename):
         if (subid == -1):
             continue
 
-        try:
-            session = metadata.pop("SESSION")
-        except:
-            session = "Session-1"
+        # try:
+        #     session = metadata.pop("SESSION")
+        # except:
+        #     session = "Session-1"
 
         for key, value in metadata.items():
             try:
                 result = lims.update_one(
                     filter = {"_id": "sub-" + subid},
-                    update = {"$set": {"metadata." + session + "." + key: value}}
+                    update = {"$set": {dataset + ".metadata." + key: value}}
                 )
 
                 ##Update did not occur
                 if (result.matched_count < 1):
                     lims.update_one(
                         filter = {"_id": "sub-00" + subid},
-                        update = {"$set": {"metadata." + session + "." + key: value}}
+                        update = {"$set": {dataset + ".metadata."  + key: value}}
                     )
             except:
                 raise Exception("Error adding metadata")

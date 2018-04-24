@@ -6,8 +6,7 @@
 
 import os
 import pandas as pd
-import sys
-
+import pickle as pkl
 
 # Load the lemur library
 import sys
@@ -34,10 +33,13 @@ def run_eeg(name):
 
 
   eds = lds.EEGDataSet(dataset_descriptor)
-  print(eds.n)
   # Create a lemur distance matrix based on the EEG data
   DM = lds.DistanceMatrix(eds, lms.FroCorr)
   DM.name = "eeg-DistanceMatrix"
+
+  with open(os.path.join(BASE, name, 'eeg_dm.pkl'), 'wb') as pkl_loc:
+      pkl.dump(DM, pkl_loc)
+
 
 
   # In[3]:

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {%  block head %}{% endblock %}
     <link rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
           integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
@@ -9,9 +8,11 @@
     <link rel="stylesheet" href="https://getbootstrap.com/docs/4.0/examples/dashboard/dashboard.css">\
     <!--<link rel="stylesheet" href="styles.css">-->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <style>.top-buffer { margin-top:20px; } </style>\
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <style>.top-buffer { margin-top:20px; } </style>
     <meta charset="UTF-8">
     <title>MEDA</title>
+    {%  block head %}{% endblock %}
 </head>
 <body>
     <!-- Navabr -->

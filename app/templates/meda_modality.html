@@ -1,7 +1,37 @@
 {% extends "layout.html" %}
+{% block head %}
+    <!-- <script>
+        function tableFilter() {
+          // Declare variables
+          var input, filter, table, tr, tds, i, j;
+          input = document.getElementById("myInput");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("myTable");
+          tr = table.getElementsByTagName("tr");
+
+          // Loop through all table rows, and hide those who don't match the search query
+          for (i = 0; i < tr.length; i++) {
+            tds = tr[i].getElementsByTagName("td");
+            for (j = 0; j < tds.length; j++) {
+              td = tds[j];
+              if (td) {
+                  if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                      tr[i].style.display = "";
+                      break;
+                  } else {
+                      tr[i].style.display = "none";
+                  }
+              }
+            }
+          }
+        }
+    </script> -->
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">\
+{% endblock %}
 {% block content %}
     <div class="container-fluid">
-        <div class="row">
+        <tr class="row">
             <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
               <div class="container-fluid">MEDA Options</div>
               <hr>
@@ -64,22 +94,46 @@
                     them from the list below!</p>
                 {% endif %}
                 {% if request.args.get('subj_name') == "none" and plot == None %}
-                    <ul>
-                    {% for subject, tasks in interm %}
-                        <li> {{ subject }}<ul>
-                        {% for task in tasks %}
-                            <li>
-                                <a href={{ url_for('meda_modality', ds_name=request.path.split('/')[-4], modality = Modality, mode='one',
-                                subj_name=subject, test_name=task, plot_name=request.path.split('/')[-1]) }}>{{ task }}</a>
-                            </li>
-                        {% endfor %}
-                        </ul></li>
-                    {% endfor %}
-                    </ul>
+                    <table id="subjTable" class="display">
+                        <thead class="thead">
+                            <tr>
+                                <th>Subject</th>
+                                <th>Task</th>
+                                {% for meta_name in interm_meta %}
+                                    <th>{{ meta_name }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subject, tasks in interm %}
+                                {% for task in tasks %}
+                                    <tr>
+                                        <td>
+                                            <a href={{ url_for('meda_modality', ds_name=request.path.split('/')[-4], modality = Modality, mode='one',
+                                        subj_name=subject['_id'], test_name=task, plot_name=request.path.split('/')[-1]) }}>{{ subject['_id'] }}</a>
+                                        </td>
+                                        <td>
+                                            {{ task }}
+                                        </td>
+                                        {% for meta_name in subject['metadata'] %}
+                                            <td>
+                                                {{ subject['metadata'][meta_name] }}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
                 {% else %}
                     {{ plot|safe }}
                 {% endif %}
             </main>
         </div>
     </div>
+
+    <script>
+        $( function() {
+            $('#subjTable').DataTable();
+        });
+    </script>
 {% endblock %}

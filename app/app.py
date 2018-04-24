@@ -14,6 +14,7 @@ import pheno
 import graph
 
 import db.mongo_update as mongo_update
+import db.mongo_get as mongo_get
 
 import sys
 sys.path.append(os.path.abspath(os.path.join('..')))
@@ -227,18 +228,21 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
 
     subjs = []
     tasks = []
+    metadata = dict()
     if plot_name == "default":
         todisp = "<h1> Choose a plot! </h1>"
     elif subj_name == "none" and mode == 'one':
-        subjs = [di for di in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, di))
+        ids = [di for di in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, di))
                     and di.startswith('sub')]
-        tasks = []
-        for subj in subjs:
-            tasks.append([task_di for task_di in os.listdir(os.path.join(base_path, subj))
-                          if os.path.isdir(os.path.join(base_path, subj, task_di))])
+
+        subjs = mongo_get.get_from_database(ds_name, ids)
+
+        for id in ids:
+            tasks.append([task_di for task_di in os.listdir(os.path.join(base_path, id))
+                          if os.path.isdir(os.path.join(base_path, id, task_di))])
             if modality == 'fmri':
-                tasks.append([task_di for task_di in os.listdir(os.path.join(base_path, subj, 'Nifti4DPlotter'))
-                              if os.path.isdir(os.path.join(base_path, subj, 'Nifti4DPlotter', task_di))])
+                tasks.append([task_di for task_di in os.listdir(os.path.join(base_path, id, 'Nifti4DPlotter'))
+                              if os.path.isdir(os.path.join(base_path, id, 'Nifti4DPlotter', task_di))])
         todisp = None
     elif plot_name is not None:
         plot_filename = "%s.html"%(plot_name)
@@ -262,8 +266,12 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
         for title, _, tag in one_to_one_options[modality]:
             if tag == plot_name: plot_title = title
 
+    if len(subjs) > 0:
+        metadata = subjs[0]['metadata']
+
     return render_template('meda_modality.html',
                            interm=zip(subjs, tasks),
+                           interm_meta=metadata,
                            one_title=plot_title,
                            plot=todisp,
                            MEDA_options = aggregate_options[modality],
@@ -354,7 +362,7 @@ def upload():
     if session['pheno_data'] is not None:
         try:
             pheno.run_pheno(session['pheno_data'])
-            mongo_update.build_metadata('/home/nitin/hopkins/fall2017/ndd/lemur/data/HBN_R1_1_Pheno.csv')
+            mongo_update.build_metadata(session['pheno_data'], filedir)
         except:
             print("Running plots/synchronization failed!")
 
