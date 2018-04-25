@@ -1194,7 +1194,7 @@ class SpatialTimeSeries(TimeSeriesPlotter):
             pad = {"t": 50},
             steps = steps
         )]
-        layout = dict(sliders=sliders)
+        layout = dict(title=title, sliders=sliders)
 
         # Plot figure.
         fig = dict(data=data, layout=layout)
@@ -1273,7 +1273,7 @@ class SpatialPeriodogram(TimeSeriesPlotter):
             pad = {"t": 50},
             steps = steps
         )]
-        layout = dict(sliders=sliders)
+        layout = dict(title=title, sliders=sliders)
 
         # Plot figure.
         fig = dict(data=data, layout=layout)

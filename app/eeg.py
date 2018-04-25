@@ -9,8 +9,8 @@ import pandas as pd
 import pickle as pkl
 
 # Load the lemur library
-import sys
-sys.path.append("..")
+# import sys
+# sys.path.append("..")
 import lemur.datasets as lds
 import lemur.metrics as lms
 import lemur.plotters as lpl

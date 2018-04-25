@@ -269,6 +269,7 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
     if len(subjs) > 0:
         metadata = subjs[0]['metadata']
 
+
     return render_template('meda_modality.html',
                            interm=zip(subjs, tasks),
                            interm_meta=metadata,

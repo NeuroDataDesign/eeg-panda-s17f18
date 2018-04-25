@@ -1,4 +1,4 @@
 boto3==1.4.7
 Flask==0.12.2
 botocore==1.5.92
-redlemur==0.30
+redlemur==0.31

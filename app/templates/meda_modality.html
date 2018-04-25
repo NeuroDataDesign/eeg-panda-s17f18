@@ -73,7 +73,9 @@
                           <a class="nav-link {{ 'active' if value == request.path.split('/')[-1]
                             and 'embed' == request.path.split('/')[-2]}}"
                              href={{ url_for('meda_modality', ds_name=request.path.split('/')[-4], modality = Modality, mode='one',
-                             subj_name="none", tests_name="none", plot_name=filename) }}>{{ sidename }}
+                             subj_name=('none' if lemurname | lower == request.path.split('/')[-1] else request.args.get('subj_name', 'none')),
+                             test_name=('none' if lemurname | lower == request.path.split('/')[-1] else request.args.get('test_name', 'none')),
+                             plot_name=filename) }}> {{ sidename }}
                               {% if filename == request.path.split('/')[-1] %}
                                   <span class="sr-only">(current)</span>
                               {%  endif %}
