@@ -32,98 +32,28 @@ def run_pheno(name):
     CDS.imputeColumns("mean")
     DM = lds.DistanceMatrix(CDS, lms.VectorDifferenceNorm)
 
-    # Create an embedded distance matrix object under MDS
-    MDSEmbedder = leb.MDSEmbedder(num_components=10)
-    HBN_Embedded = MDSEmbedder.embed(DM)
-
     # Set output paths for saved plots.
     BASE = "data"
     out_base = os.path.join(BASE, DATASET, "pheno_derivatives")
     out_emb_base = os.path.join(BASE, DATASET, "pheno_embedded_deriatives")
     os.makedirs(out_base + "/agg", exist_ok=True)
     os.makedirs(out_emb_base + "/agg", exist_ok=True)
-
     with open(os.path.join(BASE, name, 'pheno_dm.pkl'), 'wb') as pkl_loc:
         pkl.dump(DM, pkl_loc)
 
+    # Create an embedded distance matrix object under MDS
+    MDSEmbedder = leb.MDSEmbedder(num_components=10)
+    HBN_Embedded = MDSEmbedder.embed(DM)
+    with open(os.path.join(BASE, name, 'pheno_embed_dm.pkl'), 'wb') as pkl_loc:
+        pkl.dump(HBN_Embedded, pkl_loc)
 
-    # In[ ]:
-
-
-    lpl.Heatmap(CDS, mode="savediv", base_path=out_base).plot()
-    lpl.Heatmap(HBN_Embedded, mode="savediv", base_path=out_emb_base).plot()
-
-    # In[ ]:
-
-
-    lpl.LocationLines(CDS, mode="savediv", base_path = out_base).plot()
-    lpl.LocationLines(HBN_Embedded, mode="savediv", base_path = out_emb_base).plot()
-
-    # In[ ]:
-
-
-    lpl.LocationHeatmap(CDS, mode="savediv", base_path=out_base).plot()
-    lpl.LocationHeatmap(HBN_Embedded, mode="savediv", base_path=out_emb_base).plot()
-
-    # In[ ]:
-
-
-    lpl.HistogramHeatmap(CDS, mode="savediv", base_path=out_base).plot()
-    lpl.HistogramHeatmap(HBN_Embedded, mode="savediv", base_path=out_emb_base).plot()
-
-
-    # In[ ]:
-
-
-    #lpl.CorrelationMatrix(CDS).plot()
-    #lpl.CorrelationMatrix(HBN_Embedded).plot()
-    #lpl.CorrelationMatrix(CDS, mode="savediv", base_path=out_base).plot()
-    #lpl.CorrelationMatrix(HBN_Embedded, mode="savediv", base_path=out_base).plot()
-
-
-    # In[ ]:
-
-
-    lpl.ScreePlotter(CDS, mode="savediv", base_path=out_base).plot()
-    lpl.ScreePlotter(HBN_Embedded, mode="savediv", base_path=out_emb_base).plot()
-
-
-    # In[ ]:
-
-
-    lpl.EigenvectorHeatmap(CDS, mode="savediv", base_path=out_base).plot()
-    lpl.EigenvectorHeatmap(HBN_Embedded, mode="savediv", base_path=out_base).plot()
-
-
-    ##### Clustering
     hgmm = lcl.HGMMClustering(HBN_Embedded, 4)
     hgmm.cluster()
+    with open(os.path.join(BASE, name, 'pheno_clust_dm.pkl'), 'wb') as pkl_loc:
+        pkl.dump(HBN_Embedded, pkl_loc)
 
-    # In[ ]:
-
-
-    lpl.ClusterPairsPlot(hgmm, mode="savediv", base_path=out_emb_base).plot()
-
-
-    # In[ ]:
-
-
-    lpl.HierarchicalClusterMeansDendrogram(hgmm, mode="savediv", base_path=out_emb_base).plot()
-
-
-    # In[ ]:
-
-
-    lpl.HierarchicalStackedClusterMeansHeatmap(hgmm, mode="savediv", base_path=out_emb_base).plot()
-
-
-    # In[ ]:
-
-
-    lpl.ClusterMeansLevelHeatmap(hgmm, mode="savediv", base_path=out_emb_base).plot()
-
-
-    # In[ ]:
-
-
-    lpl.ClusterMeansLevelLines(hgmm, mode="savediv", base_path=out_emb_base).plot()
+    # lpl.ClusterPairsPlot(hgmm, mode="savediv", base_path=out_emb_base).plot()
+    # lpl.HierarchicalClusterMeansDendrogram(hgmm, mode="savediv", base_path=out_emb_base).plot()
+    # lpl.HierarchicalStackedClusterMeansHeatmap(hgmm, mode="savediv", base_path=out_emb_base).plot()
+    # lpl.ClusterMeansLevelHeatmap(hgmm, mode="savediv", base_path=out_emb_base).plot()
+    # lpl.ClusterMeansLevelLines(hgmm, mode="savediv", base_path=out_emb_base).plot()

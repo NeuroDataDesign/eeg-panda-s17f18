@@ -37,7 +37,6 @@ def run_fmri(name):
   # Create a lemur distance matrix based on the EEG data
   DM = lds.DistanceMatrix(fds, lms.DiffAve)
   DM.name = "fmri-DistanceMatrix"
-
   with open(os.path.join(BASE, name, 'fmri_dm.pkl'), 'wb') as pkl_loc:
       pkl.dump(DM, pkl_loc)
 
@@ -48,6 +47,8 @@ def run_fmri(name):
   # Create an embedded distance matrix object under MDS
   MDSEmbedder = leb.MDSEmbedder(num_components=10)
   fMRI_Embedded = MDSEmbedder.embed(DM)
+  with open(os.path.join(BASE, name, 'fmri_embed_dm.pkl'), 'wb') as pkl_loc:
+      pkl.dump(fMRI_Embedded, pkl_loc)
 
 
   # In[17]:

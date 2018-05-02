@@ -30,17 +30,19 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">\
 {% endblock %}
 {% block content %}
-    <div class="container-fluid">
-        <tr class="row">
-            <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
-              <div class="container-fluid">MEDA Options</div>
-              <hr>
+    <div class="container-fluid" style="margin-top: 50px;">
+        <div class="row">
+            <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar" style="padding-top: 80px">
               <ul class="nav nav-pills flex-column">
+                  <li class="nav-item">
+                    <h6 class="nav-link font-weight-bold mb-0">MEDA Options</h6>
+                  </li>
                   {% for sidename, lemurname, filename in MEDA_options %}
                     <li class="nav-item">
                       <a class="nav-link {{ 'active' if value == request.path.split('/')[-1]
                               and 'none' == request.path.split('/')[-2]}}"
-                          href={{ url_for('meda_modality', ds_name=request.path.split('/')[-4], modality = Modality, mode='none', plot_name=filename) }}>{{ sidename }}
+                          href={{ url_for('meda_modality', ds_name=request.path.split('/')[-4],
+                          modality = Modality, mode='none', plot_name=filename) }}>{{ sidename }}
                           {% if filename == request.path.split('/')[-1] %}
                               <span class="sr-only">(current)</span>
                           {%  endif %}
@@ -49,9 +51,12 @@
                   {% endfor %}
               </ul>
 
-              <div class="container-fluid">MEDA Embedded Options</div>
+
               <hr>
               <ul class="nav nav-pills flex-column">
+                  <li class="nav-item">
+                    <h6 class="nav-link font-weight-bold mb-0">MEDA Embedded Options</h6>
+                  </li>
                   {% for sidename, lemurname, filename in MEDA_Embedded_options %}
                       <li class="nav-item">
                           <a class="nav-link {{ 'active' if value == request.path.split('/')[-1]
@@ -65,9 +70,11 @@
                   {% endfor %}
               </ul>
 
-              <div class="container-fluid">One-to-One Plots</div>
               <hr>
               <ul class="nav nav-pills flex-column">
+                  <li class="nav-item">
+                      <h6 class="nav-link font-weight-bold mb-0">One-to-One Plots</h6>
+                  </li>
                   {% for sidename, lemurname, filename in One_to_One %}
                       <li class="nav-item">
                           <a class="nav-link {{ 'active' if value == request.path.split('/')[-1]

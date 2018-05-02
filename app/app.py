@@ -1,5 +1,6 @@
 import os
 import shutil
+import pickle as pkl
 import botocore
 from flask import Flask, session, render_template, request, send_from_directory, url_for, redirect
 import logging
@@ -12,6 +13,8 @@ import eeg
 import fmri
 import pheno
 import graph
+
+import lemur.plotters as lpl
 
 import db.mongo_update as mongo_update
 import db.mongo_get as mongo_get
@@ -28,136 +31,132 @@ app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
+#'NameOfPlotInLemur': 'name-of-plot-file-name'
 aggregate_options = {
-    'pheno': [
-        #'NameOfPlotInLemur': 'name-of-plot-file-name'
-        ('Heatmap', 'Heatmap', 'heatmap'),
-        ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
-        ('Location Lines', 'LocationLines', 'locationlines'),
-        ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
-        ('Scree Plot', 'ScreePlotter', 'scree')
-    ],
-    'eeg': [
-        #'NameOfPlotInLemur': 'name-of-plot-file-name'
-        ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
-        ('Heatmap', 'Heatmap', 'squareheat'),
-        ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
-        ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
-        ('Location Lines', 'LocationLines', 'locationlines'),
-        ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
-        ('Scree Plot', 'ScreePlotter', 'scree')
-    ],
-    'fmri': [
-        #'NameOfPlotInLemur': 'name-of-plot-file-name'
-        ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
-        ('Heatmap', 'Heatmap', 'squareheat'),
-        ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
-        ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
-        ('Location Lines', 'LocationLines', 'locationlines'),
-        ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
-        ('Scree Plot', 'ScreePlotter', 'scree')
-    ],
-    'graph': [
-        #'NameOfPlotInLemur': 'name-of-plot-file-name'
-        ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
-        ('Heatmap', 'Heatmap', 'squareheat'),
-        ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
-        ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
-        ('Location Lines', 'LocationLines', 'locationlines'),
-        ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
-        ('Scree Plot', 'ScreePlotter', 'scree'),
-        ('Graph Stats', 'GraphStats', 'gr_stats')
-    ]
+    'pheno': {
+        'heatmap': ('Heatmap', 'Heatmap', 'heatmap'),
+        'histogramheat': ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
+        'locationlines': ('Location Lines', 'LocationLines', 'locationlines'),
+        'locationheat': ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+        'scree': ('Scree Plot', 'ScreePlotter', 'scree')
+    },
+    'eeg': {
+        'correlation': ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
+        'squareheat': ('Heatmap', 'Heatmap', 'squareheat'),
+        'evheat': ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
+        'histogramheat': ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
+        'locationlines': ('Location Lines', 'LocationLines', 'locationlines'),
+        'locationheat': ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+        'scree': ('Scree Plot', 'ScreePlotter', 'scree')
+    },
+    'fmri': {
+        'correlation': ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
+        'squareheat': ('Heatmap', 'Heatmap', 'squareheat'),
+        'evheat': ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
+        'histogramheat': ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
+        'locationlines': ('Location Lines', 'LocationLines', 'locationlines'),
+        'locationheat': ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+        'scree': ('Scree Plot', 'ScreePlotter', 'scree')
+    },
+    'graph': {
+        'correlation': ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
+        'squareheat': ('Heatmap', 'Heatmap', 'squareheat'),
+        'evheat': ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
+        'histogramheat': ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
+        'locationlines': ('Location Lines', 'LocationLines', 'locationlines'),
+        'locationheat': ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+        'scree': ('Scree Plot', 'ScreePlotter', 'scree'),
+        'gr_stats': ('Graph Stats', 'GraphStats', 'gr_stats')
+    }
 }
 
 # EEG and FMRI One-to-One options.
 one_to_one_options = {
-    'pheno' : [
-    ],
-    'eeg' : [
-        ('Connected Scatter', 'ConnectedScatter', 'connectedscatter'),
-        ('Sparkline', 'Sparkline', 'sparkline'),
-        ('Spatial Time Series', 'SpatialTimeSeries', 'spatialtimeseries'),
-        ('Spatial Periodogram', 'SpatialPeriodogram', 'spatialpgram')
-    ],
-    'fmri' : [
-        ('Time Elapse of fMRI Signal', 'TimeElapse', 'orth_epi')
-    ],
-    'graph' : [
-        ('Graph Stats', 'GraphStats', 'gr_stats')
-    ]
+    'pheno' : {
+    },
+    'eeg' : {
+        'connectedscatter': ('Connected Scatter', 'ConnectedScatter', 'connectedscatter'),
+        'sparkline': ('Sparkline', 'Sparkline', 'sparkline'),
+        'spatialtimeseries': ('Spatial Time Series', 'SpatialTimeSeries', 'spatialtimeseries'),
+        'spatialpgram': ('Spatial Periodogram', 'SpatialPeriodogram', 'spatialpgram')
+    },
+    'fmri' : {
+        'orth_epi': ('Time Elapse of fMRI Signal', 'TimeElapse', 'orth_epi')
+    },
+    'graph' : {
+        'gr_stats': ('Graph Stats', 'GraphStats', 'gr_stats')
+    }
 }
 
 # Embed for EEG and FMRI
 embedded_options = {
-    'pheno' : [
-        ('Heatmap', 'Heatmap', 'heatmap'),
-        ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
-        ('Location Lines', 'LocationLines', 'locationlines'),
-        ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
-        ('Scree Plot', 'ScreePlotter', 'scree'),
-        ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
-        ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
-        ('HGMM Stacked Cluster Means Heatmap',
-         'HGMMStackedClusterMeansHeatmap',
-         'hgmmscmh'),
-        ('HGMM Cluster Means Dendrogram',
-         'HGMMClusterMeansDendrogram',
-         'hgmmcmd'),
-        ('HGMM Pairs Plot',
-         'HGMMPairsPlot',
-          'hgmmcpp'),
-        ('HGMM Cluster Means Level Lines',
-         'HGMMClusterMeansLevelLines',
-          'hgmmcmll'),
-        ('HGMM Cluster Means Level Heatmap',
-         'HGMMClusterMeansLevelHeatmap',
-         'hgmmcmlh')
-    ],
-    'eeg' : [
-       #'NameOfPlotInLemur': 'name-of-plot-file-name'
-       ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
-       ('Heatmap', 'Heatmap', 'heatmap'),
-       ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
-       ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
-       ('Location Lines', 'LocationLines', 'locationlines'),
-       ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
-       ('Scree Plot', 'ScreePlotter', 'scree')
-    ],
-    'fmri' : [
-       #'NameOfPlotInLemur': 'name-of-plot-file-name'
-       ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
-       ('Heatmap', 'Heatmap', 'heatmap'),
-       ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
-       ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
-       ('Location Lines', 'LocationLines', 'locationlines'),
-       ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
-       ('Scree Plot', 'ScreePlotter', 'scree')
-    ],
-    'graph' : [
-        ('Heatmap', 'Heatmap', 'heatmap'),
-        ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
-        ('Location Lines', 'LocationLines', 'locationlines'),
-        ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
-        ('Scree Plot', 'ScreePlotter', 'scree'),
-        ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
-        ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
-        ('HGMM Stacked Cluster Means Heatmap',
-         'HGMMStackedClusterMeansHeatmap',
-         'hgmmscmh'),
-        ('HGMM Cluster Means Dendrogram',
-         'HGMMClusterMeansDendrogram',
-         'hgmmcmd'),
-        ('HGMM Pairs Plot',
-         'HGMMPairsPlot',
-          'hgmmcpp'),
-        ('HGMM Cluster Means Level Lines',
-         'HGMMClusterMeansLevelLines',
-          'hgmmcmll'),
-        ('HGMM Cluster Means Level Heatmap',
-         'HGMMClusterMeansLevelHeatmap',
-         'hgmmcmlh')
-    ],
+    'pheno' : {
+        'heatmap': ('Heatmap', 'Heatmap', 'heatmap'),
+        'histogramheat': ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
+        'locationlines': ('Location Lines', 'LocationLines', 'locationlines'),
+        'locationheat' : ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+        'scree' : ('Scree Plot', 'ScreePlotter', 'scree'),
+        'correlation': ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
+        'evheat': ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
+        'hgmmscmh' : ('HGMM Stacked Cluster Means Heatmap',
+                      'HGMMStackedClusterMeansHeatmap',
+                      'hgmmscmh'),
+        'hgmmcmd' : ('HGMM Cluster Means Dendrogram',
+                     'HGMMClusterMeansDendrogram',
+                     'hgmmcmd'),
+        'hgmmcpp' : ('HGMM Pairs Plot',
+                     'HGMMPairsPlot',
+                     'hgmmcpp'),
+        'hgmmcmll' : ('HGMM Cluster Means Level Lines',
+                      'HGMMClusterMeansLevelLines',
+                      'hgmmcmll'),
+        'hgmmcmlh' : ('HGMM Cluster Means Level Heatmap',
+                      'HGMMClusterMeansLevelHeatmap',
+                      'hgmmcmlh')
+    },
+    'eeg' : {
+        'correlation': ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
+        'squareheat': ('Heatmap', 'Heatmap', 'squareheat'),
+        'evheat': ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
+        'histogramheat': ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
+        'locationlines': ('Location Lines', 'LocationLines', 'locationlines'),
+        'locationheat': ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+        'scree': ('Scree Plot', 'ScreePlotter', 'scree')
+    },
+    'fmri' : {
+        'correlation': ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
+        'squareheat': ('Heatmap', 'Heatmap', 'squareheat'),
+        'evheat': ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
+        'histogramheat': ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
+        'locationlines': ('Location Lines', 'LocationLines', 'locationlines'),
+        'locationheat': ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+        'scree': ('Scree Plot', 'ScreePlotter', 'scree')
+    },
+    'graph' : {
+        'heatmap': ('Heatmap', 'Heatmap', 'heatmap'),
+        'histogramheat': ('Histogram Heatmap', 'HistogramHeatmap', 'histogramheat'),
+        'locationlines': ('Location Lines', 'LocationLines', 'locationlines'),
+        'locationheat': ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
+        'correlation': ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
+        'evheat': ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
+        'scree': ('Scree Plot', 'ScreePlotter', 'scree'),
+        'hgmmscmh' : ('HGMM Stacked Cluster Means Heatmap',
+                      'HGMMStackedClusterMeansHeatmap',
+                      'hgmmscmh'),
+        'hgmmcmd' : ('HGMM Cluster Means Dendrogram',
+                     'HGMMClusterMeansDendrogram',
+                     'hgmmcmd'),
+        'hgmmcpp' : ('HGMM Pairs Plot',
+                     'HGMMPairsPlot',
+                     'hgmmcpp'),
+        'hgmmcmll' : ('HGMM Cluster Means Level Lines',
+                      'HGMMClusterMeansLevelLines',
+                      'hgmmcmll'),
+        'hgmmcmlh' : ('HGMM Cluster Means Level Heatmap',
+                      'HGMMClusterMeansLevelHeatmap',
+                      'hgmmcmlh')
+
+    }
 }
 
 @app.route('/')
@@ -233,7 +232,7 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
         todisp = "<h1> Choose a plot! </h1>"
     elif subj_name == "none" and mode == 'one':
         ids = [di for di in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, di))
-                    and di.startswith('sub')]
+               and di.startswith('sub')]
 
         subjs = mongo_get.get_from_database(ds_name, ids)
 
@@ -245,10 +244,17 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
                               if os.path.isdir(os.path.join(base_path, id, 'Nifti4DPlotter', task_di))])
         todisp = None
     elif plot_name is not None:
-        plot_filename = "%s.html"%(plot_name)
-        plot_path = os.path.join(base_path, plot_filename)
-        with open(plot_path, "r") as f:
-            todisp = f.read()
+        # Rendering a plot
+        dm_path = modality
+        if mode == 'embed':
+            dm_path += '_embed'
+        elif modality == 'eeg' and mode == 'one' and 'spatial' in plot_name:
+            dm_path += '_spatial'
+        dm_path += '_data.pkl'
+
+        with open(os.path.join('data', ds_name, dm_path), 'rb') as pkl_loc:
+            DM = pkl.load(pkl_loc)
+            todisp = getattr(lpl, aggregate_options[modality][plot_name][1])(DM, mode='div').plot()
     else:
         todisp = "<h1> Choose a plot! </h1>"
 
@@ -263,7 +269,7 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
 
     plot_title = ""
     if mode == "one":
-        for title, _, tag in one_to_one_options[modality]:
+        for title, _, tag in one_to_one_options[modality].values():
             if tag == plot_name: plot_title = title
 
     if len(subjs) > 0:
@@ -275,11 +281,11 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
                            interm_meta=metadata,
                            one_title=plot_title,
                            plot=todisp,
-                           MEDA_options = aggregate_options[modality],
-                           MEDA_Embedded_options = embedded_options[modality],
-                           One_to_One = one_to_one_options[modality],
+                           MEDA_options = aggregate_options[modality].values(),
+                           MEDA_Embedded_options = embedded_options[modality].values(),
+                           One_to_One = one_to_one_options[modality].values(),
                            Modality = modality
-                       )
+                           )
 
 # Pass modality as string, and base path.
 def run_modality(modality, basepath):
@@ -370,58 +376,6 @@ def upload():
     for name in file_names:
         if session[name+'_data'] is not None:
             return redirect(url_for('meda_modality', ds_name=filedir, modality=name, mode='none', plot_name='default'))
-
-@app.route('/s3upload', methods=['POST'])
-def s3upload():
-
-    target = os.path.join(APP_ROOT,'downloads')
-    app.logger.info('Target route: %s', target)
-
-    if not os.path.isdir(target):
-        os.mkdir(target)
-
-    for file in request.files.getlist("file"):
-        # print file
-        filename = file.filename
-        destination = "/".join([target,filename])
-        app.logger.info('Accept incoming file: %s', filename)
-        app.logger.info('Save it to: %s', destination)
-        file.save(destination)
-
-        credential_info = open(destination, 'r').readlines()
-        bucket_name = credential_info[0][:-1]
-
-        cmd = ["aws", "s3", "cp", "s3://%s/%s"%(bucket_name, )]
-        # # Uploads the given file using a managed uploader, which will split up large
-        # # files automatically and upload parts in parallel.
-        client.upload_file(destination, bucket_name, filename)
-        #
-        # # Then grab the file from S3 bucket to show connection is established
-        KEY = filename  # replace with your object key
-
-        objects = client.list_objects(Bucket = bucket_name)['Contents']
-        for s3_key in objects:
-            s3_object = s3_key['Key']
-            if not s3_object.endswith("/"):
-                client.download_file(bucket_name, s3_object, target+'/'+ s3_object)
-            else:
-                if not os.path.exists(s3_object):
-                    os.makedirs(target+'/'+ s3_object)
-
-
-        try:
-            client.download_file(bucket_name, KEY, KEY)
-            app.logger.info('Downloading file from S3...')
-            # s = open(filename, 'r')
-            # print s.read()
-        except botocore.exceptions.ClientError as e:
-            if e.response['Error']['Code'] == "404":
-                app.logger.error('The object does not exist.')
-            else:
-                raise
-        #         # s = open(destination, 'r')
-        #         # print s.read()
-    return render_template("complete.html",file_name = filename)
 
 @app.route('/upload/<filename>')
 def send_image(filename):
