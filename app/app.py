@@ -343,7 +343,7 @@ def upload():
             file = files[0]
             app.logger.info('Input type in loop: %s', name)
             dirpath = os.path.join(dspath, name)
-            os.makedirs(dirpath, exist_ok=True)
+#            os.makedirs(dirpath, exist_ok=True)
             filename = file.filename
             destination = os.path.join(dspath, filename)
             app.logger.info('Accept incoming file: %s', filename)
@@ -356,35 +356,35 @@ def upload():
     # For modalities in which you upload S3 credentials.
     for name in ['eeg', 'fmri', 'graph']:
         if session[name+'_data'] is not None:
-            # Download EEG patients
-            app.logger.info("Downloading "+name+" Data...")
-
-            # Collect AWS credentials,
-            credential_info = open(session[name+'_data'], 'r').read().split(",")
-            bucket_name = credential_info[0]
-            ACCESS_KEY = str(credential_info[1])
-            SECRET_KEY = str(credential_info[2])
-
-            # Download files
-            '''
-            s3 = boto3.resource('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY, region_name='us-east-1')
-            bucket = s3.Bucket(bucket_name)
-            for elem in bucket.list():
-                key = elem.name.encode('utf-8')
-                bucket.download_file(key, os.path.join(session['basepath'], name)+"/"+str(key.split('/')[-1]))
-            '''
-
-            # Configre AWS Credentials
-
-            try:
-                cmd = ["aws", "s3",
-                       "cp", ("s3://%s/"+name)%(bucket_name),
-                       os.path.join(session['basepath'], name), "--recursive"]
-                app.logger.info(name+" Data Downloaded")
-                call(cmd)
-                mongo_update.build_database(filedir, bucket_name)
-            except:
-                print("Download from S3/database synchronization failed!")
+#            # Download EEG patients
+#            app.logger.info("Downloading "+name+" Data...")
+#
+#            # Collect AWS credentials,
+#            credential_info = open(session[name+'_data'], 'r').read().split(",")
+#            bucket_name = credential_info[0]
+#            ACCESS_KEY = str(credential_info[1])
+#            SECRET_KEY = str(credential_info[2])
+#
+#            # Download files
+#            '''
+#            s3 = boto3.resource('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY, region_name='us-east-1')
+#            bucket = s3.Bucket(bucket_name)
+#            for elem in bucket.list():
+#                key = elem.name.encode('utf-8')
+#                bucket.download_file(key, os.path.join(session['basepath'], name)+"/"+str(key.split('/')[-1]))
+#            '''
+#
+#            # Configre AWS Credentials
+#
+#            try:
+#                cmd = ["aws", "s3",
+#                       "cp", ("s3://%s/"+name)%(bucket_name),
+#                       os.path.join(session['basepath'], name), "--recursive"]
+#                app.logger.info(name+" Data Downloaded")
+#                call(cmd)
+#                mongo_update.build_database(filedir, bucket_name)
+#            except:
+#                print("Download from S3/database synchronization failed!")
 
 
             run_modality(name, os.path.basename(session['basepath']))
