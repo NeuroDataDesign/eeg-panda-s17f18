@@ -34,26 +34,23 @@ def run_pheno(name):
 
     # Set output paths for saved plots.
     BASE = "data"
-    out_base = os.path.join(BASE, DATASET, "pheno_derivatives")
-    out_emb_base = os.path.join(BASE, DATASET, "pheno_embedded_deriatives")
-    os.makedirs(out_base + "/agg", exist_ok=True)
-    os.makedirs(out_emb_base + "/agg", exist_ok=True)
-    with open(os.path.join(BASE, name, 'pheno_dm.pkl'), 'wb') as pkl_loc:
+    # out_base = os.path.join(BASE, DATASET, "pheno_derivatives")
+    # out_emb_base = os.path.join(BASE, DATASET, "pheno_embedded_deriatives")
+    # os.makedirs(out_base + "/agg", exist_ok=True)
+    # os.makedirs(out_emb_base + "/agg", exist_ok=True)
+    with open(os.path.join(BASE, DATASET, 'pheno_dm.pkl'), 'wb') as pkl_loc:
+        print('writing pheo reg file', os.path.join(BASE, 'pheno_embed_dm.pkl'))
+        print(DATASET)
         pkl.dump(DM, pkl_loc)
 
     # Create an embedded distance matrix object under MDS
     MDSEmbedder = leb.MDSEmbedder(num_components=10)
     HBN_Embedded = MDSEmbedder.embed(DM)
-    with open(os.path.join(BASE, name, 'pheno_embed_dm.pkl'), 'wb') as pkl_loc:
+    with open(os.path.join(BASE, DATASET, 'pheno_embed_dm.pkl'), 'wb') as pkl_loc:
+        print('writing pheno embed file', os.path.join(BASE, 'pheno_embed_dm.pkl'))
         pkl.dump(HBN_Embedded, pkl_loc)
 
     hgmm = lcl.HGMMClustering(HBN_Embedded, 4)
     hgmm.cluster()
-    with open(os.path.join(BASE, name, 'pheno_clust_dm.pkl'), 'wb') as pkl_loc:
-        pkl.dump(HBN_Embedded, pkl_loc)
-
-    # lpl.ClusterPairsPlot(hgmm, mode="savediv", base_path=out_emb_base).plot()
-    # lpl.HierarchicalClusterMeansDendrogram(hgmm, mode="savediv", base_path=out_emb_base).plot()
-    # lpl.HierarchicalStackedClusterMeansHeatmap(hgmm, mode="savediv", base_path=out_emb_base).plot()
-    # lpl.ClusterMeansLevelHeatmap(hgmm, mode="savediv", base_path=out_emb_base).plot()
-    # lpl.ClusterMeansLevelLines(hgmm, mode="savediv", base_path=out_emb_base).plot()
+    with open(os.path.join(BASE, DATASET, 'pheno_clust_dm.pkl'), 'wb') as pkl_loc:
+        pkl.dump(hgmm, pkl_loc)

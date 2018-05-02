@@ -1052,7 +1052,7 @@ class CorrelationMatrixPlotter(TimeSeriesPlotter):
             title = "Channels"
         )
         yaxis = dict(
-                scaleanchor="x",
+            scaleanchor="x",
             title = "Channels"
         )
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)

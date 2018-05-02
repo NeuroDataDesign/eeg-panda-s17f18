@@ -22,3 +22,14 @@ def get_from_database(dataset, ids):
         doc = {'_id' : doc['_id'], 'metadata' : doc[dataset].get('metadata', {})}
         subjs.append(doc)
     return subjs
+
+def get_from_dataset(dataset):
+    # Initialize
+    lims = init_database()
+    cursor = lims.find({ '_id' : dataset })
+    subjs = []
+    for doc in cursor:
+        subjs = doc['subjects']
+        break
+    return subjs
+

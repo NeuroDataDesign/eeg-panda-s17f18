@@ -73,6 +73,24 @@
               <hr>
               <ul class="nav nav-pills flex-column">
                   <li class="nav-item">
+                      <h6 class="nav-link font-weight-bold mb-0">MEDA Embedded and Clustering Options</h6>
+                  </li>
+                  {% for sidename, lemurname, filename in MEDA_Clustering_options %}
+                      <li class="nav-item">
+                          <a class="nav-link {{ 'active' if value == request.path.split('/')[-1]
+                            and 'embed' == request.path.split('/')[-2]}}"
+                             href={{ url_for('meda_modality', ds_name=request.path.split('/')[-4], modality = Modality, mode='clust', plot_name=filename) }}>{{ sidename }}
+                              {% if filename == request.path.split('/')[-1] %}
+                                  <span class="sr-only">(current)</span>
+                              {%  endif %}
+                          </a>
+                      </li>
+                  {% endfor %}
+              </ul>
+
+              <hr>
+              <ul class="nav nav-pills flex-column">
+                  <li class="nav-item">
                       <h6 class="nav-link font-weight-bold mb-0">One-to-One Plots</h6>
                   </li>
                   {% for sidename, lemurname, filename in One_to_One %}

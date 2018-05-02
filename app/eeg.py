@@ -28,17 +28,15 @@ def run_eeg(name):
   # os.makedirs(out_base + "/agg", exist_ok=True)
   # os.makedirs(out_emb_base + "/agg", exist_ok=True)
 
-
-  # In[2]:
-
-
   eds = lds.EEGDataSet(dataset_descriptor)
+  with open(os.path.join(BASE, name, 'eeg_ds.pkl'), 'wb') as pkl_loc:
+      pkl.dump(eds, pkl_loc)
+
   # Create a lemur distance matrix based on the EEG data
   DM = lds.DistanceMatrix(eds, lms.FroCorr)
   DM.name = "eeg-DistanceMatrix"
   with open(os.path.join(BASE, name, 'eeg_dm.pkl'), 'wb') as pkl_loc:
       pkl.dump(DM, pkl_loc)
-
 
   # Create an embedded distance matrix object under MDS
   MDSEmbedder = leb.MDSEmbedder(num_components=10)
@@ -48,10 +46,11 @@ def run_eeg(name):
 
 
   chanlocs = pd.read_csv("data/%s/eeg/chanlocs.csv"%(name))
+  with open(os.path.join(BASE, name, 'eeg_chanlocs.pkl'), 'wb') as pkl_loc:
+      pkl.dump(chanlocs.as_matrix()[:, 1:4], pkl_loc)
+  
   spatial = lds.DataSet(chanlocs[["X", "Y", "Z"]], "Spatial")
   spatialDM = lds.DistanceMatrix(spatial, lms.VectorDifferenceNorm)
   with open(os.path.join(BASE, name, 'eeg_spatial_dm.pkl'), 'wb') as pkl_loc:
       pkl.dump(spatialDM, pkl_loc)
 
-def get_plot(mode, ds_name, fxn):
-  # Rendering a plot

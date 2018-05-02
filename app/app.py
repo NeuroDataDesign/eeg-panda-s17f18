@@ -97,22 +97,7 @@ embedded_options = {
         'locationheat' : ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
         'scree' : ('Scree Plot', 'ScreePlotter', 'scree'),
         'correlation': ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
-        'evheat': ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
-        'hgmmscmh' : ('HGMM Stacked Cluster Means Heatmap',
-                      'HGMMStackedClusterMeansHeatmap',
-                      'hgmmscmh'),
-        'hgmmcmd' : ('HGMM Cluster Means Dendrogram',
-                     'HGMMClusterMeansDendrogram',
-                     'hgmmcmd'),
-        'hgmmcpp' : ('HGMM Pairs Plot',
-                     'HGMMPairsPlot',
-                     'hgmmcpp'),
-        'hgmmcmll' : ('HGMM Cluster Means Level Lines',
-                      'HGMMClusterMeansLevelLines',
-                      'hgmmcmll'),
-        'hgmmcmlh' : ('HGMM Cluster Means Level Heatmap',
-                      'HGMMClusterMeansLevelHeatmap',
-                      'hgmmcmlh')
+        'evheat': ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat')
     },
     'eeg' : {
         'correlation': ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
@@ -139,23 +124,48 @@ embedded_options = {
         'locationheat': ('Location Heatmap', 'LocationHeatmap', 'locationheat'),
         'correlation': ('Correlation Matrix', 'CorrelationMatrix', 'correlation'),
         'evheat': ('Eigenvector Heatmap', 'EigenvectorHeatmap', 'evheat'),
-        'scree': ('Scree Plot', 'ScreePlotter', 'scree'),
+        'scree': ('Scree Plot', 'ScreePlotter', 'scree')
+    }
+}
+
+clustering_options = {
+    'pheno' : {
         'hgmmscmh' : ('HGMM Stacked Cluster Means Heatmap',
-                      'HGMMStackedClusterMeansHeatmap',
+                      'ClusterMeansLevelHeatmap',
                       'hgmmscmh'),
         'hgmmcmd' : ('HGMM Cluster Means Dendrogram',
-                     'HGMMClusterMeansDendrogram',
+                     'HierarchicalClusterMeansDendrogram',
                      'hgmmcmd'),
         'hgmmcpp' : ('HGMM Pairs Plot',
-                     'HGMMPairsPlot',
+                     'ClusterPairsPlot',
                      'hgmmcpp'),
         'hgmmcmll' : ('HGMM Cluster Means Level Lines',
-                      'HGMMClusterMeansLevelLines',
+                      'ClusterMeansLevelLines',
                       'hgmmcmll'),
         'hgmmcmlh' : ('HGMM Cluster Means Level Heatmap',
-                      'HGMMClusterMeansLevelHeatmap',
+                      'HierarchicalStackedClusterMeansHeatmap',
                       'hgmmcmlh')
-
+    },
+    'eeg' : {
+    },
+    'fmri' : {
+    },
+    'graph' : {
+        'hgmmscmh' : ('HGMM Stacked Cluster Means Heatmap',
+                      'ClusterMeansLevelHeatmap',
+                      'hgmmscmh'),
+        'hgmmcmd' : ('HGMM Cluster Means Dendrogram',
+                     'HierarchicalClusterMeansDendrogram',
+                     'hgmmcmd'),
+        'hgmmcpp' : ('HGMM Pairs Plot',
+                     'ClusterPairsPlot',
+                     'hgmmcpp'),
+        'hgmmcmll' : ('HGMM Cluster Means Level Lines',
+                      'ClusterMeansLevelLines',
+                      'hgmmcmll'),
+        'hgmmcmlh' : ('HGMM Cluster Means Level Heatmap',
+                      'HierarchicalStackedClusterMeansHeatmap',
+                      'hgmmcmlh')
     }
 }
 
@@ -231,14 +241,11 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
     if plot_name == "default":
         todisp = "<h1> Choose a plot! </h1>"
     elif subj_name == "none" and mode == 'one':
-        ids = [di for di in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, di))
-               and di.startswith('sub')]
-
+        ids = mongo_get.get_from_dataset(ds_name)
         subjs = mongo_get.get_from_database(ds_name, ids)
 
         for id in ids:
-            tasks.append([task_di for task_di in os.listdir(os.path.join(base_path, id))
-                          if os.path.isdir(os.path.join(base_path, id, task_di))])
+            tasks.append(['Rest'])
             if modality == 'fmri':
                 tasks.append([task_di for task_di in os.listdir(os.path.join(base_path, id, 'Nifti4DPlotter'))
                               if os.path.isdir(os.path.join(base_path, id, 'Nifti4DPlotter', task_di))])
@@ -246,15 +253,31 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
     elif plot_name is not None:
         # Rendering a plot
         dm_path = modality
+        options = aggregate_options
         if mode == 'embed':
             dm_path += '_embed'
-        elif modality == 'eeg' and mode == 'one' and 'spatial' in plot_name:
-            dm_path += '_spatial'
-        dm_path += '_data.pkl'
+            options = embedded_options
+        elif mode == 'one':
+            options = one_to_one_options
+            if modality == 'eeg' and 'spatial' in plot_name:
+                dm_path += '_spatial'
+        elif mode == 'clust':
+            dm_path += '_clust'
+            options = clustering_options
+        dm_path += '_dm.pkl'
 
-        with open(os.path.join('data', ds_name, dm_path), 'rb') as pkl_loc:
-            DM = pkl.load(pkl_loc)
-            todisp = getattr(lpl, aggregate_options[modality][plot_name][1])(DM, mode='div').plot()
+        if modality == 'eeg' and 'spatial' in plot_name:
+            with open(os.path.join('data', ds_name, 'eeg_chanlocs.pkl'), 'rb') as chanloc_pkl, open(os.path.join('data', ds_name, dm_path), 'rb') as pkl_loc:
+                DM = pkl.load(pkl_loc)
+                chanlocs = pkl.load(chanloc_pkl)
+                print(len(chanlocs))
+                print(DM.D)
+                todisp = getattr(lpl, options[modality][plot_name][1])(DM.getResourceDS(0), mode='div').plot(chanlocs)
+        else:
+            with open(os.path.join('data', ds_name, dm_path), 'rb') as pkl_loc:
+                DM = pkl.load(pkl_loc)
+                todisp = getattr(lpl, options[modality][plot_name][1])(DM, mode='div').plot()
+
     else:
         todisp = "<h1> Choose a plot! </h1>"
 
@@ -283,9 +306,10 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
                            plot=todisp,
                            MEDA_options = aggregate_options[modality].values(),
                            MEDA_Embedded_options = embedded_options[modality].values(),
+                           MEDA_Clustering_options = clustering_options[modality].values(),
                            One_to_One = one_to_one_options[modality].values(),
                            Modality = modality
-                           )
+                          )
 
 # Pass modality as string, and base path.
 def run_modality(modality, basepath):
