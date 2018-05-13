@@ -51,6 +51,8 @@ def run_eeg(name):
       pkl.dump(spatialDM, pkl_loc)
 
 
+
+
   # TODO: Yujia no idea what's happneing here...
   # s3 = boto3.resource('s3')
   # bucket = s3.Bucket('redlemurtest')

@@ -58,6 +58,7 @@ class MatrixPlotter:
             An plotly figure.
 
         """
+        print('plot-mode', self.plot_mode)
 
         if self.plot_mode == "notebook":
             iplot(fig)
@@ -1031,17 +1032,18 @@ class SparkLinePlotter(TimeSeriesPlotter):
             title = "Intensity"
         )
         layout = dict(title=title, xaxis=xaxis, yaxis=yaxis)
+        df = pd.DataFrame(self.data.T)
+        winsize = 1
         if self.n > 500:
             winsize = self.n // 500
-            df = pd.DataFrame(self.data.T)
             df = df.groupby(lambda x: x // winsize).mean()
-            downsampled_data = df.as_matrix().T
-            data = [dict(mode="lines",
-                         name = str(i),
-                         x=(np.arange(downsampled_data.shape[1]) * winsize) / sample_freq,
-                         y=downsampled_data[i, :]) for i in range(downsampled_data.shape[0])]
+        downsampled_data = df.as_matrix().T
+        data = [dict(mode="lines",
+                     name = str(i),
+                     x=(np.arange(downsampled_data.shape[1]) * winsize) / sample_freq,
+                     y=downsampled_data[i, :]) for i in range(downsampled_data.shape[0])]
         fig = dict(data=data, layout=layout)
-        self.makeplot(fig, self.resource_name + "/" + self.shortname)
+        return self.makeplot(fig, self.resource_name + "/" + self.shortname)
 
 class CorrelationMatrixPlotter(TimeSeriesPlotter):
     titlestring = "Correlation Matrix for %s"

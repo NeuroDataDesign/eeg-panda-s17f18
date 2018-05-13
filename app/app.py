@@ -75,8 +75,8 @@ one_to_one_options = {
     'pheno' : {
     },
     'eeg' : {
-        'connectedscatter': ('Connected Scatter', 'ConnectedScatter', 'connectedscatter'),
-        'sparkline': ('Sparkline', 'Sparkline', 'sparkline'),
+        'connectedscatter': ('Connected Scatter', 'ConnectedScatterplot', 'connectedscatter'),
+        'sparkline': ('Sparkline', 'SparkLinePlotter', 'sparkline'),
         'spatialtimeseries': ('Spatial Time Series', 'SpatialTimeSeries', 'spatialtimeseries'),
         'spatialpgram': ('Spatial Periodogram', 'SpatialPeriodogram', 'spatialpgram')
     },
@@ -257,31 +257,41 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
     elif plot_name is not None:
         # Rendering a plot
         dm_path = modality
+        # Choose options
         options = aggregate_options
         if mode == 'embed':
             dm_path += '_embed'
             options = embedded_options
         elif mode == 'one':
             options = one_to_one_options
-            if modality == 'eeg' and 'spatial' in plot_name:
-                dm_path += '_spatial'
         elif mode == 'clust':
             dm_path += '_clust'
             options = clustering_options
-        dm_path += '_dm.pkl'
 
-        if modality == 'eeg' and 'spatial' in plot_name:
-            with open(os.path.join('data', ds_name, 'eeg_chanlocs.pkl'), 'rb') as chanloc_pkl, open(os.path.join('data', ds_name, dm_path), 'rb') as pkl_loc:
-                DM = pkl.load(pkl_loc)
-                chanlocs = pkl.load(chanloc_pkl)
-                print(len(chanlocs))
-                print(DM.D)
-                todisp = getattr(lpl, options[modality][plot_name][1])(DM.getResourceDS(0), mode='div').plot(chanlocs)
+        if mode == 'one':
+            dm_path += '_ds.pkl'
         else:
-            with open(os.path.join('data', ds_name, dm_path), 'rb') as pkl_loc:
-                DM = pkl.load(pkl_loc)
-                todisp = getattr(lpl, options[modality][plot_name][1])(DM, mode='div').plot()
+            dm_path += '_dm.pkl'
 
+        # Actually set to disp
+        with open(os.path.join('data', ds_name, dm_path), 'rb') as dm_loc:
+            DM = pkl.load(dm_loc)
+            if mode == 'one':
+                if modality == 'eeg' and 'spatial' in plot_name:
+                    with open(os.path.join('data', ds_name, 'eeg_chanlocs.pkl'), 'rb') as chanloc_pkl:
+                        chanlocs = pkl.load(chanloc_pkl)
+                        todisp = getattr(lpl, options[modality][plot_name][1])(DM.getResourceDS(0), mode='div').plot(chanlocs)
+                elif modality == 'eeg' and 'connectedscatter' in plot_name:
+                    with open(os.path.join('data', ds_name, 'eeg_spatial_dm.pkl'), 'rb') as spatial_pkl:
+                        spatial = pkl.load(spatial_pkl)
+                        todisp = getattr(lpl, options[modality][plot_name][1])(DM.getResourceDS(0), mode='div').plot(spatial)
+                elif modality == 'eeg' and 'sparkline' in plot_name:
+                    todisp = getattr(lpl, options[modality][plot_name][1])(DM.getResourceDS(0), mode='div').plot(sample_freq=500)
+                else:
+                    todisp = getattr(lpl, options[modality][plot_name][1])(DM.getResourceDS(0), mode='div').plot()
+
+            else:
+                todisp = getattr(lpl, options[modality][plot_name][1])(DM, mode='div').plot()
     else:
         todisp = "<h1> Choose a plot! </h1>"
 
