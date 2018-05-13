@@ -1,7 +1,9 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
 from sklearn.mixture import GaussianMixture
+from scipy.spatial import distance
 import sklearn.cluster as skcl
+import sklearn.metrics as skmetrics
 
 
 class Clustering(metaclass=ABCMeta):
@@ -39,6 +41,42 @@ class KMeans(Clustering):
         clust = skcl.KMeans(n_clusters=self.n_clusters,random_state=self.random_state)
         y = clust.fit_predict(self.X)
         self.clusters.append([(self.X[y == i, :]) for i in range(self.n_clusters)])
+
+
+class AdaptiveKMeans(Clustering):
+    def __init__(self, DS, clust_min=1, clust_max=10, random_state=None):
+        """
+        Parameters
+        ----------
+        DS :obj:`Dataset`
+        level : int
+            Number of levels to cluster
+        random_state : int (optional)
+            Initialize Gaussian Mixture Model with specified random state
+        """
+        Clustering.__init__(self, DS, 1, random_state)
+        self.clust_min = clust_min
+        self.clust_max = clust_max
+        self.clustname = 'AdaptiveKMeans'
+        self.shortclustname = 'adpkm'
+
+    def cluster(self):
+        clusts = []
+        s_scores = []
+        for i in range(self.clust_min, self.clust_max + 1):
+            clust = self.cluster_one(i)
+            clusts.append(clust)
+            s_scores.append(skmetrics.silhouette_score(self.X, clust))
+        print(s_scores)
+        winner_index = s_scores.index(max(s_scores))
+        winner = clusts[winner_index]
+        self.clusters = [[self.X]]
+        self.clusters.append([(self.X[winner == i, :]) for i in range(self.clust_min + winner_index)])
+
+    def cluster_one(self, n_clusters):
+        kmeans = skcl.KMeans(n_clusters=n_clusters, random_state=self.random_state)
+        y = kmeans.fit_predict(self.X)
+        return y
 
 
 class HGMMClustering(Clustering):

@@ -1,9 +1,3 @@
-
-# coding: utf-8
-
-# In[1]:
-
-
 import os
 import pandas as pd
 import pickle as pkl
@@ -21,9 +15,9 @@ import lemur.embedders as leb
 
 def run_eeg(name):
   BASE = "data"
-#  DATASET = "%s/eeg"%(name)
-#  root = os.path.join(BASE, DATASET)
-  bp = lds.BIDSParser()
+  DATASET = "%s/eeg"%(name)
+  root = os.path.join(BASE, DATASET)
+  bp = lds.BIDSParser(os.path.join(BASE, root))
   dataset_descriptor = bp.getModalityFrame("preprocessed", ".pkl").iloc[:6]
   # print(dataset_descriptor)
   # out_base = os.path.join(BASE, name, "eeg_derivatives")
