@@ -226,14 +226,16 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
     except:
         subj_name = None
         test_name = None
-    if mode == 'embed':
-        base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_embedded_deriatives', 'agg')
-    elif mode == 'one' and subj_name == 'none':
-        base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_derivatives')
-    elif mode == 'one':
-        base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_derivatives', subj_name, test_name)
-    else:
-        base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_derivatives', 'agg')
+
+    # TODO: Test on big dataset, re enable these if we end up caching plots
+    # if mode == 'embed':
+    #     base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_embedded_deriatives', 'agg')
+    # elif mode == 'one' and subj_name == 'none':
+    #     base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_derivatives')
+    # elif mode == 'one':
+    #     base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_derivatives', subj_name, test_name)
+    # else:
+    #     base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_derivatives', 'agg')
 
     subjs = []
     tasks = []
