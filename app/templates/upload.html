@@ -16,58 +16,62 @@
         </center>
         <br />
         <form class="form-group" id="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
-            <div class="row form-inline">
+            <div class="row">
+                <!-- Graphs -->
                 <div class="col-sm-4">
+                    <h4><b>Graph Data:</b></h4>
+                    <p>Bucket must be in <a href="http://bids.neuroimaging.io/bids_spec.pdf">BIDS Format</a></p>
+                    <div class="form-group">
+                        <label for="graph" class="font-weight-bold">AWS Bucket Name:
+{#                            <input id="file-picker" type="file" name="graph" accept="text/csv">#}
+                        </label>
+                        <input type="text" class="form-control" id="graph" name="graph">
+                    </div>
+                    <div id="msg"></div>
+                </div>
+                <!-- EEG -->
+                <div class="col-sm-4">
+                    <h4><b>EEG:</b></h4>
+                    <p>Bucket must be in <a href="http://bids.neuroimaging.io/bids_spec.pdf">BIDS Format</a> (look at EEG proposal).</p>
+                    <div class="form-group">
+                        <label for="eeg" class="font-weight-bold">AWS Bucket Name:
+{#                            <input id="file-picker" type="file" name="eeg" accept="text/csv">#}
+                        </label>
+                        <input type="text" class="form-control" id="eeg" name="eeg">
+                    </div>
+                    <div id="msg"></div>
+                </div>
+                <!-- fMRI -->
+                <div class="col-sm-4">
+                    <h4><b>MRI:</b></h4>
+                    <p>Bucket must be in <a href="http://bids.neuroimaging.io/bids_spec.pdf">BIDS Format</a></p>
+                    <div class="form-group">
+                        <label for="fmri" class="font-weight-bold">AWS Bucket Name:
+                            <!-- <input id="file-picker" type="file" name="fmri" accept="text/csv"> -->
+                        </label>
+                        <input type="text" class="form-control" id="fmri" name="fmri">
+                    </div>
+                    <div id="msg"></div>
+                </div>
+            </div>
+            <div class="row form-inline top-buffer">
+                <!-- Phenotypic -->
+                <div class="col-sm-4 offset-sm-4">
                     <h4><b>Phenotypic:</b></h4>
                     <p>Stored data in a CSV, subjects as rows, tests as columns</p>
                     <strong>Phenotypic data (.csv) </strong><br>
-
                     <label style="margin-right:20px" class="btn btn-light">
                         <input id="file-picker" type="file" name="pheno" accept="text/csv">
                     </label>
                     <div id="msg"></div>
                 </div>
-                <div class="col-sm-4">
-                    <h4><b>EEG:</b></h4>
-                    <p>Store credentials to an AWS bucket in a CSV as follows:</p>
-                    <p style="font-size:14px">AWS_bucket_name,AWS_access_key,AWS_secret_key</p>
-                    <p>Bucket must be in <a href="http://bids.neuroimaging.io/bids_spec.pdf">BIDS Format</a> (look at EEG proposal)</p>
-                    <strong>AWS Credentials (.csv)</strong><br>
-                    <label style="margin-right:20px" class="btn btn-light">
-                        <input id="file-picker" type="file" name="eeg" accept="text/csv">
-                    </label>
-                    <div id="msg"></div>
-                </div>
-                <div class="col-sm-4">
-                    <h4><b>fMRI:</b></h4>
-                    <p>Store credentials in a CSV as follows:</p>
-                    <p style="font-size:14px">AWS_bucket_name,AWS_access_key,AWS_secret_key</p>
-                    <p>Bucket must be in <a href="http://bids.neuroimaging.io/bids_spec.pdf">BIDS Format</a></p>
-                    <strong>AWS Credentials (.csv)</strong><br>
-                    <label style="margin-right:20px" class="btn btn-light">
-                        <input id="file-picker" type="file" name="fmri" accept="text/csv">
-                    </label>
-                    <div id="msg"></div>
-                </div>
             </div>
-            <div class="row form-inline top-buffer">
-                <div class="col-sm-4 offset-sm-4">
-                    <h4><b>Graphs:</b></h4>
-                    <p>Store credentials to an AWS bucket in a CSV as follows:</p>
-                    <p style="font-size:14px">AWS_bucket_name,AWS_access_key,AWS_secret_key</p>
-                    <p>Bucket must be in <a href="http://bids.neuroimaging.io/bids_spec.pdf">BIDS Format</a></p>
-                    <strong>AWS Credentials (.csv)</strong><br>
-                    <label style="margin-right:20px" class="btn btn-light">
-                        <input id="file-picker" type="file" name="graph" accept="text/csv">
-                    </label>
-                    <div id="msg"></div>
-                </div>
-            </div>
+            <!-- Final Submission -->
             <div class="row top-buffer">
-                <div class="col-sm-4 offset-sm-4">
-                    <div class="">
-                        <label>Dataset Name:</label>
-                        <input type="text" id="dataset-name" name="dataset-name">
+                <div class="col-sm-4 offset-sm-4 ">
+                    <div class="form-group">
+                        <label for="dataset-name" class="font-weight-bold">Dataset Name:</label>
+                        <input type="text" class="form-control" id="dataset-name" name="dataset-name">
                     </div>
                     <input class="btn btn-primary btn-block" type="submit" value="Upload" id="upload-button">
                 </div>

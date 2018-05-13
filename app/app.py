@@ -335,74 +335,69 @@ def upload():
     os.makedirs(dspath, exist_ok=True)
     session['basepath'] = dspath
 
-    file_names = ['pheno', 'eeg', 'fmri', 'graph']
 
-    for name in file_names:
-        files = request.files.getlist(name)
-        # app.logger.info('Input type: %s, File name: %s', name, file.filename)
-        if len(files) != 0 and files[0].filename != '':
-            file = files[0]
-            app.logger.info('Input type in loop: %s', name)
-            dirpath = os.path.join(dspath, name)
-#            os.makedirs(dirpath, exist_ok=True)
-            filename = file.filename
-            destination = os.path.join(dspath, filename)
-            app.logger.info('Accept incoming file: %s', filename)
-            app.logger.info('Save it to: %s', destination)
-            file.save(destination)
-            session[name + '_data'] = destination
-        else:
-            session[name + '_data'] = None
+    ########################################
+    # Other Modalities
 
     # For modalities in which you upload S3 credentials.
     for name in ['eeg', 'fmri', 'graph']:
-        if session[name+'_data'] is not None:
-            # Download EEG patients
-            app.logger.info("Downloading "+name+" Data...")
-#
-            # Collect AWS credentials,
-            credential_info = open(session[name+'_data'], 'r').read().split(",")
-            bucket_name = credential_info[0]
-#            ACCESS_KEY = str(credential_info[1])
-#            SECRET_KEY = str(credential_info[2])
-#
-#            # Download files
-#            '''
-#            s3 = boto3.resource('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY, region_name='us-east-1')
-#            bucket = s3.Bucket(bucket_name)
-#            for elem in bucket.list():
-#                key = elem.name.encode('utf-8')
-#                bucket.download_file(key, os.path.join(session['basepath'], name)+"/"+str(key.split('/')[-1]))
-#            '''
-#
+        bucket_name = request.form[name]
+        session[name] = True
+        if bucket_name is None or len(bucket_name) == 0:
+            session[name] = False
+            continue
 
-            try:
-                print('About to try!')
-                cmd = ["aws", "s3",
-                       "cp", ("s3://%s/%s")%(bucket_name, name),
-                       os.path.join(session['basepath'], name), "--recursive"]
-                call(cmd)
-                app.logger.info(name+" Data Downloaded")
-            except:
-                print("Download from S3 failed!")
+        # Make folders to load files into
+        dirpath = os.path.join(dspath, name)
+        os.makedirs(dirpath, exist_ok=True)
 
-            try:
-                mongo_update.build_database(filedir, bucket_name)
-            except:
-                print("Database synchronization failed!")
-
-            run_modality(name, os.path.basename(session['basepath']))
-
-    # For modalities in which you upload the dataset itself.
-    if session['pheno_data'] is not None:
+        # Download patients
+        app.logger.info("Downloading "+name+" Data...")
+        # Download files
         try:
-            pheno.run_pheno(session['pheno_data'])
-            mongo_update.build_metadata(session['pheno_data'], filedir)
+            cmd = ["aws", "s3",
+                   "cp", ("s3://%s/%s")%(bucket_name, name),
+                   os.path.join(session['basepath'], name), "--recursive"]
+            call(cmd)
+            app.logger.info(name+" Data Downloaded")
+        except:
+            print("Download from S3 failed!")
+
+        try:
+            mongo_update.build_database(filedir, bucket_name)
+        except:
+            print("Database synchronization failed!")
+
+        run_modality(name, os.path.basename(session['basepath']))
+
+    ########################################
+    # Phenotypic
+
+    files = request.files.getlist('pheno')
+    # Check if phenotypic files have been uploaded
+    session['pheno'] = False
+    if len(files) != 0 and files[0].filename != '':
+        session['pheno'] = True
+
+        # Upload the file
+        file = files[0]
+        app.logger.info('Uploading Phenotypic Data')
+        dirpath = os.path.join(dspath, 'pheno')
+        os.makedirs(dirpath, exist_ok=True)
+        filename = file.filename
+        destination = os.path.join(dspath, filename)
+        app.logger.info('Accept incoming file: %s', filename)
+        app.logger.info('Save it to: %s', destination)
+        file.save(destination)
+
+        try:
+            pheno.run_pheno(destination)
+            mongo_update.build_metadata(destination, filedir)
         except:
             print("Running plots/synchronization failed!")
 
-    for name in file_names:
-        if session[name+'_data'] is not None:
+    for name in ['pheno', 'eeg', 'mri', 'graph']:
+        if session[name]:
             return redirect(url_for('meda_modality', ds_name=filedir, modality=name, mode='none', plot_name='default'))
 
 
