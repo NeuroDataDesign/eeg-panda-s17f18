@@ -14,10 +14,10 @@
                 <tr>
             </thead>
             <tbody>
-            {% for meta in metas  %}
+            {% for meta in metas %}
                 <tr>
                     <td>{{loop.index}}</td>
-                    <td><a  href="/MEDA/plot/{{ meta.name }}/pheno/None/default">{{ meta.name }}</a></td>
+                    <td><a href="/MEDA/plot/{{ meta.name }}/pheno/None/default">{{ meta.name }}</a></td>
                     <td>{{ meta.n }}</td>
                     <td>{{ meta.d }}</td>
                     <td><a  href='/MEDA/datasets/delete/{{ meta.name }}'>Delete</a></td>

@@ -1,29 +1,11 @@
 {% extends "layout.html" %}
-{% block head %}
-    <!--<script>
-        $("#file-picker").change(function(){
-            var input = document.getElementById('file-picker');
-            $("#file-val").text(input.files[0].name);
-            for (var i=0; i<input.files.length; i++)
-            {
-                var ext= input.files[i].name.substring(input.files[i].name.lastIndexOf('.')+1).toLowerCase();
-                if ((ext === 'txt') || (ext === 'csv')) {
-                    $("#msg").text("Files are supported");
-                } else {
-                    $("#msg").text("Files are NOT supported");
-                    document.getElementById("file-picker").value ="";
-                }
-            }
-        } );
-    </script>-->
-{% endblock %}
 {% block content %}
-    <div class="container top-buffer">
-        <h1>
+    <div class="container mt-2">
+        <h1><b>
             <center>
                 Welcome to Red Lemur!
             </center>
-        </h1>
+        </b></h1>
         <br />
     </div>
 
