@@ -287,7 +287,7 @@ class CSVDataSet(DataSet):
         d = []
         for c in D.columns:
             d.append(convertDtype(list(D[c])))
-            print("Converting", c, end="\r\r") 
+            print("Converting", c, end="\r\r")
         newcolumns = D.columns
         newindex = D.index
         D = list(d)

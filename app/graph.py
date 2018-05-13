@@ -1,8 +1,4 @@
 # coding: utf-8
-
-# In[1]:
-
-
 import os
 import pandas as pd
 import sys

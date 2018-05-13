@@ -1,9 +1,3 @@
-
-# coding: utf-8
-
-# In[ ]:
-
-
 # Outside imports
 import pandas as pd
 import numpy as np
@@ -11,12 +5,9 @@ import os
 import pickle as pkl
 
 
-# In[ ]:
-
-
 # Load the lemur library
 import sys
-sys.path.append(".")
+sys.path.append("..")
 import lemur.datasets as lds
 import lemur.metrics as lms
 import lemur.plotters as lpl

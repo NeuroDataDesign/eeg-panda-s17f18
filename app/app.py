@@ -330,9 +330,6 @@ def upload():
     dspath = os.path.join(target, filedir)
     os.makedirs(dspath, exist_ok=True)
     session['basepath'] = dspath
-    # print(dspath)
-    # print(request.files.getlist('file'))
-    # print(request.files['file[]'])
 
     file_names = ['pheno', 'eeg', 'fmri', 'graph']
 
@@ -356,12 +353,12 @@ def upload():
     # For modalities in which you upload S3 credentials.
     for name in ['eeg', 'fmri', 'graph']:
         if session[name+'_data'] is not None:
-#            # Download EEG patients
-#            app.logger.info("Downloading "+name+" Data...")
+            # Download EEG patients
+            app.logger.info("Downloading "+name+" Data...")
 #
-#            # Collect AWS credentials,
-#            credential_info = open(session[name+'_data'], 'r').read().split(",")
-#            bucket_name = credential_info[0]
+            # Collect AWS credentials,
+            credential_info = open(session[name+'_data'], 'r').read().split(",")
+            bucket_name = credential_info[0]
 #            ACCESS_KEY = str(credential_info[1])
 #            SECRET_KEY = str(credential_info[2])
 #
@@ -374,18 +371,21 @@ def upload():
 #                bucket.download_file(key, os.path.join(session['basepath'], name)+"/"+str(key.split('/')[-1]))
 #            '''
 #
-#            # Configre AWS Credentials
-#
-#            try:
-#                cmd = ["aws", "s3",
-#                       "cp", ("s3://%s/"+name)%(bucket_name),
-#                       os.path.join(session['basepath'], name), "--recursive"]
-#                app.logger.info(name+" Data Downloaded")
-#                call(cmd)
-#                mongo_update.build_database(filedir, bucket_name)
-#            except:
-#                print("Download from S3/database synchronization failed!")
 
+            try:
+                print('About to try!')
+                cmd = ["aws", "s3",
+                       "cp", ("s3://%s/%s")%(bucket_name, name),
+                       os.path.join(session['basepath'], name), "--recursive"]
+                call(cmd)
+                app.logger.info(name+" Data Downloaded")
+            except:
+                print("Download from S3 failed!")
+
+            try:
+                mongo_update.build_database(filedir, bucket_name)
+            except:
+                print("Database synchronization failed!")
 
             run_modality(name, os.path.basename(session['basepath']))
 

@@ -6,8 +6,8 @@ import io
 import glob
 
 # Load the lemur library
-# import sys
-# sys.path.append("..")
+import sys
+sys.path.append("..")
 import lemur.datasets as lds
 import lemur.metrics as lms
 import lemur.plotters as lpl
@@ -17,9 +17,8 @@ def run_eeg(name):
   BASE = "data"
   DATASET = "%s/eeg"%(name)
   root = os.path.join(BASE, DATASET)
-  bp = lds.BIDSParser(os.path.join(BASE, root))
+  bp = lds.BIDSParser(root)
   dataset_descriptor = bp.getModalityFrame("preprocessed", ".pkl").iloc[:6]
-  # print(dataset_descriptor)
   # out_base = os.path.join(BASE, name, "eeg_derivatives")
   # out_emb_base = os.path.join(BASE, name, "eeg_embedded_deriatives")
   # os.makedirs(out_base + "/agg", exist_ok=True)
@@ -53,17 +52,16 @@ def run_eeg(name):
 
 
   # TODO: Yujia no idea what's happneing here...
-  # In[4]:
-  s3 = boto3.resource('s3')
-  bucket = s3.Bucket('redlemurtest')
-      # Directly read through S3 bucket and pass into pandas dataframe
-  for obj in bucket.objects.all():
-      key = obj.key
-      if key.endswith('chanlocs.csv'):
-          body = obj.get()['Body'].read()
-          chanlocs = pd.read_csv(io.BytesIO(body))
-  spatial = lds.DataSet(chanlocs[["X", "Y", "Z"]], "Spatial")
-  spatialDM = lds.DistanceMatrix(spatial, lms.VectorDifferenceNorm)
+  # s3 = boto3.resource('s3')
+  # bucket = s3.Bucket('redlemurtest')
+  #     # Directly read through S3 bucket and pass into pandas dataframe
+  # for obj in bucket.objects.all():
+  #     key = obj.key
+  #     if key.endswith('chanlocs.csv'):
+  #         body = obj.get()['Body'].read()
+  #         chanlocs = pd.read_csv(io.BytesIO(body))
+  # spatial = lds.DataSet(chanlocs[["X", "Y", "Z"]], "Spatial")
+  # spatialDM = lds.DistanceMatrix(spatial, lms.VectorDifferenceNorm)
 #  chanlocs = pd.read_csv("data/%s/eeg/chanlocs.csv"%(name))
 #  spatial = lds.DataSet(chanlocs[["X", "Y", "Z"]], "Spatial")
 #  spatialDM = lds.DistanceMatrix(spatial, lms.VectorDifferenceNorm)

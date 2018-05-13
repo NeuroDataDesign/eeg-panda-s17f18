@@ -46,6 +46,7 @@ def init_database():
     except:
         raise Exception("MongoDB not running.")
 
+
 def build_database(dataset, bucket_name):
     # Initialize
     lims = init_database()
@@ -117,6 +118,7 @@ def parse_csv(filename):
             metadata_list.append(metadata)
 
     return metadata_list
+
 
 def build_derivative(lims, dataset, datatype, derivative, links):
 
