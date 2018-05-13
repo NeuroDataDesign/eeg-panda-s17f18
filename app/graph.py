@@ -20,10 +20,6 @@ def run_graph(name):
   root = os.path.join(BASE, DATASET)
   bp = lds.BIDSParser(root)
   dataset_descriptor = bp.getModalityFrame("func", ".edgelist")
-  # out_base = os.path.join(BASE, name, "graph_derivatives")
-  # out_emb_base = os.path.join(BASE, name, "graph_embedded_deriatives")
-  # os.makedirs(out_base + "/agg", exist_ok=True)
-  # os.makedirs(out_emb_base + "/agg", exist_ok=True)
 
   gds = lds.GraphDataSet(dataset_descriptor)
   # Create a lemur distance matrix based on the graph data

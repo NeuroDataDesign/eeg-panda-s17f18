@@ -54,16 +54,15 @@ def build_database(dataset, bucket_name):
 
     # TODO: Use Docker creds
     # Read creds
-    rows = []
-    with open('/home/nitin/.aws/s3_creds') as credsfile:
-        cred_reads = csv.reader(credsfile)
-        for row in cred_reads:
-            rows.append(row)
-    creds = dict(zip(rows[0], rows[1]))
+    # rows = []
+    # with open('/home/nitin/.aws/s3_creds') as credsfile:
+    #     cred_reads = csv.reader(credsfile)
+    #     for row in cred_reads:
+    #         rows.append(row)
+    # creds = dict(zip(rows[0], rows[1]))
 
     # Read listing of files
-    s3 = boto3.resource('s3', aws_access_key_id=creds['access_key'], aws_secret_access_key=creds['secret_key'],
-                        region_name='us-east-1')
+    s3 = boto3.resource('s3')
     print(bucket_name)
     bucket = s3.Bucket(bucket_name)
     subs = dict()

@@ -25,10 +25,6 @@ def run_pheno(name):
 
     # Set output paths for saved plots.
     BASE = "data"
-    # out_base = os.path.join(BASE, DATASET, "pheno_derivatives")
-    # out_emb_base = os.path.join(BASE, DATASET, "pheno_embedded_deriatives")
-    # os.makedirs(out_base + "/agg", exist_ok=True)
-    # os.makedirs(out_emb_base + "/agg", exist_ok=True)
     with open(os.path.join(BASE, DATASET, 'pheno_dm.pkl'), 'wb') as pkl_loc:
         print('writing pheo reg file', os.path.join(BASE, 'pheno_embed_dm.pkl'))
         print(DATASET)

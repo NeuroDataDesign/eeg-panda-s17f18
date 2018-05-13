@@ -1,8 +1,4 @@
-
 # coding: utf-8
-
-# In[1]:
-
 
 import os
 import pickle as pkl
@@ -22,10 +18,6 @@ def run_fmri(name):
   root = os.path.join(BASE, DATASET)
   bp = lds.BIDSParser(root)
   dataset_descriptor = bp.getModalityFrame("func", "nii.gz")
-  # out_base = os.path.join(BASE, name, "fmri_derivatives")
-  # out_emb_base = os.path.join(BASE, name, "fmri_embedded_deriatives")
-  # os.makedirs(out_base + "/agg", exist_ok=True)
-  # os.makedirs(out_emb_base + "/agg", exist_ok=True)
 
   fds = lds.fMRIDataSet(dataset_descriptor)
   # Create a lemur distance matrix based on the EEG data
