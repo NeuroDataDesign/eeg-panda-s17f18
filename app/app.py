@@ -243,12 +243,14 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
     elif subj_name == "none" and mode == 'one':
         ids = mongo_get.get_from_dataset(ds_name)
         subjs = mongo_get.get_from_database(ds_name, ids)
+        print('Getting from db subjs', subjs)
 
         for id in ids:
+            # TODO: How are we handling tasks
             tasks.append(['Rest'])
-            if modality == 'fmri':
-                tasks.append([task_di for task_di in os.listdir(os.path.join(base_path, id, 'Nifti4DPlotter'))
-                              if os.path.isdir(os.path.join(base_path, id, 'Nifti4DPlotter', task_di))])
+            # if modality == 'fmri':
+            #     tasks.append([task_di for task_di in os.listdir(os.path.join(base_path, id, 'Nifti4DPlotter'))
+            #                   if os.path.isdir(os.path.join(base_path, id, 'Nifti4DPlotter', task_di))])
         todisp = None
     elif plot_name is not None:
         # Rendering a plot
@@ -401,9 +403,6 @@ def upload():
         if session[name+'_data'] is not None:
             return redirect(url_for('meda_modality', ds_name=filedir, modality=name, mode='none', plot_name='default'))
 
-@app.route('/upload/<filename>')
-def send_image(filename):
-    return send_from_directory("text", filename)
 
 @app.route('/display/<filename>')
 def display_file(filename):
