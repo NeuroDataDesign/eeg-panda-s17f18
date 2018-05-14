@@ -52,33 +52,6 @@ def build_database(dataset, bucket_name):
     lims = init_database()
     build_dataset(lims, dataset)
 
-    # TODO: Use Docker creds
-    # Read creds
-    # rows = []
-    # with open('/home/nitin/.aws/s3_creds') as credsfile:
-    #     cred_reads = csv.reader(credsfile)
-    #     for row in cred_reads:
-    #         rows.append(row)
-    # creds = dict(zip(rows[0], rows[1]))
-
-    # Read listing of files
-    s3 = boto3.resource('s3')
-    print(bucket_name)
-    bucket = s3.Bucket(bucket_name)
-    subs = dict()
-    for elem in bucket.objects.all():
-        print('In elem loop')
-        file_structs = elem.key.split('/')
-        if len(file_structs) < 4:
-            continue
-        subs[file_structs[1]] = subs.get(file_structs[0], {})
-        subs[file_structs[1]][file_structs[0]] = subs[file_structs[1]].get(file_structs[0], {})
-        subs[file_structs[1]][file_structs[0]][file_structs[2]] = subs[file_structs[1]][file_structs[0]].get(
-            file_structs[2], [])
-        subs[file_structs[1]][file_structs[0]][file_structs[2]].append([file_structs[3], file_structs[3]])
-
-    print(subs)
-
     # Insert into db
     for sub, datatypes in subs.items():
         for datatype, derivs in datatypes.items():

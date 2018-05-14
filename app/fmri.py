@@ -17,7 +17,7 @@ def run_fmri(name):
   DATASET = "%s/fmri"%(name)
   root = os.path.join(BASE, DATASET)
   bp = lds.BIDSParser(root)
-  dataset_descriptor = bp.getModalityFrame("func", "nii.gz")
+  dataset_descriptor = bp.getmodalityframe("func", "nii.gz")
 
   fds = lds.fMRIDataSet(dataset_descriptor)
   # Create a lemur distance matrix based on the EEG data

@@ -26,15 +26,12 @@ def run_pheno(name):
     # Set output paths for saved plots.
     BASE = "data"
     with open(os.path.join(BASE, DATASET, 'pheno_dm.pkl'), 'wb') as pkl_loc:
-        print('writing pheo reg file', os.path.join(BASE, 'pheno_embed_dm.pkl'))
-        print(DATASET)
         pkl.dump(DM, pkl_loc)
 
     # Create an embedded distance matrix object under MDS
     MDSEmbedder = leb.MDSEmbedder(num_components=10)
     HBN_Embedded = MDSEmbedder.embed(DM)
     with open(os.path.join(BASE, DATASET, 'pheno_embed_dm.pkl'), 'wb') as pkl_loc:
-        print('writing pheno embed file', os.path.join(BASE, 'pheno_embed_dm.pkl'))
         pkl.dump(HBN_Embedded, pkl_loc)
 
     hgmm = lcl.HGMMClustering(HBN_Embedded, 4)
