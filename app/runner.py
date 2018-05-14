@@ -12,52 +12,78 @@ import lemur.embedders as leb
 def run_modality(name, modality):
 
     # Set root paths and parse data
-    if modality == 'pheno':
-        DATASET = os.path.split(os.path.split(name)[0])[1]
-    else:
-        BASE = "data"
-        DATASET = "%s/%s"%(name, modality)
-        root = os.path.join(BASE, DATASET)
-        bp = lds.BIDSParser(root)
+    BASE = 'data'
+
+    DATASET = '%s/%s'%(name, modality)
+    root = os.path.join(BASE, DATASET)
+    bp = lds.BIDSParser(root)
 
     # For each modality, set specific settings
     if modality == 'eeg':
-        dataset_descriptor = bp.getModalityFrame("preprocessed", ".pkl").iloc[:6]
-        DS = lds.EEGDataSet(dataset_descriptor)
+        modality_list = [('preprocessed', '.pkl')]
+        DS_type = lds.EEGDataSet
         metric = lms.FroCorr
     elif modality == 'fmri':
-        dataset_descriptor = bp.getmodalityframe("func", "nii.gz")
-        DS = lds.fMRIDataSet(dataset_descriptor)
+        modality_list = [
+            ('func', 'nii.gz')
+        ]
+        DS_type = lds.fMRIDataSet
         metric = lms.DiffAve
     elif modality == 'graph':
-        dataset_descriptor = bp.getModalityFrame("func", ".edgelist")
-        DS = lds.GraphDataSet(dataset_descriptor)
+        modality_list = [
+            ('func', '.edgelist')
+        ]
+        DS_type = lds.GraphDataSet
         metric = lms.FroCorr
     else:
-        raise ValueError('')
+        raise ValueError('Needs to be eeg, fmri, or graph')
 
-    with open(os.path.join(BASE, name, 'eeg_ds.pkl'), 'wb') as pkl_loc:
-        pkl.dump(eds, pkl_loc)
+    # If EEG, save important metadata pkls
+    if modality == 'eeg':
+        chanlocs = pd.read_csv("data/%s/eeg/chanlocs.csv"%(name))
+        with open(os.path.join("data/%s/eeg"%(name), 'chanlocs.pkl'), 'wb') as pkl_loc:
+            pkl.dump(chanlocs.as_matrix()[:, 1:4], pkl_loc)
 
-    # Create a lemur distance matrix
-    DM = lds.DistanceMatrix(DS, metric)
-    DM.name = "eeg-DistanceMatrix"
-    with open(os.path.join(BASE, name, 'eeg_dm.pkl'), 'wb') as pkl_loc:
-        pkl.dump(DM, pkl_loc)
+        spatial = lds.DataSet(chanlocs[["X", "Y", "Z"]], "Spatial")
+        spatialDM = lds.DistanceMatrix(spatial, lms.VectorDifferenceNorm)
+        with open(os.path.join("data/%s/eeg"%(name), 'spatial_dm.pkl'), 'wb') as pkl_loc:
+            pkl.dump(spatialDM, pkl_loc)
 
-    # Create an embedded distance matrix object under MDS
-    MDSEmbedder = leb.MDSEmbedder(num_components=10)
-    EEG_Embedded = MDSEmbedder.embed(DM)
-    with open(os.path.join(BASE, name, 'eeg_embed_dm.pkl'), 'wb') as pkl_loc:
-        pkl.dump(EEG_Embedded, pkl_loc)
+    # Iterate through potential files
+    for datatype, f_ext in modality_list:
+
+        dataset_descriptor = bp.getModalityFrame(datatype, f_ext)
+        DS = DS_type(dataset_descriptor)
+        curr_dir = os.path.join(root, datatype)
+        if os.path.exists(curr_dir):
+            continue
+        else:
+            os.makedirs(curr_dir)
+
+        # Save the dataset
+        with open(os.path.join(root, 'ds.pkl'), 'wb') as pkl_loc:
+            pkl.dump(DS, pkl_loc)
+
+        # Create a lemur distance matrix
+        DM = lds.DistanceMatrix(DS, metric)
+        DM.name = "%s-DistanceMatrix"%(modality)
+        with open(os.path.join(curr_dir, 'dm.pkl'), 'wb') as pkl_loc:
+            pkl.dump(DM, pkl_loc)
+
+        # Create an embedded distance matrix object under MDS
+        MDSEmbedder = leb.MDSEmbedder(num_components=10)
+        embedded = MDSEmbedder.embed(DM)
+        with open(os.path.join(curr_dir, 'embed_dm.pkl'), 'wb') as pkl_loc:
+            pkl.dump(embedded, pkl_loc)
+
+        ##### Clustering
+        # I think this may be better to do while the app is running
+
+        # clustered = lcl.HGMMClustering(embedded, 4)
+        # clustered.cluster()
+        # with open(os.path.join(BASE, name, 'clust_dm.pkl'), 'wb') as pkl_loc:
+        #     pkl.dump(Graph_Embedded, pkl_loc)
 
 
-    chanlocs = pd.read_csv("data/%s/eeg/chanlocs.csv"%(name))
-    with open(os.path.join(BASE, name, 'eeg_chanlocs.pkl'), 'wb') as pkl_loc:
-        pkl.dump(chanlocs.as_matrix()[:, 1:4], pkl_loc)
-
-    spatial = lds.DataSet(chanlocs[["X", "Y", "Z"]], "Spatial")
-    spatialDM = lds.DistanceMatrix(spatial, lms.VectorDifferenceNorm)
-    with open(os.path.join(BASE, name, 'eeg_spatial_dm.pkl'), 'wb') as pkl_loc:
-        pkl.dump(spatialDM, pkl_loc)
-
+    # Return modality list
+    return bp, modality_list
