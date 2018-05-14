@@ -6,6 +6,7 @@ import pickle as pkl
 import logging
 import json
 import glob
+import statistics
 
 from nilearn import image as nimage
 from nilearn import plotting as nilplot
@@ -485,7 +486,7 @@ class DistanceMatrix:
 
     """
 
-    def __init__(self, dataset, metric):
+    def __init__(self, dataset, metric, std_shape=False):
         self.DS = dataset
         self.name = self.DS.name
         self.labels = self.DS.D.index.values
@@ -494,6 +495,14 @@ class DistanceMatrix:
         self.metric_name = metric.__name__
         self.n = self.DS.n
         parameterization = self.metric.parameterize(self.DS)
+        # If indicated to standardize shape, remove nonstandard shaped matrices
+        common_idx = range(self.n)
+        if std_shape:
+            common_shape = statistics.mode(list(map(lambda x: x.shape, parameterization)))
+            common_idx = list(filter(lambda x: parameterization[x].shape != common_shape, range(self.n)))
+            parameterization = [parameterization[i] for i in common_idx]
+            self.n = len(parameterization)
+
         self.D = np.zeros([self.n, self.n])
         for i in range(self.n):
             I = parameterization[i]
@@ -502,7 +511,7 @@ class DistanceMatrix:
                 self.D[i, j] = self.metric.compare(I, J)
                 self.D[j, i] = self.D[i, j]
         self.D = pd.DataFrame(self.D)
-        self.D.index = self.DS.D.index
+        self.D.index = [self.DS.D.index[i] for i in common_idx]
         self.D.index.name = self.DS.D.index.name
 
     def getMatrix(self):
