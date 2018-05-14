@@ -55,7 +55,10 @@ class BIDSParser:
                 print(files)
                 for f in files:
                     t = "".join(f.split("_")[1:]).split(".")[0]
-                    dataset[s][m].update({t:f})
+                    if t not in dataset[s][m]:
+                        dataset[s][m].update({t:[f]})
+                    else:
+                        dataset[s][m][t].append(f)
         self.dataset = dataset
         self.base_path = base_path
         print(self.dataset)
@@ -66,11 +69,11 @@ class BIDSParser:
         tasks = []
         for s in self.dataset.keys():
             for t in self.dataset[s][modality].keys():
-                f = self.dataset[s][modality][t]
-                if f.endswith(extension):
-                    files.append(os.path.join(self.base_path, s, modality, f))
-                    subjects.append(s)
-                    tasks.append(t)
+                for f in self.dataset[s][modality][t]:
+                    if f.endswith(extension):
+                        files.append(os.path.join(self.base_path, s, modality, f))
+                        subjects.append(s)
+                        tasks.append(t)
         d = {
             "resource_path": files,
             "subjects": subjects,

@@ -22,10 +22,13 @@
                     <h4><b>Graph Data:</b></h4>
                     <p>Bucket must be in <a href="http://bids.neuroimaging.io/bids_spec.pdf">BIDS Format</a></p>
                     <div class="form-group">
-                        <label for="graph" class="font-weight-bold">AWS Bucket Name:
-{#                            <input id="file-picker" type="file" name="graph" accept="text/csv">#}
-                        </label>
+                        <label for="graph" class="font-weight-bold">AWS Bucket Name:</label>
+{#                      <input id="file-picker" type="file" name="graph" accept="text/csv">#}
                         <input type="text" class="form-control" id="graph" name="graph">
+                    </div>
+                    <div class="form-group">
+                        <label for="graph-key" class="font-weight-bold">AWS Key:</label>
+                        <input type="text" class="form-control" id="graph-key" name="graph-key">
                     </div>
                     <div id="msg"></div>
                 </div>
@@ -34,10 +37,12 @@
                     <h4><b>EEG:</b></h4>
                     <p>Bucket must be in <a href="http://bids.neuroimaging.io/bids_spec.pdf">BIDS Format</a> (look at EEG proposal).</p>
                     <div class="form-group">
-                        <label for="eeg" class="font-weight-bold">AWS Bucket Name:
-{#                            <input id="file-picker" type="file" name="eeg" accept="text/csv">#}
-                        </label>
+                        <label for="eeg" class="font-weight-bold">AWS Bucket Name:</label>
                         <input type="text" class="form-control" id="eeg" name="eeg">
+                    </div>
+                    <div class="form-group">
+                        <label for="eeg-key" class="font-weight-bold">AWS Key:</label>
+                        <input type="text" class="form-control" id="eeg-key" name="eeg-key">
                     </div>
                     <div id="msg"></div>
                 </div>
@@ -46,10 +51,13 @@
                     <h4><b>MRI:</b></h4>
                     <p>Bucket must be in <a href="http://bids.neuroimaging.io/bids_spec.pdf">BIDS Format</a></p>
                     <div class="form-group">
-                        <label for="fmri" class="font-weight-bold">AWS Bucket Name:
-                            <!-- <input id="file-picker" type="file" name="fmri" accept="text/csv"> -->
-                        </label>
+                        <label for="fmri" class="font-weight-bold">AWS Bucket Name:</label>
+                        <!-- <input id="file-picker" type="file" name="fmri" accept="text/csv"> -->
                         <input type="text" class="form-control" id="fmri" name="fmri">
+                    </div>
+                    <div class="form-group">
+                        <label for="fmri-key" class="font-weight-bold">AWS Key:</label>
+                        <input type="text" class="form-control" id="fmri-key" name="fmri-key">
                     </div>
                     <div id="msg"></div>
                 </div>

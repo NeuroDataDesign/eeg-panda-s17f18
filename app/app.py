@@ -352,6 +352,7 @@ def upload():
     # For modalities in which you upload S3 credentials.
     for name in ['eeg', 'fmri', 'graph']:
         bucket_name = request.form[name]
+        bucket_key = request.form[name+'-key']
         session[name] = True
         if bucket_name is None or len(bucket_name) == 0:
             session[name] = False
@@ -366,7 +367,7 @@ def upload():
         # Download files
         try:
             cmd = ["aws", "s3",
-                   "cp", ("s3://%s/%s")%(bucket_name, name),
+                   "cp", ("s3://%s/%s")%(bucket_name, bucket_key),
                    os.path.join(session['basepath'], name), "--recursive"]
             call(cmd)
             app.logger.info(name+" Data Downloaded")
