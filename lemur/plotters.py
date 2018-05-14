@@ -37,6 +37,33 @@ def get_heat_colors(n):
     hues = range(0, max_value, interval)
     return cl.to_rgb(["hsl(%d,100%%,40%%)"%i for i in hues])
 
+def get_plt_cmap(cmap, n):
+    """
+    Helper function that converts matplotlib cmap to 
+    integers in R, G, B space.
+
+    Parameters
+    ----------
+    cmap : str
+        Colormap from matplotlib 
+    n : int
+        Number of colors to output
+        
+    Returns
+    -------
+    out : list
+        List of RGB values in format that can be used in Plotly
+    """
+    ranges = np.linspace(0, 1, num=n)
+    arr = plt.cm.get_cmap(cmap)(ranges)
+    arr = arr[:, :3] * 255
+    
+    out = []
+    for r, g, b in arr.astype(np.int):
+        out.append('rgb({},{},{})'.format(r, g, b))
+        
+    return out
+
 class MatrixPlotter:
     def __init__(self, DS, mode="notebook", base_path = None):
         self.DS = DS
@@ -499,11 +526,16 @@ class RidgeLine(MatrixPlotter):
     def plot(self):
         title = self.titlestring % (self.DS.name)
         D = self.DS.D.as_matrix().T
-        columns = self.DS.D.columns
+        columns = self.DS.D.columns[::-1]
         d, n = D.shape
+        # Standardize each feature so that mean=0, std=1
         D = (D - np.mean(D, axis=1).reshape(d, 1)) / np.std(D, axis=1).reshape(d, 1)
         D = np.nan_to_num(D) # only nan if std all 0 -> all values 0
         
+        # Get colors
+        colors = get_plt_cmap('rainbow', d)
+        
+        # Clip the min and max values at -5 and 5 respectively
         min_val = np.floor(np.min(D))
         if min_val < -5:
             min_val = -5
@@ -512,30 +544,60 @@ class RidgeLine(MatrixPlotter):
             max_val = 5
             
         x_range = np.linspace(min_val, max_val, 100)
+        
         # calculate guassian KDEs
         kdes = []
         for row in D:
             kde = stats.kde.gaussian_kde(row)
             kdes.append(kde(x_range))
         
-        rows = int(np.ceil(d / 4))
-        fig = tools.make_subplots(rows=rows, cols=4, shared_xaxes=True, 
-                                  print_grid=False, horizontal_spacing=0.01,
-                                  subplot_titles=columns)
+        # Spacing between each ridgeline
+        spacing = 0.5
         
-        plot_indicies = list(product(np.arange(1, rows+1, dtype=np.int), np.arange(1, 5, dtype=np.int)))
-        for idx, y in enumerate(kdes):
-            r, c = plot_indicies[idx]
+        # Plot each ridgelines
+        data = []
+        for idx, y in enumerate(kdes[::-1]):
+            y += idx * spacing # Amount to separate each ridgeline
             trace = go.Scatter(
-                    x = x_range,
-                    y = y,
-                    mode = 'lines')
-            fig.append_trace(trace, r, c)
-            fig['layout']['yaxis{}'.format(idx+1)]['showticklabels'] = False
-            fig['layout']['xaxis{}'.format(c)]['title'] = 'Normalized Values'
-            fig['layout']['xaxis{}'.format(c)]['titlefont']['size'] = 12
-
-        fig['layout']['showlegend'] = False
+                            x=x_range,
+                            y=y,
+                            name=columns[idx],
+                            mode='lines',
+                            line= dict(color = 'rgb(0,0,0)', width=1.5),
+                            fill='toself',
+                            fillcolor=colors[idx],
+                            opacity=.6)
+            data.append(trace)
+        
+        # Controls placement of y-axis tick labels
+        tickvals = np.arange(len(data)) * spacing
+        yaxis=dict(
+            showgrid=False,
+            zeroline=False,
+            showline=False,
+            showticklabels=True,
+            tickmode='array',
+            ticktext=columns,
+            tickvals=tickvals,
+            rangemode='nonnegative')
+        
+        xaxis=dict(
+                showline=False,
+                showgrid=False,
+                showticklabels=True,
+                linecolor='rgb(204, 204, 204)',
+                autotick=False,
+                ticks='outside',
+                tickcolor='rgb(204, 204, 204)')
+            
+        layout = go.Layout(showlegend=False,
+                           height=max(42*len(data), 600),
+                           xaxis=xaxis,
+                           yaxis=yaxis,
+                           title=title)
+        
+        # Reverse order since lastest plot is on the front
+        fig = go.Figure(data=data[::-1], layout=layout)
         return self.makeplot(fig, "agg/" + self.shortname)
 
 
