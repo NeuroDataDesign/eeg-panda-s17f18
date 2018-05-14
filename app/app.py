@@ -407,7 +407,7 @@ def upload():
         except:
             print("Running plots/synchronization failed!")
 
-    for name in ['pheno', 'eeg', 'mri', 'graph']:
+    for name in ['pheno', 'eeg', 'fmri', 'graph']:
         if session[name]:
             return redirect(url_for('meda_modality', ds_name=filedir, modality=name, mode='none', plot_name='default'))
 
