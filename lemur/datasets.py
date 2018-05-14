@@ -68,7 +68,7 @@ class BIDSParser:
         subjects = []
         tasks = []
         for s in self.dataset.keys():
-            for t in self.dataset[s][modality].keys():
+            for t in self.dataset[s].get(modality, {}).keys():
                 for f in self.dataset[s][modality][t]:
                     if f.endswith(extension):
                         files.append(os.path.join(self.base_path, s, modality, f))
