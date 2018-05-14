@@ -499,6 +499,11 @@ class DistanceMatrix:
             I = parameterization[i]
             for j in range(i + 1):
                 J = parameterization[j]
+                if I.shape != J.shape:
+                        print('I_shape', I.shape)
+                        print('J_shape', J.shape)
+                        print('I_index', i)
+                        print('J_index', j)
                 self.D[i, j] = self.metric.compare(I, J)
                 self.D[j, i] = self.D[i, j]
         self.D = pd.DataFrame(self.D)
