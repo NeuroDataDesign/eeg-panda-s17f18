@@ -54,6 +54,7 @@ def run_modality(name, modality):
 
         dataset_descriptor = bp.getModalityFrame(datatype, f_ext)
         DS = DS_type(dataset_descriptor)
+        print (DS)
         curr_dir = os.path.join(root, datatype)
         if os.path.exists(curr_dir):
             continue
@@ -61,11 +62,11 @@ def run_modality(name, modality):
             os.makedirs(curr_dir)
 
         # Save the dataset
-        with open(os.path.join(root, 'ds.pkl'), 'wb') as pkl_loc:
+        with open(os.path.join(curr_dir, 'ds.pkl'), 'wb') as pkl_loc:
             pkl.dump(DS, pkl_loc)
 
         # Create a lemur distance matrix
-        if modality == 'eeg':
+        if modality == 'fmri':
             DM = lds.DistanceMatrix(DS, metric, True)
         else:
             DM = lds.DistanceMatrix(DS, metric)
