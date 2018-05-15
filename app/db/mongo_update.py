@@ -157,6 +157,3 @@ def build_metadata(filename, dataset):
 def get_subject(link_header):
     return link_header.split("_")[0]
 
-
-if __name__ == "__main__":
-    build_metadata('/home/nitin/hopkins/fall2017/ndd/lemur/data/HBN_R1_1_Pheno.csv')
