@@ -157,3 +157,16 @@ def build_metadata(filename, dataset):
 def get_subject(link_header):
     return link_header.split("_")[0]
 
+#########################################
+
+def delete_dataset(dataset):
+    # Initialize
+    lims = init_database()
+    cursor = lims.find({ '_id' : dataset })
+    subjs = []
+    for doc in cursor:
+        subjs = doc['subjects']
+        break
+    for s in subjs:
+        lims.update_one({'_id': s}, {'$unset': {dataset: ''}})
+    lims.remove({ '_id' : dataset })
