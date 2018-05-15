@@ -40,6 +40,7 @@ def init_database():
         client = MongoClient("mongodb://localhost:27017/")
         # specify database
         db = client.m2gdatabase
+        print(db)
         # specify collection
         lims = db.lims
         return lims
@@ -170,3 +171,7 @@ def delete_dataset(dataset):
     for s in subjs:
         lims.update_one({'_id': s}, {'$unset': {dataset: ''}})
     lims.remove({ '_id' : dataset })
+
+if __name__ == '__main__':
+    lims = init_database()
+    build_dataset(lims, 'lord_forgive_me')
