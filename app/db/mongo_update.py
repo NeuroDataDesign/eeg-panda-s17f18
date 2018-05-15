@@ -105,7 +105,7 @@ def build_derivative(lims, dataset, modality, subject, datatype, task, links):
 
     lims.update_one(
         filter = {'_id': subject},
-        update = {'$set': { dataset + '.' + modality + '.' + datatype + '.' + task : [links]}},
+        update = {'$set': { dataset + '.' + modality + '.' + datatype + '.' + task : links}},
         upsert = True
     )
 
