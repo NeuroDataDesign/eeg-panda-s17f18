@@ -92,10 +92,10 @@ def run_modality(name, modality):
         with open(os.path.join(curr_dir, 'hgmm_clust_dm.pkl'), 'wb') as pkl_loc:
             pkl.dump(clustered, pkl_loc)
 
-        # clustered = lcl.AdaptiveKMeans(embedded)
-        # clustered.cluster()
-        # with open(os.path.join(curr_dir, 'km_clust_dm.pkl'), 'wb') as pkl_loc:
-        #     pkl.dump(clustered, pkl_loc)
+        clustered = lcl.AdaptiveKMeans(embedded)
+        clustered.cluster()
+        with open(os.path.join(curr_dir, 'km_clust_dm.pkl'), 'wb') as pkl_loc:
+            pkl.dump(clustered, pkl_loc)
 
 
     # Return modality list
