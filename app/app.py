@@ -108,20 +108,17 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
         datatype = 'func'
 
     # TODO: Fix this mess
+    datatype = ''
     if modality == 'fmri' or modality == 'graph':
         datatype = 'func'
     elif modality == 'eeg':
         datatype = 'preprocessed'
-    else:
-        datatype = ''
 
     if plot_name == "default":
         todisp = "<h1> Choose a plot! </h1>"
     elif subj_name == "none" and mode == 'one':
         ids = mongo_get.get_from_dataset(ds_name)
         subjs, datatypes, tasks = mongo_get.get_from_database(ds_name, ids, modality)
-        datatype_tasks = [(i, j) for i, j in zip(datatypes, tasks)]
-
         todisp = None
     elif plot_name is not None:
         # Rendering a plot
@@ -139,7 +136,7 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
         # Choose filepath
         if mode == 'embed':
             dm_path += 'embed_'
-        elif mode =='cluster':
+        elif mode =='clust':
             dm_path += 'hgmm_clust_'
 
         if mode == 'one':
