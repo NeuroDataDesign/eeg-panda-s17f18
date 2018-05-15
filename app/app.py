@@ -3,6 +3,7 @@ import shutil
 import pickle as pkl
 import botocore
 from flask import Flask, session, render_template, request, send_from_directory, url_for, redirect
+import jinja2
 import logging
 from logging.handlers import RotatingFileHandler
 import json
@@ -227,6 +228,7 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
 
 
     subjs = []
+    datatypes = []
     tasks = []
     metadata = dict()
 
@@ -252,15 +254,9 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
         todisp = "<h1> Choose a plot! </h1>"
     elif subj_name == "none" and mode == 'one':
         ids = mongo_get.get_from_dataset(ds_name)
-        subjs = mongo_get.get_from_database(ds_name, ids)
-        print('Getting from db subjs', subjs)
+        subjs, datatypes, tasks = mongo_get.get_from_database(ds_name, ids, modality)
+        datatype_tasks = [(i, j) for i, j in zip(datatypes, tasks)]
 
-        for id in ids:
-            # TODO: How are we handling tasks
-            tasks.append(['Rest'])
-            # if modality == 'fmri':
-            #     tasks.append([task_di for task_di in os.listdir(os.path.join(base_path, id, 'Nifti4DPlotter'))
-            #                   if os.path.isdir(os.path.join(base_path, id, 'Nifti4DPlotter', task_di))])
         todisp = None
     elif plot_name is not None:
         # Rendering a plot
@@ -321,7 +317,7 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
 
 
     return render_template('meda_modality.html',
-                           interm=zip(subjs, tasks),
+                           interm=zip(subjs, datatypes, tasks),
                            interm_meta=metadata,
                            one_title=plot_title,
                            plot=todisp,

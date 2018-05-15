@@ -11,17 +11,17 @@ def init_database():
     except:
         raise Exception("MongoDB not running.")
 
-def get_from_database(dataset, ids):
+def get_from_database(dataset, ids, modality):
     # Initialize
     lims = init_database()
-    print(ids)
-    cursor = lims.find({ '_id' : { '$in' : ids } }, { dataset : 1, dataset + '.metadata' : 1})
-    subjs = []
-    print(cursor)
+    cursor = lims.find({ '_id' : { '$in' : ids } }, { dataset : 1, dataset + '.' + modality : 1, dataset + '.metadata' : 1})
+    subjs, datatypes, tasks = [], [], []
     for doc in cursor:
-        doc = {'_id' : doc['_id'], 'metadata' : doc[dataset].get('metadata', {})}
-        subjs.append(doc)
-    return subjs
+        subjs.append({'_id' : doc['_id'], 'metadata' : doc[dataset].get('metadata', {})})
+        datatypes.append(list(doc[dataset][modality].keys()))
+        print('inside fxn datatypes', datatypes)
+        tasks.append([list(doc[dataset][modality][datatype].keys()) for datatype in datatypes[-1]])
+    return subjs, datatypes, tasks
 
 def get_from_dataset(dataset):
     # Initialize

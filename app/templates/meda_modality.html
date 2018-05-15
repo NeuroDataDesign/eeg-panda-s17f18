@@ -98,6 +98,7 @@
                         <thead class="thead">
                             <tr>
                                 <th>Subject</th>
+                                <th>Datatype</th>
                                 <th>Task</th>
                                 {% for meta_name in interm_meta %}
                                     <th>{{ meta_name }}</th>
@@ -105,22 +106,27 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for subject, tasks in interm %}
-                                {% for task in tasks %}
-                                    <tr>
-                                        <td>
-                                            <a href={{ url_for('meda_modality', ds_name=request.path.split('/')[-4], modality = Modality, mode='one',
-                                        subj_name=subject['_id'], test_name=task, plot_name=request.path.split('/')[-1]) }}>{{ subject['_id'] }}</a>
-                                        </td>
-                                        <td>
-                                            {{ task }}
-                                        </td>
-                                        {% for meta_name in subject['metadata'] %}
+                            {% for subject, datatypes, tasks in interm %}
+                                {% for datatype in datatypes %}
+                                    {% for task in tasks[loop.index0] %}
+                                        <tr>
                                             <td>
-                                                {{ subject['metadata'][meta_name] }}
+                                                <a href={{ url_for('meda_modality', ds_name=request.path.split('/')[-4], modality = Modality, mode='one',
+                                            subj_name=subject['_id'], test_name=task, plot_name=request.path.split('/')[-1]) }}>{{ subject['_id'] }}</a>
                                             </td>
-                                        {% endfor %}
-                                    </tr>
+                                            <td>
+                                                {{ datatype }}
+                                            </td>
+                                            <td>
+                                                {{ task }}
+                                            </td>
+                                            {% for meta_name in subject['metadata'] %}
+                                                <td>
+                                                    {{ subject['metadata'][meta_name] }}
+                                                </td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
                                 {% endfor %}
                             {% endfor %}
                         </tbody>
