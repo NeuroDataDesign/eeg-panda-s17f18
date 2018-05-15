@@ -49,3 +49,21 @@ def get_datatype_task(dataset, modality):
     return list(datatypes), list(tasks)
 
 
+def get_metadata(dataset, modality):
+    # Initialize
+    lims = init_database()
+    subjs = get_from_dataset(dataset)
+
+    metadata = dict()
+
+    cursor = lims.find({ '_id' : { '$in' : subjs } }, { dataset + '.metadata' : 1})
+    for doc in cursor:
+        curr_metadata = doc[dataset].get('metadata', {})
+        for key, val in curr_metadata.items():
+            vals = metadata.get(key, set())
+            vals.add(val)
+            metadata[key] = vals
+
+    print('metadata', metadata)
+    return metadata
+

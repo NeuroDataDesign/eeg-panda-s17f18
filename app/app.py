@@ -69,6 +69,7 @@ def medahome():
 # Delete dataset from app.
 @app.route('/MEDA/datasets/delete/<dataset>')
 def delete_dataset(dataset = None):
+    mongo_update.delete_dataset(dataset)
     datadir = os.path.join(APP_ROOT, 'data', dataset)
     shutil.rmtree(datadir+"/")
     return redirect(url_for('medahome'))
@@ -198,6 +199,8 @@ def metadata_modal(dataset, modality):
     datatypes, tasks = mongo_get.get_datatype_task(dataset, modality)
     metadata['datatypes'] = datatypes
     metadata['tasks'] = tasks
+
+    return metadata
 
 @app.route('/upload', methods=['POST'])
 def upload():
