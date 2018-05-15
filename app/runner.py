@@ -65,7 +65,10 @@ def run_modality(name, modality):
             pkl.dump(DS, pkl_loc)
 
         # Create a lemur distance matrix
-        DM = lds.DistanceMatrix(DS, metric)
+        if modality == 'eeg':
+            DM = lds.DistanceMatrix(DS, metric, True)
+        else:
+            DM = lds.DistanceMatrix(DS, metric)
         DM.name = "%s-DistanceMatrix"%(modality)
         with open(os.path.join(curr_dir, 'dm.pkl'), 'wb') as pkl_loc:
             pkl.dump(DM, pkl_loc)
