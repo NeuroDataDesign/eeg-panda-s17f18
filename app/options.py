@@ -114,8 +114,38 @@ clustering_options = {
                       'hgmmcmlh')
     },
     'eeg' : {
+        'hgmmscmh' : ('HGMM Stacked Cluster Means Heatmap',
+                      'ClusterMeansLevelHeatmap',
+                      'hgmmscmh'),
+        'hgmmcmd' : ('HGMM Cluster Means Dendrogram',
+                     'HierarchicalClusterMeansDendrogram',
+                     'hgmmcmd'),
+        'hgmmcpp' : ('HGMM Pairs Plot',
+                     'ClusterPairsPlot',
+                     'hgmmcpp'),
+        'hgmmcmll' : ('HGMM Cluster Means Level Lines',
+                      'ClusterMeansLevelLines',
+                      'hgmmcmll'),
+        'hgmmcmlh' : ('HGMM Cluster Means Level Heatmap',
+                      'HierarchicalStackedClusterMeansHeatmap',
+                      'hgmmcmlh')
     },
     'fmri' : {
+        'hgmmscmh' : ('HGMM Stacked Cluster Means Heatmap',
+                      'ClusterMeansLevelHeatmap',
+                      'hgmmscmh'),
+        'hgmmcmd' : ('HGMM Cluster Means Dendrogram',
+                     'HierarchicalClusterMeansDendrogram',
+                     'hgmmcmd'),
+        'hgmmcpp' : ('HGMM Pairs Plot',
+                     'ClusterPairsPlot',
+                     'hgmmcpp'),
+        'hgmmcmll' : ('HGMM Cluster Means Level Lines',
+                      'ClusterMeansLevelLines',
+                      'hgmmcmll'),
+        'hgmmcmlh' : ('HGMM Cluster Means Level Heatmap',
+                      'HierarchicalStackedClusterMeansHeatmap',
+                      'hgmmcmlh')
     },
     'graph' : {
         'hgmmscmh' : ('HGMM Stacked Cluster Means Heatmap',
