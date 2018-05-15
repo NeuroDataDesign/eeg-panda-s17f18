@@ -321,10 +321,10 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
                            interm_meta=metadata,
                            one_title=plot_title,
                            plot=todisp,
-                           MEDA_options = aggregate_options[modality].values(),
-                           MEDA_Embedded_options = embedded_options[modality].values(),
-                           MEDA_Clustering_options = clustering_options[modality].values(),
-                           One_to_One = one_to_one_options[modality].values(),
+                           MEDA_options = sorted(aggregate_options[modality].values()),
+                           MEDA_Embedded_options = sorted(embedded_options[modality].values()),
+                           MEDA_Clustering_options = sorted(clustering_options[modality].values()),
+                           One_to_One = sorted(one_to_one_options[modality].values()),
                            Modality = modality
                           )
 
