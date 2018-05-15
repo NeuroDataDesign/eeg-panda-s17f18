@@ -499,7 +499,7 @@ class DistanceMatrix:
         common_idx = range(self.n)
         if std_shape:
             common_shape = statistics.mode(list(map(lambda x: x.shape, parameterization)))
-            common_idx = list(filter(lambda x: parameterization[x].shape != common_shape, range(self.n)))
+            common_idx = list(filter(lambda x: parameterization[x].shape == common_shape, range(self.n)))
             parameterization = [parameterization[i] for i in common_idx]
             self.n = len(parameterization)
 

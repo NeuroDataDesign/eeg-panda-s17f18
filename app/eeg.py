@@ -51,19 +51,3 @@ def run_eeg(name):
       pkl.dump(spatialDM, pkl_loc)
 
 
-
-
-  # TODO: Yujia no idea what's happneing here...
-  # s3 = boto3.resource('s3')
-  # bucket = s3.Bucket('redlemurtest')
-  #     # Directly read through S3 bucket and pass into pandas dataframe
-  # for obj in bucket.objects.all():
-  #     key = obj.key
-  #     if key.endswith('chanlocs.csv'):
-  #         body = obj.get()['Body'].read()
-  #         chanlocs = pd.read_csv(io.BytesIO(body))
-  # spatial = lds.DataSet(chanlocs[["X", "Y", "Z"]], "Spatial")
-  # spatialDM = lds.DistanceMatrix(spatial, lms.VectorDifferenceNorm)
-#  chanlocs = pd.read_csv("data/%s/eeg/chanlocs.csv"%(name))
-#  spatial = lds.DataSet(chanlocs[["X", "Y", "Z"]], "Spatial")
-#  spatialDM = lds.DistanceMatrix(spatial, lms.VectorDifferenceNorm)

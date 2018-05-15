@@ -3,16 +3,15 @@ import shutil
 import pickle as pkl
 import botocore
 from flask import Flask, session, render_template, request, send_from_directory, url_for, redirect
+import jinja2
 import logging
 from logging.handlers import RotatingFileHandler
 import json
 from subprocess import Popen, call, PIPE
 import pexpect
 
-import eeg
-import fmri
 import pheno
-import graph
+from runner import run_modality
 
 import lemur.plotters as lpl
 
@@ -227,62 +226,70 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
         subj_name = None
         test_name = None
 
-    # TODO: Test on big dataset, re enable these if we end up caching plots
-    # if mode == 'embed':
-    #     base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_embedded_deriatives', 'agg')
-    # elif mode == 'one' and subj_name == 'none':
-    #     base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_derivatives')
-    # elif mode == 'one':
-    #     base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_derivatives', subj_name, test_name)
-    # else:
-    #     base_path = os.path.join(APP_ROOT, 'data', ds_name, modality+'_derivatives', 'agg')
 
     subjs = []
+    datatypes = []
     tasks = []
     metadata = dict()
+
+    plot_title = ""
+    if mode == "one":
+        for title, _, tag in one_to_one_options[modality].values():
+            if tag == plot_name: plot_title = title
+
+    try:
+        datatype = request.args.get('datatype')
+    except:
+        datatype = 'func'
+
+    # TODO: Fix this mess
+    if modality == 'fmri' or modality == 'graph':
+        datatype = 'func'
+    elif modality == 'eeg':
+        datatype = 'preprocessed'
+    else:
+        datatype = ''
+
     if plot_name == "default":
         todisp = "<h1> Choose a plot! </h1>"
     elif subj_name == "none" and mode == 'one':
         ids = mongo_get.get_from_dataset(ds_name)
-        subjs = mongo_get.get_from_database(ds_name, ids)
-        print('Getting from db subjs', subjs)
+        subjs, datatypes, tasks = mongo_get.get_from_database(ds_name, ids, modality)
+        datatype_tasks = [(i, j) for i, j in zip(datatypes, tasks)]
 
-        for id in ids:
-            # TODO: How are we handling tasks
-            tasks.append(['Rest'])
-            # if modality == 'fmri':
-            #     tasks.append([task_di for task_di in os.listdir(os.path.join(base_path, id, 'Nifti4DPlotter'))
-            #                   if os.path.isdir(os.path.join(base_path, id, 'Nifti4DPlotter', task_di))])
         todisp = None
     elif plot_name is not None:
         # Rendering a plot
-        dm_path = modality
+        dm_dir = os.path.join('data', ds_name, modality, datatype)
+        dm_path = ''
         # Choose options
         options = aggregate_options
         if mode == 'embed':
-            dm_path += '_embed'
             options = embedded_options
         elif mode == 'one':
             options = one_to_one_options
         elif mode == 'clust':
-            dm_path += '_clust'
             options = clustering_options
 
+        # Choose filepath
+        if mode == 'embed' or mode == 'cluster':
+            dm_path += 'embed_'
+
         if mode == 'one':
-            dm_path += '_ds.pkl'
+            dm_path += 'ds.pkl'
         else:
-            dm_path += '_dm.pkl'
+            dm_path += 'dm.pkl'
 
         # Actually set to disp
-        with open(os.path.join('data', ds_name, dm_path), 'rb') as dm_loc:
+        with open(os.path.join(dm_dir, dm_path), 'rb') as dm_loc:
             DM = pkl.load(dm_loc)
             if mode == 'one':
                 if modality == 'eeg' and 'spatial' in plot_name:
-                    with open(os.path.join('data', ds_name, 'eeg_chanlocs.pkl'), 'rb') as chanloc_pkl:
+                    with open(os.path.join('data', ds_name, 'eeg', 'chanlocs.pkl'), 'rb') as chanloc_pkl:
                         chanlocs = pkl.load(chanloc_pkl)
                         todisp = getattr(lpl, options[modality][plot_name][1])(DM.getResourceDS(0), mode='div').plot(chanlocs)
                 elif modality == 'eeg' and 'connectedscatter' in plot_name:
-                    with open(os.path.join('data', ds_name, 'eeg_spatial_dm.pkl'), 'rb') as spatial_pkl:
+                    with open(os.path.join('data', ds_name, 'eeg', 'spatial_dm.pkl'), 'rb') as spatial_pkl:
                         spatial = pkl.load(spatial_pkl)
                         todisp = getattr(lpl, options[modality][plot_name][1])(DM.getResourceDS(0), mode='div').plot(spatial)
                 elif modality == 'eeg' and 'sparkline' in plot_name:
@@ -304,35 +311,23 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
     elif plot_name is not None: ...
     '''
 
-    plot_title = ""
-    if mode == "one":
-        for title, _, tag in one_to_one_options[modality].values():
-            if tag == plot_name: plot_title = title
 
     if len(subjs) > 0:
         metadata = subjs[0]['metadata']
 
 
     return render_template('meda_modality.html',
-                           interm=zip(subjs, tasks),
+                           interm=zip(subjs, datatypes, tasks),
                            interm_meta=metadata,
                            one_title=plot_title,
                            plot=todisp,
-                           MEDA_options = aggregate_options[modality].values(),
-                           MEDA_Embedded_options = embedded_options[modality].values(),
-                           MEDA_Clustering_options = clustering_options[modality].values(),
-                           One_to_One = one_to_one_options[modality].values(),
+                           MEDA_options = sorted(aggregate_options[modality].values()),
+                           MEDA_Embedded_options = sorted(embedded_options[modality].values()),
+                           MEDA_Clustering_options = sorted(clustering_options[modality].values()),
+                           One_to_One = sorted(one_to_one_options[modality].values()),
                            Modality = modality
                           )
 
-# Pass modality as string, and base path.
-def run_modality(modality, basepath):
-    if modality == 'eeg':
-        eeg.run_eeg(basepath)
-    elif modality == 'fmri':
-        fmri.run_fmri(basepath)
-    elif modality == 'graph':
-        graph.run_graph(basepath)
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -374,12 +369,14 @@ def upload():
         except:
             print("Download from S3 failed!")
 
+        bp, modality_list = run_modality(os.path.basename(session['basepath']), name)
+        task_list = list(map(lambda x: x[0], modality_list))
+
         try:
-            mongo_update.build_database(filedir, bucket_name)
+            mongo_update.build_database(filedir, name, bp, task_list)
         except:
             print("Database synchronization failed!")
 
-        run_modality(name, os.path.basename(session['basepath']))
 
     ########################################
     # Phenotypic
