@@ -44,7 +44,7 @@ class KMeans(Clustering):
 
 
 class AdaptiveKMeans(Clustering):
-    def __init__(self, DS, clust_min=1, clust_max=10, random_state=None):
+    def __init__(self, DS, clust_min=2, clust_max=10, random_state=None):
         """
         Parameters
         ----------

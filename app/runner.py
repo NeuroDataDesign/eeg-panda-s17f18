@@ -8,6 +8,8 @@ sys.path.append("..")
 import lemur.datasets as lds
 import lemur.metrics as lms
 import lemur.embedders as leb
+import lemur.clustering as lcl
+import copy
 
 def run_modality(name, modality):
 
@@ -25,10 +27,9 @@ def run_modality(name, modality):
         metric = lms.FroCorr
     elif modality == 'fmri':
         modality_list = [
-            ('func', 'nii.gz'),
-            ('anat', 'nii.gz'),
-            ('fmap', 'nii.gz'),
-            ('dwi', 'nii.gz')
+            ('func', 'nii.gz')
+            # ('anat', 'nii.gz'),
+            # ('dwi', 'nii.gz')
         ]
         DS_type = lds.fMRIDataSet
         metric = lms.DiffAve
@@ -86,10 +87,15 @@ def run_modality(name, modality):
         ##### Clustering
         # I think this may be better to do while the app is running
 
-        # clustered = lcl.HGMMClustering(embedded, 4)
+        clustered = lcl.HGMMClustering(copy.deepcopy(embedded), 4)
+        clustered.cluster()
+        with open(os.path.join(curr_dir, 'hgmm_clust_dm.pkl'), 'wb') as pkl_loc:
+            pkl.dump(clustered, pkl_loc)
+
+        # clustered = lcl.AdaptiveKMeans(embedded)
         # clustered.cluster()
-        # with open(os.path.join(BASE, name, 'clust_dm.pkl'), 'wb') as pkl_loc:
-        #     pkl.dump(Graph_Embedded, pkl_loc)
+        # with open(os.path.join(curr_dir, 'km_clust_dm.pkl'), 'wb') as pkl_loc:
+        #     pkl.dump(clustered, pkl_loc)
 
 
     # Return modality list

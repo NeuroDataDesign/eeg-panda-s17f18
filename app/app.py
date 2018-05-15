@@ -137,8 +137,10 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
             options = clustering_options
 
         # Choose filepath
-        if mode == 'embed' or mode == 'cluster':
+        if mode == 'embed':
             dm_path += 'embed_'
+        elif mode =='cluster':
+            dm_path += 'hgmm_clust_'
 
         if mode == 'one':
             dm_path += 'ds.pkl'
