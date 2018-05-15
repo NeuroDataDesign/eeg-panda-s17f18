@@ -241,10 +241,12 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
         datatype = 'func'
 
     # TODO: Fix this mess
-    if modality == 'fmri':
+    if modality == 'fmri' or modality == 'graph':
         datatype = 'func'
     elif modality == 'eeg':
         datatype = 'preprocessed'
+    else:
+        datatype = ''
 
     if plot_name == "default":
         todisp = "<h1> Choose a plot! </h1>"
