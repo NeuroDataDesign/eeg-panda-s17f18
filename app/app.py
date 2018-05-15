@@ -278,7 +278,6 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
             dm_path += 'embed_'
 
         if mode == 'one':
-            dm_dir = os.path.join('data', ds_name, modality)
             dm_path += 'ds.pkl'
         else:
             dm_path += 'dm.pkl'
