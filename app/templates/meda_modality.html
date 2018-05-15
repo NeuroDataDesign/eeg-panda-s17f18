@@ -132,15 +132,18 @@
                         </tbody>
                     </table>
                 {% else %}
-                    <div style="position:absolute; margin-top:10px; z-index:2">
-                        <!-- <button class="btn btn-primary" type="button">
-                            Back to all Subjects
-                        </button> -->
-                        <button class="btn btn-primary" style="cursor:pointer" type="button"
-                                data-toggle="modal" data-target="#metadataModal">
-                            Metadata Selector
-                        </button>
-                    </div>
+                    {% if request.path.split('/')[-1] != 'default' and request.path.split('/')[-1] != 'none'
+                        and request.path.split('/')[-2] == 'none'  %}
+                        <div style="position:absolute; margin-top:10px; z-index:2">
+                            <!-- <button class="btn btn-primary" type="button">
+                                Back to all Subjects
+                            </button> -->
+                            <button class="btn btn-primary" style="cursor:pointer" type="button"
+                                    data-toggle="modal" data-target="#metadataModal">
+                                Metadata Selector
+                            </button>
+                        </div>
+                    {% endif %}
                     {{ plot|safe }}
                 {% endif %}
             </main>

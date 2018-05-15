@@ -193,8 +193,11 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
                           )
 
 def metadata_modal(dataset, modality):
+    metadata = dict()
     # Get all datatypes and tasks
     datatypes, tasks = mongo_get.get_datatype_task(dataset, modality)
+    metadata['datatypes'] = datatypes
+    metadata['tasks'] = tasks
 
 @app.route('/upload', methods=['POST'])
 def upload():
