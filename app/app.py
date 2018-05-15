@@ -369,10 +369,10 @@ def upload():
             print("Download from S3 failed!")
 
         bp, modality_list = run_modality(os.path.basename(session['basepath']), name)
-        print(bp)
+        task_list = list(map(lambda x: x[0], modality_list))
 
         try:
-            mongo_update.build_database(filedir, bp, modality_list)
+            mongo_update.build_database(filedir, name, bp, task_list)
         except:
             print("Database synchronization failed!")
 

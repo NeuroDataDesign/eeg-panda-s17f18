@@ -47,16 +47,19 @@ def init_database():
         raise Exception("MongoDB not running.")
 
 
-def build_database(dataset, bucket_name):
+def build_database(dataset, modality, bids_parser, task_list):
     # Initialize
     lims = init_database()
     build_dataset(lims, dataset)
 
+    print(bids_parser)
     # Insert into db
-    for sub, datatypes in subs.items():
-        for datatype, derivs in datatypes.items():
-            for deriv, links in derivs.items():
-                build_derivative(lims, dataset, datatype, deriv, links)
+    for sub, datatypes in bids_parser.dataset.items():
+        for datatype, tasks in datatypes.items():
+            if datatype not in task_list:
+                continue
+            for task, links in tasks.items():
+                build_derivative(lims, dataset, modality, sub, datatype, task, links)
 
 def build_dataset(lims, dataset):
     lims.update_one(
@@ -92,48 +95,20 @@ def parse_csv(filename):
     return metadata_list
 
 
-def build_derivative(lims, dataset, datatype, derivative, links):
+def build_derivative(lims, dataset, modality, subject, datatype, task, links):
+
+    update_dataset(lims, dataset, subject)
 
     global scan_count
-    for link_list in links:
-        scan_count += 1
-        link_header = link_list[0]
-        ## invalid parse
-        ## TODO: get better fix
-        if (link_header.find("sub") < 0 or link_header.find("_") < 0):
-            continue
-        # url = encode_url(link_list[1])
-        url = link_list[1]
+    scan_count += len(links)
+    links = list(filter(lambda link: link.find('sub') >= 0 and link.find('_') >= 0, links))
 
-        subject = get_subject(link_header)
-        update_dataset(lims, dataset, subject)
-        # insert  and subject dataype if needed
+    lims.update_one(
+        filter = {'_id': subject},
+        update = {'$set': { dataset + '.' + modality + '.' + datatype + '.' + task : [links]}},
+        upsert = True
+    )
 
-        print(dataset)
-
-        write_result = lims.update_one(
-            filter = {"_id": subject},
-            update = {"$setOnInsert": { dataset + "." + datatype + "." + derivative: [{url: ""}]}},
-            upsert = True
-        )
-
-        print(write_result)
-
-        if (write_result.upserted_id is not None):
-            continue
-
-        lims.update_one(
-            filter = {"_id": subject, dataset + "." + datatype + "." + derivative: {"$exists": False}},
-            update = { "$set": { dataset + "." + datatype + "." + derivative: [] }},
-        )
-        #insert url to derivative list
-        #NOTE: no upsert option exists
-        lims.update_one(
-            filter = {"_id": subject}, #query
-            update = {
-                "$push": { dataset + "." + datatype + "." + derivative: {url: ""} }
-            }
-        )
     print("Updated Scan Count: " + str(scan_count))
 
 def build_metadata(filename, dataset):
