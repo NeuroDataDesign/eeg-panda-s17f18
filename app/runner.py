@@ -27,9 +27,7 @@ def run_modality(name, modality):
         metric = lms.FroCorr
     elif modality == 'fmri':
         modality_list = [
-            ('func', 'nii.gz'),
-            ('anat', 'nii.gz'),
-            ('dwi', 'nii.gz')
+            ('func', 'nii.gz')
         ]
         DS_type = lds.fMRIDataSet
         metric = lms.DiffAve

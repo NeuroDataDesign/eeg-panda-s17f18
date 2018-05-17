@@ -51,21 +51,14 @@ def medahome():
     fmris = []
     graphs = []
     for d in datasets:
-        print(os.path.join(basedir, d, "metadata.json"))
-        if os.path.exists(os.path.join(basedir, d, "metadata.json")):
-
-            with open(os.path.join(basedir, d, "metadata.json")) as f:
-                rawjson = f.read()
-            metadata = json.loads(rawjson)
-            metas.append(metadata)
+        if os.path.exists(os.path.join(basedir, d, "pheno")):
+            metas.append({'name': d, 'n': 'N/A', 'd': 'N/A'})
         if os.path.exists(os.path.join(basedir, d, 'eeg')):
             eegs.append(d)
         if os.path.exists(os.path.join(basedir, d, 'fmri')):
             fmris.append(d)
         if os.path.exists(os.path.join(basedir, d, 'graph')):
             graphs.append(d)
-        if d == 'pheno_only':
-            metas.append({'name': d, 'n': 934, 'd':0})
     return render_template('home.html', metas = metas, eegs = eegs, fmris = fmris, graphs = graphs)
 
 # Delete dataset from app.
@@ -297,4 +290,4 @@ if __name__ == '__main__':
     handler = RotatingFileHandler('foo.log', maxBytes=10000, backupCount=1)
     handler.setLevel(logging.INFO)
     app.logger.addHandler(handler)
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=5000)

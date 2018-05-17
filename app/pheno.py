@@ -40,5 +40,10 @@ def run_pheno(name):
 
     hgmm = lcl.HGMMClustering(HBN_Embedded, 4)
     hgmm.cluster()
-    with open(os.path.join(root, 'clust_dm.pkl'), 'wb') as pkl_loc:
+    with open(os.path.join(root, 'hgmm_clust_dm.pkl'), 'wb') as pkl_loc:
         pkl.dump(hgmm, pkl_loc)
+
+    clustered = lcl.AdaptiveKMeans(HBN_Embedded)
+    clustered.cluster()
+    with open(os.path.join(root, 'km_clust_dm.pkl'), 'wb') as pkl_loc:
+        pkl.dump(clustered, pkl_loc)
