@@ -64,6 +64,8 @@ def medahome():
             fmris.append(d)
         if os.path.exists(os.path.join(basedir, d, 'graph')):
             graphs.append(d)
+        if d == 'pheno_only':
+            metas.append({'name': d, 'n': 934, 'd':0})
     return render_template('home.html', metas = metas, eegs = eegs, fmris = fmris, graphs = graphs)
 
 # Delete dataset from app.
@@ -90,7 +92,8 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
     except:
         subj_name = None
         test_name = None
-
+    
+    clusttype = request.args.get('clusttype', 'hgmm')
 
     subjs = []
     datatypes = []
@@ -137,7 +140,7 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
         if mode == 'embed':
             dm_path += 'embed_'
         elif mode =='clust':
-            dm_path += 'hgmm_clust_'
+            dm_path += ('%s_clust_'% (clusttype))
 
         if mode == 'one':
             dm_path += 'ds.pkl'
@@ -189,7 +192,8 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
                            MEDA_Embedded_options = sorted(embedded_options[modality].values()),
                            MEDA_Clustering_options = sorted(clustering_options[modality].values()),
                            One_to_One = sorted(one_to_one_options[modality].values()),
-                           Modality = modality
+                           Modality = modality,
+                           clusttype=clusttype
                           )
 
 def metadata_modal(dataset, modality):
@@ -293,4 +297,4 @@ if __name__ == '__main__':
     handler = RotatingFileHandler('foo.log', maxBytes=10000, backupCount=1)
     handler.setLevel(logging.INFO)
     app.logger.addHandler(handler)
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=80)
