@@ -1,0 +1,121 @@
+#parser.sh - download data onto ec2 from HBN in segments
+
+#!/bin/bash
+
+readarray SUBJECTS < /home/ec2-user/scripts/subjects1.md
+
+for i in ${SUBJECTS[@]}; do
+        aws s3 cp s3://eegndd/session/$i/ ~/data/$i --recursive
+done
+
+------------------------------------------------------------------
+
+#test.sh - convert csv files to pkls so we can run pandas
+
+#!/bin/bash
+
+for i in ~/data/*; do
+        for j in $i/EEG/preprocessed/csv_format/*_data.csv; do
+                python csv_to_pkl.py $j
+        done
+
+        echo $i has been pkl dumped!
+        rm -R $i
+done
+
+------------------------------------------------------------------
+
+#csv_to_pkl.py
+
+#!/usr/bin/env python
+
+import cPickle as pkl
+import sys
+import csv
+import numpy as np
+from numpy import genfromtxt
+
+filepath = sys.argv[1]
+
+filepath1 = filepath.split("/")
+
+filepath2 = filepath1[4]+"_"+filepath1[8]
+
+filepath3 = filepath2.split(".")
+
+filename = filepath3[0]
+
+array = np.genfromtxt(filepath, delimiter=',')
+
+f = file(filename+'.pkl', 'wb')
+pkl.dump((array), f, protocol=pkl.HIGHEST_PROTOCOL)
+f.close()
+
+------------------------------------------------------------------
+
+#test.py - running pandas on ec2 instance
+
+#!/usr/bin/env python
+
+#import necessary
+from panda.methods import viz as viz
+from panda import default_config
+import numpy as np
+import os
+from numpy import genfromtxt
+import cPickle as pkl
+from matplotlib import pyplot as plt
+plt.switch_backend('agg')
+
+#pipeline methods
+from panda.methods.misc import setup
+from panda.methods.denoise import highpass
+from panda.methods.denoise import bandstop
+from panda.methods.denoise import wave_rejection
+from panda.methods.denoise import eog_regress
+from panda.methods.denoise import amp_shrinkage
+from panda.methods.bad_chans import bad_detec
+from panda.methods.interpolation import wave_interp
+
+#load chan_locs
+with open('/home/ec2-user/chan_locs.pkl') as f:
+    chan_locs = pkl.load(f)
+
+#run pandas
+for i in os.listdir("/home/ec2-user/rest_state_pkl_4/"):
+        eeg_datapath = "/home/ec2-user/rest_state_pkl_4/"+i
+        newname = i.split(".")[0]
+        with open(eeg_datapath, 'rb') as f:
+            data = pkl.load(f)
+
+        p_global = default_config.params['p_global']
+        p_global['plot_folders']['heatmap_dir'] = ''
+        p_global['plot_folders']['sparkline_dir'] = ''
+        eog_chans = []
+        eeg_chans = np.setdiff1d(np.arange(111), eog_chans)
+        p_global.update({'eog_chans': eog_chans,
+                        'eeg_chans': eeg_chans})
+        p_global['inter'].update({'chan_locs': chan_locs})
+        p_global['plotting']['notebook'] = True
+
+        (data, p_local) = setup(data, {'eog_in': True}, p_global)
+
+        (data, p_local) = highpass(data, p_local, p_global)
+        (data, p_local) = eog_regress(data, p_local, p_global)
+        (data, p_local) = wave_rejection(data, p_local, p_global)
+        (data, p_local) = amp_shrinkage(data, p_local, p_global)
+
+        (D_bd, p_local) = bad_detec(data, p_local, p_global)
+        D_bd[p_local['bad_chans'], :] = 0
+
+        (D_int, p_local) = wave_interp(D_bd, p_local, p_global)
+
+        if p_local['eog_in']:
+            D_int = D_int[p_global['eeg_chans'], :]
+        with np.errstate(invalid='ignore'):
+            D_int = np.nan_to_num(np.corrcoef(D_int))
+
+#save correlation matrix
+        np.savetxt(newname+".csv", D_int, delimiter=",")
+
+        print(newname+" CSV has been created")

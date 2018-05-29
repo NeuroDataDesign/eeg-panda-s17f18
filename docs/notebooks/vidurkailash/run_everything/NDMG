@@ -1,0 +1,33 @@
+#SLURM script for running ndmg
+
+#!/bin/bash -l
+
+#SBATCH
+#SBATCH --job-name=vkailas3
+#SBATCH --time=3:00:0        #5 hours for dwi
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=24
+#SBATCH --exclusive
+#SBATCH --partition=gpu
+#SBATCH --mail-type=end
+#SBATCH --mail-user=vkailas3@jhu.edu
+#SBATCH --mem=120G
+
+ml singularity
+
+export SINGULARITY_HOME=/scratch/groups/jvogels3/vidur:/home/$USER
+
+readarray SUBJECTS < subs.md
+
+subject="${SUBJECTS[$SLURM_ARRAY_TASK_ID]}"
+
+mkdir -p data/outputs
+
+echo $subject
+
+singularity exec docker://neurodata/m3r-release:0.0.4 ndmg_bids /home/$USER/
+data /home/$USER/data/outputs participant func --participant_label $subject
+--remote_path session --bucket mrindd
+
+#change func to dwi for diffusion
+                                         

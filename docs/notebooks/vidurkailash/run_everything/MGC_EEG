@@ -1,0 +1,56 @@
+#running MGC between EEG and pfactor on ec2 instance
+
+#!/usr/bin/env Rscript
+
+#create distance matrix of pfactors
+setwd("/home/ubuntu/")
+y = as.matrix(read.table("eeg_pfactors.md"), ncol = 1)
+r = dist(y, method = "euclidean", diag = TRUE, upper = TRUE, p = 2)
+str(r)
+
+#read all correlation matrices as list
+setwd("/home/ubuntu/data/")
+matrices <- list()
+m <- 1
+files <- list.files(path = "/home/ubuntu/data/")
+for (f in 1:length(files)){
+  cat("Reading file", f, "...\n ")
+  corr <- read.table(files[f], sep = ",")
+  matrices[[m]] <- as.matrix(corr)
+  m <- m + 1
+}
+
+#create distance matrix based on Frobenius norm of correlation matrices
+m <- length(matrices)
+D <- matrix( rep(0, m*m), nrow = m )
+D[1,1] <- 0
+cat("Computed upper left 1 by 1 distance matrix.\n")
+for (i in 2:m) {
+  cat("Computed upper left", i, "by", i, "distance matrix.\n")
+  D[i,i] <- 0
+  for (j in 1:(i-1)) {
+    diff_matrix <- matrices[[i]] - matrices[[j]]
+    d <- norm(diff_matrix, type = c("F"))
+    D[i, j] <- d
+    D[j, i] <- d
+  }
+}
+str(D)
+
+#run MGC
+require(mgc)
+require(ggplot2)
+require(latex2exp)
+res <- mgc.test(r,D)
+
+x <- (res$pMGC)
+v <- (res$statMGC)
+z <- (res$pLocalCorr)
+t <- (res$optimalScale)
+q <- (res$localCorr)
+
+write.table(x, file="pmgc.txt", row.names=FALSE, col.names=FALSE)
+write.table(v, file="statmgc.txt", row.names=FALSE, col.names=FALSE)
+write.table(z, file="plocalcorr.txt", row.names=FALSE, col.names=FALSE)
+write.table(t, file="optscale.txt", row.names=FALSE, col.names=FALSE)
+write.table(q, file="localcorr.txt", row.names=FALSE, col.names=FALSE)
