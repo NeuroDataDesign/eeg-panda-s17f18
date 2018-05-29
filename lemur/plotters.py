@@ -714,7 +714,7 @@ class HierarchicalClusterMeansDendrogram(MatrixPlotter):
         for c in self.DS.clusters[self.DS.levels]:
             means.append(np.average(c, axis=0))
         X = np.column_stack(means).T
-        print(X)
+        if self.DS.clusters
         fig = ff.create_dendrogram(X)
         fig["layout"]["title"] = title
         fig["layout"]["xaxis"]["title"] = "Cluster Labels"
