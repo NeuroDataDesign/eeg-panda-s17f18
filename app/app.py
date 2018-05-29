@@ -8,7 +8,6 @@ import logging
 from logging.handlers import RotatingFileHandler
 import json
 from subprocess import Popen, call, PIPE
-import pexpect
 
 import pheno
 from runner import run_modality
