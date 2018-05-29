@@ -2,7 +2,7 @@ FROM ubuntu:latest
   
 MAINTAINER Yujia Liu "sophialyj07@gmail.com"
 
-ADD data/credentials /credentials
+ADD credentials/credentials /credentials
 RUN mkdir /.aws
 RUN mv credentials /.aws/credentials
 RUN mv /.aws ${HOME}/.aws
@@ -15,7 +15,6 @@ RUN apt-get update -y && \
 COPY ./ /app
 
 WORKDIR /app
-RUN rm -rf data
 RUN mkdir data
 
 RUN pip3 install -r requirements.txt
