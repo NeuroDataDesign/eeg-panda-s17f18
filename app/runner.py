@@ -28,8 +28,6 @@ def run_modality(name, modality):
     elif modality == 'fmri':
         modality_list = [
             ('func', 'nii.gz')
-            # ('anat', 'nii.gz'),
-            # ('dwi', 'nii.gz')
         ]
         DS_type = lds.fMRIDataSet
         metric = lms.DiffAve
@@ -87,15 +85,16 @@ def run_modality(name, modality):
         ##### Clustering
         # I think this may be better to do while the app is running
 
-        clustered = lcl.HGMMClustering(embedded, 4)
-        clustered.cluster()
-        with open(os.path.join(curr_dir, 'hgmm_clust_dm.pkl'), 'wb') as pkl_loc:
-            pkl.dump(clustered, pkl_loc)
+        if DS.n > 10:
+            clustered = lcl.HGMMClustering(embedded, 4)
+            clustered.cluster()
+            with open(os.path.join(curr_dir, 'hgmm_clust_dm.pkl'), 'wb') as pkl_loc:
+                pkl.dump(clustered, pkl_loc)
 
-        clustered = lcl.AdaptiveKMeans(embedded)
-        clustered.cluster()
-        with open(os.path.join(curr_dir, 'km_clust_dm.pkl'), 'wb') as pkl_loc:
-            pkl.dump(clustered, pkl_loc)
+            clustered = lcl.AdaptiveKMeans(embedded)
+            clustered.cluster()
+            with open(os.path.join(curr_dir, 'km_clust_dm.pkl'), 'wb') as pkl_loc:
+                pkl.dump(clustered, pkl_loc)
 
 
     # Return modality list

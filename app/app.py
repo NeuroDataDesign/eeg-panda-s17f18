@@ -51,13 +51,8 @@ def medahome():
     fmris = []
     graphs = []
     for d in datasets:
-        print(os.path.join(basedir, d, "metadata.json"))
-        if os.path.exists(os.path.join(basedir, d, "metadata.json")):
-
-            with open(os.path.join(basedir, d, "metadata.json")) as f:
-                rawjson = f.read()
-            metadata = json.loads(rawjson)
-            metas.append(metadata)
+        if os.path.exists(os.path.join(basedir, d, "pheno")):
+            metas.append({'name': d, 'n': 'N/A', 'd': 'N/A'})
         if os.path.exists(os.path.join(basedir, d, 'eeg')):
             eegs.append(d)
         if os.path.exists(os.path.join(basedir, d, 'fmri')):
@@ -90,7 +85,8 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
     except:
         subj_name = None
         test_name = None
-
+    
+    clusttype = request.args.get('clusttype', 'hgmm')
 
     subjs = []
     datatypes = []
@@ -137,7 +133,7 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
         if mode == 'embed':
             dm_path += 'embed_'
         elif mode =='clust':
-            dm_path += 'hgmm_clust_'
+            dm_path += ('%s_clust_'% (clusttype))
 
         if mode == 'one':
             dm_path += 'ds.pkl'
@@ -189,7 +185,8 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
                            MEDA_Embedded_options = sorted(embedded_options[modality].values()),
                            MEDA_Clustering_options = sorted(clustering_options[modality].values()),
                            One_to_One = sorted(one_to_one_options[modality].values()),
-                           Modality = modality
+                           Modality = modality,
+                           clusttype=clusttype
                           )
 
 def metadata_modal(dataset, modality):
@@ -293,4 +290,4 @@ if __name__ == '__main__':
     handler = RotatingFileHandler('foo.log', maxBytes=10000, backupCount=1)
     handler.setLevel(logging.INFO)
     app.logger.addHandler(handler)
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=5000)

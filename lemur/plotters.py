@@ -714,8 +714,16 @@ class HierarchicalClusterMeansDendrogram(MatrixPlotter):
         for c in self.DS.clusters[self.DS.levels]:
             means.append(np.average(c, axis=0))
         X = np.column_stack(means).T
-        if self.DS.clusters
-        fig = ff.create_dendrogram(X)
+        try:
+            fig = ff.create_dendrogram(X)
+        except:
+            return '''
+                <div class="row" style="margin-top:20%">
+                    <div class="col-md-4 offset-md-4 text-center">
+                        <h1><b>Only one cluster found.</b></h1>
+                        <h3>Perhaps try another algorithm?</h2>
+                </div>
+                '''
         fig["layout"]["title"] = title
         fig["layout"]["xaxis"]["title"] = "Cluster Labels"
         fig["layout"]["yaxis"]["title"] = "Cluster Mean Distances"

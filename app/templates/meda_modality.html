@@ -74,7 +74,7 @@
                              href={{ url_for('meda_modality', ds_name=request.path.split('/')[-4], modality = Modality, mode='one',
                              subj_name=('none' if lemurname | lower == request.path.split('/')[-1] else request.args.get('subj_name', 'none')),
                              test_name=('none' if lemurname | lower == request.path.split('/')[-1] else request.args.get('test_name', 'none')),
-                             plot_name=filename) }}> {{ sidename }}
+                             plot_name=filename) + '?clusttype=' + ('km' if clusttype == 'hgmm' else 'hgmm') }}> {{ sidename }}
                               {% if filename == request.path.split('/')[-1] %}
                                   <span class="sr-only">(current)</span>
                               {%  endif %}
@@ -132,18 +132,22 @@
                         </tbody>
                     </table>
                 {% else %}
-                    {% if request.path.split('/')[-1] != 'default' and request.path.split('/')[-1] != 'none'
-                        and request.path.split('/')[-2] == 'none'  %}
                         <div style="position:absolute; margin-top:10px; z-index:2">
                             <!-- <button class="btn btn-primary" type="button">
                                 Back to all Subjects
                             </button> -->
-                            <button class="btn btn-primary" style="cursor:pointer" type="button"
-                                    data-toggle="modal" data-target="#metadataModal">
-                                Metadata Selector
-                            </button>
+                            {% if request.path.split('/')[-1] != 'default' and request.path.split('/')[-1] != 'none' and request.path.split('/')[-2] == 'clust'  %}
+                                    <a class="btn btn-primary" style="cursor:pointer" type="button" href="{{ request.path + '?clusttype=' + ('km' if clusttype == 'hgmm' else 'hgmm') }}">
+                                        Switch to {{ 'Adpative KMeans' if clusttype == 'hgmm' else 'Hierarchial Gaussian Mixture Models' }}
+                                    </a>
+                            {% endif %}
+                            {% if request.path.split('/')[-1] != 'default' and request.path.split('/')[-1] != 'none' and request.path.split('/')[-2] == 'none'  %}
+                                    <button class="btn btn-primary" style="cursor:pointer" type="button"
+                                            data-toggle="modal" data-target="#metadataModal">
+                                        Metadata Selector
+                                    </button>
+                            {% endif %}
                         </div>
-                    {% endif %}
                     {{ plot|safe }}
                 {% endif %}
             </main>
