@@ -146,15 +146,15 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
                 if modality == 'eeg' and 'spatial' in plot_name:
                     with open(os.path.join('data', ds_name, 'eeg', 'chanlocs.pkl'), 'rb') as chanloc_pkl:
                         chanlocs = pkl.load(chanloc_pkl)
-                        todisp = getattr(lpl, options[modality][plot_name][1])(DM.getResourceDS(0), mode='div').plot(chanlocs)
+                        todisp = getattr(lpl, options[modality][plot_name][1])(DM.getResourceDS(subj_name + '-' + test_name), mode='div').plot(chanlocs)
                 elif modality == 'eeg' and 'connectedscatter' in plot_name:
                     with open(os.path.join('data', ds_name, 'eeg', 'spatial_dm.pkl'), 'rb') as spatial_pkl:
                         spatial = pkl.load(spatial_pkl)
-                        todisp = getattr(lpl, options[modality][plot_name][1])(DM.getResourceDS(0), mode='div').plot(spatial)
+                        todisp = getattr(lpl, options[modality][plot_name][1])(DM.getResourceDS(subj_name + '-' + test_name), mode='div').plot(spatial)
                 elif modality == 'eeg' and 'sparkline' in plot_name:
-                    todisp = getattr(lpl, options[modality][plot_name][1])(DM.getResourceDS(0), mode='div').plot(sample_freq=500)
+                    todisp = getattr(lpl, options[modality][plot_name][1])(DM.getResourceDS(subj_name + '-' + test_name), mode='div').plot(sample_freq=500)
                 else:
-                    todisp = getattr(lpl, options[modality][plot_name][1])(DM.getResourceDS(0), mode='div').plot()
+                    todisp = getattr(lpl, options[modality][plot_name][1])(DM.getResourceDS(subj_name + '-' + test_name), mode='div').plot()
 
             else:
                 todisp = getattr(lpl, options[modality][plot_name][1])(DM, mode='div').plot()
