@@ -6,3 +6,5 @@ services:
      - "5000:5000"
   mongo:
     image: "mongo:3.6.3-jessie"
+    ports:
+     - "27017:27017"
