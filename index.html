@@ -36,12 +36,9 @@
                             <div class="card-text">
                                 <p>Red Lemur (Lemur for short) is a visualization package for multimodal datasets.</p>
                                 <p><b>Quickstart:</b></p>
-                                <p><code>pip install redlemur</code></p>
-                                <p>Or, if Python3 is not your default version:</p>
                                 <p><code>pip3 install redlemur</code></p>
-                                <p>Check out some of the links below for more detailed information about our project!</p>
+                                <p>For more detailed documentation, check the link below!</p>
                             </div>
-                            <a role="button" href="https://github.com/NeuroDataDesign/lemur"  class="btn btn-dark">Github</a>
                             <a role="button" href="pkg" class="btn btn-dark">Documentation</a>
                             <!--<a role="button" href="https://pypi.python.org/pypi/redlemur" class="btn btn-dark">PyPi Release</a>-->
                         </div>
@@ -55,13 +52,18 @@
                               <h5 class="card-title"><b>Docker Container</b></h5>
                               <div class="card-text">
                                   <p>Web service that utilizes Lemur to generate visualizations for its users.</p>
-                                  <p><b>Quickstart:</b></p>
-                                  <p><code>docker pull nkumarcc/redlemur</code></p>
-                                  <p><code>docker run -p 5000:5000 nkumarcc/redlemur</code></p>
+                                  <p><b>Quickstart (requires both Docker and docker-compose):</b></p>
+                                  <p>Clone our git repository:</p>
+                                  <p><code>git clone git@github.com:NeuroDataDesign/lemur.git</code></p>
+                                  <p>Add your AWS Credentials to the <code>app/dir</code> directory:</p>
+                                  <p><code>cp path/to/your/credentials ./app/credentials/credentials</code></p>
+                                  <p>Go to our <code>app</code> folder:</p>
+                                  <p><code>cd app</code></p>
+                                  <p><code>docker-compose up</code></p>
                                   <p>Access the service at <b><a href="localhost:5000">localhost:5000</a></b>! (This link will only work after you have run the service with quickstart instructions)</p>
-                                  <p>If you would like to see more detailed documentation on running our webservice, check out our Dockerhub below!</p>
+                                  <p>If you would like to see more detailed documentation on running our webservice, check out our Github below!</p>
                               </div>
-                              <a role="button" href="https://hub.docker.com/r/nkumarcc/redlemur/"  class="btn btn-dark">Dockerhub</a>
+                              <a role="button" href="https://github.com/NeuroDataDesign/lemur"  class="btn btn-dark">Github</a>
                           </div>
                       </div>
                   </div>
