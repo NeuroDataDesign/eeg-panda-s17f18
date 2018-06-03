@@ -1,9 +1,13 @@
-version: '3'
+version: '3.2'
 services:
   web:
     build: .
     ports:
-     - "5000:5000"
+     - "8080:5000"
+    volumes:
+      - type: bind
+        source: ./credentials
+        target: ${HOME}/.aws
   mongo:
     image: "mongo:3.6.3-jessie"
     ports:

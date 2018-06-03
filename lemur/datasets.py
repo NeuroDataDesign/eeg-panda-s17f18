@@ -115,7 +115,12 @@ class EEGDataSet:
     def getMatrix(self, index):
         resource_path = self.D.ix[index][0]
         with open(resource_path, "rb") as f:
-            return pkl.load(f).T
+            try:
+                return pkl.load(f).T
+            except UnicodeDecodeError:
+                print('here')
+                return pkl.load(f, encoding='latin1').T
+
 
     def getResourceDS(self, index):
         resource = self.getResource(index)
