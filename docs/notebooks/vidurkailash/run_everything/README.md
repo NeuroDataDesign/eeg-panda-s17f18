@@ -1,5 +1,5 @@
 In this 'run everything' folder, there is code that was used to run NDMG (using MARCC) and PANDAS (using ec2) on the HBN 
-dataset. 
+dataset. The outputs of NDMG and PANDAS are stored in s3. 
 
 Files starting with 'mgc_' are R scripts used to run MGC on pfactors and the different neuroimaging modalities. 
 
