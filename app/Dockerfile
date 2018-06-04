@@ -2,6 +2,8 @@ FROM ubuntu:latest
   
 MAINTAINER Yujia Liu "sophialyj07@gmail.com"
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 ADD credentials/credentials /credentials
 RUN mkdir /.aws
 RUN mv credentials /.aws/credentials

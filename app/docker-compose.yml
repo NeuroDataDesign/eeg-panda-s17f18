@@ -4,8 +4,6 @@ services:
     build: .
     ports:
      - "5000:5000"
-    environment:
-    - DEBIAN_FRONTEND=noninteractive
   mongo:
     image: "mongo:3.6.3-jessie"
     ports:
