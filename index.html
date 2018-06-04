@@ -41,7 +41,6 @@
                                   <p>For more detailed documentation, check the link below!</p>
                               </div>
                               <a role="button" href="pkg" class="btn btn-dark">Documentation</a>
-                              <!--<a role="button" href="https://pypi.python.org/pypi/redlemur" class="btn btn-dark">PyPi Release</a>-->
                           </div>
                       </div>
                     </div>
@@ -51,11 +50,13 @@
                           <div class="card-body">
                               <h5 class="card-title"><b>Exploring the HBN Dataset:</b></h5>
                               <div class="card-text">
-                                  <p>The HBN (Healthy Brain Network) is a rich and robust dataset that collects multiple different modalities of neurological data (EEG and multiple modalities of MRI) for subjects with a variety of phenotypes. With the data it provides, we wanted to explore different levels of correlation/similarities we could find between neuroimaging data and the <b>p factor</b> a metric that can be created from the results of different phenotypic tests. We calculated this similarity using MGC, an algorithm that categorizes not only global correlation but similarities in local regions.</p>
-                                  <p></p>
+                                  <p>The HBN (Healthy Brain Network) is a rich and robust dataset that collects multiple different modalities of neurological data (EEG and multiple modalities of MRI) for subjects with a variety of phenotypes. With the data it provides, we wanted to explore different levels of correlation/similarities we could find between neuroimaging data and the <b>p factor</b> a metric that can be created from the results of different phenotypic tests. We preprocessed our data using PANDA (EEG) and ndmg (MRI). We calculated this similarity using MGC, an algorithm that categorizes not only global correlation but similarities in local regions.</p>
+                                  <p>We have preprocessed and calculated similarity with all Resting State EEG and both releases of MRI from the first 3 releases of the HBN Dataset. To access our preprocessed data, go Links to relevant material are below</p>
                               </div>
-                              <a role="button" href="pkg" class="btn btn-dark">Documentation</a>
-                              <!--<a role="button" href="https://pypi.python.org/pypi/redlemur" class="btn btn-dark">PyPi Release</a>-->
+                              <a role="button" href="http://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network/index.html" class="btn btn-dark">HBN Site</a>
+                              <a role="button" href="https://github.com/NeuroDataDesign/lemur/tree/master/docs/notebooks/vidurkailash/run_everything" class="btn btn-dark">Scripts and Outputs for Processing Data</a>
+                              <a role="button" href="https://github.com/NeuroDataDesign/orange-panda-f16s17" class="btn btn-dark">PANDA (EEG)</a>
+                              <a role="button" href="https://github.com/neurodata/ndmg" class="btn btn-dark">ndmg (MRI)</a>
                           </div>
                       </div>
                     </div>
@@ -70,7 +71,7 @@
                                   <p>Web service that utilizes Lemur to generate visualizations for its users.</p>
                                   <p><b>Quickstart (requires both Docker and docker-compose):</b></p>
                                   <p>Clone our git repository:</p>
-                                  <p><code>git clone git@github.com:NeuroDataDesign/lemur.git</code></p>
+                                  <p><code>git clone https://github.com/NeuroDataDesign/lemur.git</code></p>
                                   <p>Add your AWS Credentials to the <code>app/dir</code> directory:</p>
                                   <p><code>cp path/to/your/credentials ./app/credentials/credentials</code></p>
                                   <p>Go to our <code>app</code> folder:</p>
