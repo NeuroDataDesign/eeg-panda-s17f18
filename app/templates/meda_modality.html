@@ -148,10 +148,10 @@
                                 </a>
                             {% endif %}
                             {% if request.path.split('/')[-1] != 'default' and request.path.split('/')[-1] != 'none' and request.path.split('/')[-2] == 'none'  %}
-                                    <button class="btn btn-primary" style="cursor:pointer" type="button"
+                                    <!-- <button class="btn btn-primary" style="cursor:pointer" type="button"
                                             data-toggle="modal" data-target="#metadataModal">
                                         Metadata Selector
-                                    </button>
+                                    </button> -->
                             {% endif %}
                         </div>
                     {{ plot|safe }}
