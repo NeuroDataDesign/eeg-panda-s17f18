@@ -117,9 +117,6 @@ class EEGDataSet:
         with open(resource_path, "rb") as f:
             try:
                 return pkl.load(f).T
-            except UnicodeDecodeError:
-                print('here')
-                return pkl.load(f, encoding='latin1').T
 
 
     def getResourceDS(self, index):
