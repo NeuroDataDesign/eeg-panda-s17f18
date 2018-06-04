@@ -29,19 +29,35 @@
               <div class="row justify-content-center align-self-center">
 
                   <div class="col-md-6">
-                    <div class="card mb-4 box-shadow lemur-light">
-                        <img class="card-img-top">
-                        <div class="card-body">
-                            <h5 class="card-title"><b>For Programmers (Lemur Data Visualization Package):</b></h5>
-                            <div class="card-text">
-                                <p>Red Lemur (Lemur for short) is a visualization package for multimodal datasets.</p>
-                                <p><b>Quickstart:</b></p>
-                                <p><code>pip3 install redlemur</code></p>
-                                <p>For more detailed documentation, check the link below!</p>
-                            </div>
-                            <a role="button" href="pkg" class="btn btn-dark">Documentation</a>
-                            <!--<a role="button" href="https://pypi.python.org/pypi/redlemur" class="btn btn-dark">PyPi Release</a>-->
-                        </div>
+                    <div class="row">
+                      <div class="card mb-4 box-shadow lemur-light">
+                          <img class="card-img-top">
+                          <div class="card-body">
+                              <h5 class="card-title"><b>For Programmers (Lemur Data Visualization Package):</b></h5>
+                              <div class="card-text">
+                                  <p>Red Lemur (Lemur for short) is a visualization package for multimodal datasets.</p>
+                                  <p><b>Quickstart:</b></p>
+                                  <p><code>pip3 install redlemur</code></p>
+                                  <p>For more detailed documentation, check the link below!</p>
+                              </div>
+                              <a role="button" href="pkg" class="btn btn-dark">Documentation</a>
+                              <!--<a role="button" href="https://pypi.python.org/pypi/redlemur" class="btn btn-dark">PyPi Release</a>-->
+                          </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="card mb-4 box-shadow lemur-light">
+                          <img class="card-img-top">
+                          <div class="card-body">
+                              <h5 class="card-title"><b>Exploring the HBN Dataset:</b></h5>
+                              <div class="card-text">
+                                  <p>The HBN (Healthy Brain Network) is a rich and robust dataset that collects multiple different modalities of neurological data (EEG and multiple modalities of MRI) for subjects with a variety of phenotypes. With the data it provides, we wanted to explore different levels of correlation/similarities we could find between neuroimaging data and the <b>p factor</b> a metric that can be created from the results of different phenotypic tests. We calculated this similarity using MGC, an algorithm that categorizes not only global correlation but similarities in local regions.</p>
+                                  <p></p>
+                              </div>
+                              <a role="button" href="pkg" class="btn btn-dark">Documentation</a>
+                              <!--<a role="button" href="https://pypi.python.org/pypi/redlemur" class="btn btn-dark">PyPi Release</a>-->
+                          </div>
+                      </div>
                     </div>
                   </div>
 
@@ -61,9 +77,11 @@
                                   <p><code>cd app</code></p>
                                   <p><code>docker-compose up</code></p>
                                   <p>Access the service at <b><a href="localhost:5000">localhost:5000</a></b>! (This link will only work after you have run the service with quickstart instructions)</p>
-                                  <p>If you would like to see more detailed documentation on running our webservice, check out our Github below!</p>
+                                  <p>If you would like to see more detailed documentation on running our webservice or the tools required, check out the links below!</p>
                               </div>
-                              <a role="button" href="https://github.com/NeuroDataDesign/lemur"  class="btn btn-dark">Github</a>
+                              <a role="button" href="https://github.com/NeuroDataDesign/lemur" class="btn btn-dark">Lemur Github</a>
+                              <a role="button" href="https://docs.docker.com/install/" class="btn btn-dark">Install Docker</a>
+                              <a role="button" href="https://docs.docker.com/compose/install/" class="btn btn-dark">Install Docker Compose</a>
                           </div>
                       </div>
                   </div>
@@ -126,7 +144,7 @@
 
         <!-- Embeddded plots -->
       <section>
-          <div class=" container h-100" >
+          <div class="container h-100" >
               <div class="row justify-content-center align-self-center" style="margin-bottom:175px">
                   <h2><b>Standard Embedded Plots</b></h2>
               </div>
