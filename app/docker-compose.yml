@@ -4,10 +4,6 @@ services:
     build: .
     ports:
      - "5000:5000"
-    volumes:
-      - type: bind
-        source: ./credentials
-        target: ${HOME}/.aws
   mongo:
     image: "mongo:3.6.3-jessie"
     ports:
