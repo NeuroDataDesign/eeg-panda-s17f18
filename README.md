@@ -4,6 +4,10 @@ Welcome to Lemur!
 
 Lemur is a library to assist in the aggregate and one-to-one visualization of any set of data points. This tool was designed to assist in the visualization of multi-modal neuroscience/psychology datasets, but it can be used for any set of objects and similarity / dissimilarity function acting on pairs of such objects.
 
+**What is below this point we have left as documentation of previous work on the site, but is currently outdated.**
+
+***
+
 ### Sprint 2 Demo
 
 [Docker documentation and demo can be found at our dockerhub.](https://hub.docker.com/r/nkumarcc/redlemur/)
