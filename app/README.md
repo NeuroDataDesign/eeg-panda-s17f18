@@ -4,7 +4,9 @@
 
 ### What is LAVA?
 
-Our mission with LAVA is to provide a breadth of data visualizations with some level of depth to figure out how to gear more in-depth analyses.
+Our mission with LAVA is to provide a breadth of data visualizations with some level of depth to figure out how to gear more in-depth analyses. To do so, we provide visualizations of raw data, data transformed with multi-dimensional scaling, data that has been run through adaptive clustering algorithms, and one-to-one plots for EEG data.
+
+
 
 ### Installing and Running the Application
 
