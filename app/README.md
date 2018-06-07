@@ -65,6 +65,7 @@ docker-compose up
     - A column of electrode names/numbers
     - 3 subsequent columns with the relative X, Y, and Z locations of the electrodes
         - Example:
+
           | labels | X        | Y        | Z        |
           | E1     | -5.7876  | 5.5208   | -2.5774  |
           | E2     | -5.2918  | 6.7091   | 0.3074   |
