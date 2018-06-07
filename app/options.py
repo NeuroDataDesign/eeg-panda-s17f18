@@ -114,6 +114,21 @@ clustering_options = {
                       'hgmmcmlh')
     },
     'eeg' : {
+        'hgmmscmh' : ('Stacked Cluster Means Heatmap',
+                      'ClusterMeansLevelHeatmap',
+                      'hgmmscmh'),
+        'hgmmcmd' : ('Cluster Means Dendrogram',
+                     'HierarchicalClusterMeansDendrogram',
+                     'hgmmcmd'),
+        'hgmmcpp' : ('Pairs Plot',
+                     'ClusterPairsPlot',
+                     'hgmmcpp'),
+        'hgmmcmll' : ('Cluster Means Level Lines',
+                      'ClusterMeansLevelLines',
+                      'hgmmcmll'),
+        'hgmmcmlh' : ('Cluster Means Level Heatmap',
+                      'HierarchicalStackedClusterMeansHeatmap',
+                      'hgmmcmlh')
     },
     'fmri' : {
         'hgmmscmh' : ('Stacked Cluster Means Heatmap',
