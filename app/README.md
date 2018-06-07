@@ -14,12 +14,12 @@ Add your AWS Credentials to the app/dir directory:
 
 `cp path/to/your/credentials ./app/credentials/credentials`
 
-Make sure your credentials are saved in the format used as a config file:
+Make sure your credentials are saved in the format used as a config file stored in the .aws folder:
 
 ``` \[default\]
-aws_access_key_id = 
-aws_secret_access_key = 
-region=us-east-1 ```
+aws_access_key_id = XXXXXXXXXXXXXXXXX
+aws_secret_access_key = XXXXXXXXXXXXXXXXX
+region = XXXXXXXXX```
 
 Go to our app folder:
 
