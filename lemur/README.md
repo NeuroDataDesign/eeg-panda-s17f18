@@ -4,6 +4,8 @@ LEMUR is a tool that can assist in the aggregate and one-to-one visualization of
 
 ### Installation and Usage
 
+redlemur can be pip installed (source can also be found at the PyPI repo [here](https://pypi.org/project/redlemur/).
+
 ```
 pip3 install redlemur
 ```
