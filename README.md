@@ -1,12 +1,14 @@
 # lemur-s17f18
 
-Welcome to the Lemur Repository! Lemur is a team dedicated to building tools that can assist in the aggregate and one-to-one visualization of any set of data points. While our projects were designed to assist in the visualization of multi-modal neuroscience/psychology datasets, they can be used for any set of objects and similarity / dissimilarity function acting on pairs of such objects.
+Welcome to the Lemur Repository! 
 
 
 Explore some of our different projects:
 
-- [LEMUR Coding Package]():
-    - [fMRI Demo](http://nbviewer.jupyter.org/github/NeuroDataDesign/lemur/blob/master/docs/notebooks/rmarren1/Lemur%20fMRI.ipynb)
+- [Main Website](https://neurodatadesign.github.io/lemur/)
+- [LEMUR Coding Package](https://github.com/NeuroDataDesign/lemur/tree/master/lemur): LEMUR is a tool that can assist in the aggregate and one-to-one visualization of any set of data points. While this project was designed to assist in the visualization of multi-modal neuroscience/psychology datasets, it can be used for any set of objects and similarity / dissimilarity function acting on pairs of such objects.
+    - [Demo Notebook](http://nbviewer.jupyter.org/github/NeuroDataDesign/lemur/blob/master/docs/notebooks/rmarren1/Lemur%20fMRI.ipynb)
+- [LAVA (One-Click Web Application)](https://github.com/NeuroDataDesign/lemur/tree/master/app): LAVA is a **one-click** web-application that allows you to investigate multimodal datasets and look at your data before you move into deeper analyses.
 
 [Final Project Slides](https://docs.google.com/presentation/d/1aU0Sz5DRoYPoJU6ENPEkCqxzHaQcjo4hAYj5pnbdNNM/edit?usp=sharing)
 
