@@ -50,9 +50,14 @@ docker-compose up
 
 ### Structuring Data
 
-| Data Modality            | Format of File      | Upload Method  |
-| ------------------------ | ------------------- | -------------- |
-| Categorical/Phenotypic   | .csv                |      |
-| EEG                      | .pkl (Python 3 pkl) |      |
-| fMRI                     |                     |      |
-| Graph Based/Connectomes  |                       |      |
+- **For Graph Data**: [NetworkX Python Package](https://networkx.github.io/documentation/networkx-1.9.1/overview.html)
+- **For S3 Buckets**: LAVA was made to handle single-session BIDS formatted data. Please look at 
+
+| Data Modality            | Format of File                        | Upload Method            |
+| ------------------------ | ------------------------------------- | ------------------------ |
+| Categorical/Phenotypic   | .csv                                  | Directly from computer   |
+| EEG                      | .pkl (Python 3 pkl), location of channels .csv | S3 Bucket in BIDS Format |
+| fMRI                     | .nii.gz (NIFTI Image)                 | S3 Bucket in BIDS Format |
+| Graph Based/Connectomes  | .edgelist (NetworkX Python Package)   | S3 Bucket in BIDS Format |
+
+
