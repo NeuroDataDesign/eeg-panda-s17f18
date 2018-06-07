@@ -2,9 +2,14 @@
 
 **Hello researchers and datascientists alike!** Lemur's OCDVA is a web-application allowing you to investigate multimodal datasets and **look at your data** before you hop into next level analyses.
 
-### Running the Application
+### Installing and Running the Application
 
 Web service that utilizes Lemur to generate visualizations for its users.
+
+Running OCDVA requires installation of both Docker and Docker-Compose:
+
+- https://docs.docker.com/install/
+- https://docs.docker.com/compose/install/
 
 Clone our git repository:
 
@@ -19,8 +24,8 @@ Make sure your credentials are saved in the format used as a config file stored 
 ``` \[default\]
 aws_access_key_id = XXXXXXXXXXXXXXXXX
 aws_secret_access_key = XXXXXXXXXXXXXXXXX
-region = XXXXXXXXX```
-
+region = XXXXXXXXX
+```
 Go to our app folder:
 
 `cd app`
