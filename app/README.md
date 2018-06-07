@@ -50,15 +50,23 @@ docker-compose up
 
 ### Structuring Data
 
-- **For Graph Data**: [NetworkX Python Package](https://networkx.github.io/documentation/networkx-1.9.1/overview.html)
-- **For S3 Buckets**: Amazon S3 Buckets (part of AWS) are cheap and simple ways to store datasets. If you want more information, check out https://aws.amazon.com/s3/
-- **For BIDS Formatting**: LAVA was made to handle single-session BIDS formatted data. Please look at [the BIDS standard here](http://bids.neuroimaging.io/).
-
 | Data Modality            | Format of File                        | Upload Method            |
 | ------------------------ | ------------------------------------- | ------------------------ |
 | Categorical/Phenotypic   | .csv                                  | Directly from computer   |
-| EEG                      | .pkl (Python 3 pkl), location of channels .csv | S3 Bucket in BIDS Format |
+| EEG                      | .pkl (Python 3 pkl), location of channels .csv (format below) | S3 Bucket in BIDS Format |
 | fMRI                     | .nii.gz (NIFTI Image)                 | S3 Bucket in BIDS Format |
 | Graph Based/Connectomes  | .edgelist (NetworkX Python Package)   | S3 Bucket in BIDS Format |
 
-
+- **For S3 Buckets**: Amazon Web Services (AWS) is a collection of enterprise-level cloud-based services - among them is the Simple Storage Service (S3), meant to hold large data files in containers called “buckets”. These containers hold massive amounts of data, but the hardware component is abstracted away from the user, so they just can access their files in the cloud. If you want more information, check out https://aws.amazon.com/s3/
+- **For BIDS Formatting**: LAVA was made to handle single-session BIDS formatted data. Please look at [the BIDS standard here](http://bids.neuroimaging.io/).
+- **For Graph Data**: [NetworkX Python Package](https://networkx.github.io/documentation/networkx-1.9.1/overview.html)
+- **For EEG Data**: The channel locations csv ***must be named chanlocs.csv*** and:
+    - A header
+    - A column of electrode names/numbers
+    - 3 subsequent columns with the relative X, Y, and Z locations of the electrodes
+        - Example:
+          | labels | X        | Y        | Z        |
+          | E1     | -5.7876  | 5.5208   | -2.5774  |
+          | E2     | -5.2918  | 6.7091   | 0.3074   |
+          | E3     | -3.8641  | 7.6342   | 3.0677   |
+          | ...    | ...      | ...      | ...      |
