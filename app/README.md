@@ -64,11 +64,11 @@ docker-compose up
     - A header
     - A column of electrode names/numbers
     - 3 subsequent columns with the relative X, Y, and Z locations of the electrodes
-Example chanlocs.csv format :
+    - Example chanlocs.csv format :
 
-| labels | X        | Y        | Z        |
-| ------ | -------- | -------- | -------- |
-| E1     | -5.7876  | 5.5208   | -2.5774  |
-| E2     | -5.2918  | 6.7091   | 0.3074   |
-| E3     | -3.8641  | 7.6342   | 3.0677   |
-| ...    | ...      | ...      | ...      |
+     | labels | X        | Y        | Z        |
+     | ------ | -------- | -------- | -------- |
+     | E1     | -5.7876  | 5.5208   | -2.5774  |
+     | E2     | -5.2918  | 6.7091   | 0.3074   |
+     | E3     | -3.8641  | 7.6342   | 3.0677   |
+     | ...    | ...      | ...      | ...      |
