@@ -6,7 +6,8 @@
 
 Our mission with LAVA is to provide a breadth of data visualizations with some level of depth to figure out how to gear more in-depth analyses. To do so, we provide visualizations of raw data, data transformed with multi-dimensional scaling, data that has been run through adaptive clustering algorithms, and one-to-one plots for EEG data.
 
-
+| Raw Data Plots         | Multi Dimensional Scaling Plots        | Clustering Plots         | EEG Plots        |
+| ---------------------- |:--------------------------------------:|:------------------------:|:----------------:|
 
 ### Installing and Running the Application
 
