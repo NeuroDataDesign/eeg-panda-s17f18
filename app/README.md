@@ -49,3 +49,10 @@ docker-compose up
 ```
 
 ### Structuring Data
+
+| Data Modality            | Format of File      | Upload Method  |
+| ------------------------ | ------------------- | -------------- |
+| Categorical/Phenotypic   | .csv                |      |
+| EEG                      | .pkl (Python 3 pkl) |      |
+| fMRI                     |                     |      |
+| Graph Based/Connectomes  |                       |      |
