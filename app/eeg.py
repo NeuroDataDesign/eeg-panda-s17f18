@@ -11,6 +11,7 @@ sys.path.append("..")
 import lemur.datasets as lds
 import lemur.metrics as lms
 import lemur.plotters as lpl
+import lemur.clustering as lcl
 import lemur.embedders as leb
 
 def run_eeg(name):
