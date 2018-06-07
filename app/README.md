@@ -35,7 +35,8 @@ Add your AWS Credentials to the app/dir directory:
 
 Make sure your credentials are saved in the format used as a configuration file stored in the .aws folder:
 
-``` \[default\]
+```
+[default]
 aws_access_key_id = XXXXXXXXXXXXXXXXX
 aws_secret_access_key = XXXXXXXXXXXXXXXXX
 region = XXXXXXXXX
