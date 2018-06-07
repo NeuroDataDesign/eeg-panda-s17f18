@@ -40,6 +40,15 @@ def run_eeg(name):
   with open(os.path.join(BASE, name, 'eeg_embed_dm.pkl'), 'wb') as pkl_loc:
       pkl.dump(EEG_Embedded, pkl_loc)
 
+  hgmm = lcl.HGMMClustering(EEG_Embedded, 4)
+  hgmm.cluster()
+  with open(os.path.join(root, 'hgmm_clust_dm.pkl'), 'wb') as pkl_loc:
+    pkl.dump(hgmm, pkl_loc)
+
+  clustered = lcl.AdaptiveKMeans(EEG_Embedded)
+  clustered.cluster()
+  with open(os.path.join(root, 'km_clust_dm.pkl'), 'wb') as pkl_loc:
+    pkl.dump(clustered, pkl_loc)
 
   chanlocs = pd.read_csv("data/%s/eeg/chanlocs.csv"%(name))
   with open(os.path.join(BASE, name, 'eeg_chanlocs.pkl'), 'wb') as pkl_loc:
@@ -49,5 +58,4 @@ def run_eeg(name):
   spatialDM = lds.DistanceMatrix(spatial, lms.VectorDifferenceNorm)
   with open(os.path.join(BASE, name, 'eeg_spatial_dm.pkl'), 'wb') as pkl_loc:
       pkl.dump(spatialDM, pkl_loc)
-
 
