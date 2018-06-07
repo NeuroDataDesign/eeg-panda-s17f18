@@ -2,7 +2,7 @@
 
 **Hello researchers and datascientists alike!** Welcome to LAVA, a web-application that allows you to investigate multimodal datasets and **look at your data** before you move into deeper analyses.
 
-### What is LAVA?
+## What is LAVA?
 
 Our mission with LAVA is to provide a breadth of data visualizations with some level of depth to figure out how to gear more in-depth analyses. To do so, we provide visualizations of raw data, data transformed with multi-dimensional scaling, data that has been run through adaptive clustering algorithms (Adaptive KMeans or Hierarchial Gaussian Mixture Models), and one-to-one plots for EEG data.
 
@@ -21,7 +21,7 @@ Visit [our website](https://neurodatadesign.github.io/lemur/) to see images repr
 | Scree Plot             | Scree Plot                             |                               |                      |
 
 
-### Installing and Running the Application
+## Installing and Running the Application
 
 LAVA requires installation of both [Docker](https://docs.docker.com/install/) and [Docker-Compose](https://docs.docker.com/compose/install/).
 
@@ -48,7 +48,7 @@ cd app
 docker-compose up
 ```
 
-### Structuring Data
+#### Structuring Data
 
 | Data Modality            | Format of File                        | Upload Method            |
 | ------------------------ | ------------------------------------- | ------------------------ |
@@ -58,6 +58,7 @@ docker-compose up
 | Graph Based/Connectomes  | .edgelist (NetworkX Python Package)   | S3 Bucket in BIDS Format |
 
 - **For S3 Buckets**: Amazon Web Services (AWS) is a collection of enterprise-level cloud-based services - among them is the Simple Storage Service (S3), meant to hold large data files in containers called “buckets”. These containers hold massive amounts of data, but the hardware component is abstracted away from the user, so they just can access their files in the cloud. If you want more information, check out https://aws.amazon.com/s3/
+    - **Meaning of "Bucket Name" and "Path"**: The bucket name is the name of the S3 bucket you wish to run. The path is the path to whichever directory within the bucket contains all of the BIDS formatted data (eg within your bucket you may store your data in data/bids as opposed to the root folder).
 - **For BIDS Formatting**: LAVA was made to handle single-session BIDS formatted data. Please look at [the BIDS standard here](http://bids.neuroimaging.io/).
 - **For Graph Data**: [NetworkX Python Package](https://networkx.github.io/documentation/networkx-1.9.1/overview.html)
 - **For EEG Data**: The channel locations csv ***must be named chanlocs.csv*** and:
@@ -72,3 +73,14 @@ docker-compose up
            | E2     | -5.2918  | 6.7091   | 0.3074   |
            | E3     | -3.8641  | 7.6342   | 3.0677   |
            | ...    | ...      | ...      | ...      |
+           
+#### Example Data
+
+- Example phenotypic data can be found [here](https://drive.google.com/file/d/163zn9TwyKqs6yPtJ9DsilGibk8S1E4ji/view)
+- Example EEG and fMRI buckets:
+    - EEG:
+        - Bucket Name: red-lemur-sample
+        - Path: eeg
+    - fMRI:
+        - Bucket Name: red-lemur-fmri-sample
+        - Path: fmri
