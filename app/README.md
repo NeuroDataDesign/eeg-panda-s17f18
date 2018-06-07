@@ -59,6 +59,7 @@ docker-compose up
 
 - **For S3 Buckets**: Amazon Web Services (AWS) is a collection of enterprise-level cloud-based services - among them is the Simple Storage Service (S3), meant to hold large data files in containers called “buckets”. These containers hold massive amounts of data, but the hardware component is abstracted away from the user, so they just can access their files in the cloud. If you want more information, check out https://aws.amazon.com/s3/
     - **Meaning of "Bucket Name" and "Path"**: The bucket name is the name of the S3 bucket you wish to run. The path is the path to whichever directory within the bucket contains all of the BIDS formatted data (eg within your bucket you may store your data in data/bids as opposed to the root folder).
+    - **REMEMBER**: Only use public buckets, buckets you own, or buckets the credentials you upload have access to.
 - **For BIDS Formatting**: LAVA was made to handle single-session BIDS formatted data. Please look at [the BIDS standard here](http://bids.neuroimaging.io/).
 - **For Graph Data**: [NetworkX Python Package](https://networkx.github.io/documentation/networkx-1.9.1/overview.html)
 - **For EEG Data**: The channel locations csv ***must be named chanlocs.csv*** and:
@@ -77,7 +78,7 @@ docker-compose up
 #### Example Data
 
 - Example phenotypic data can be found [here](https://drive.google.com/file/d/163zn9TwyKqs6yPtJ9DsilGibk8S1E4ji/view)
-- Example EEG and fMRI buckets:
+- Example EEG and fMRI buckets (they are entirely public):
     - EEG:
         - Bucket Name: red-lemur-sample
         - Path: eeg
