@@ -4,11 +4,18 @@
 
 ### What is LAVA?
 
-Our mission with LAVA is to provide a breadth of data visualizations with some level of depth to figure out how to gear more in-depth analyses. To do so, we provide visualizations of raw data, data transformed with multi-dimensional scaling, data that has been run through adaptive clustering algorithms, and one-to-one plots for EEG data.
+Our mission with LAVA is to provide a breadth of data visualizations with some level of depth to figure out how to gear more in-depth analyses. To do so, we provide visualizations of raw data, data transformed with multi-dimensional scaling, data that has been run through adaptive clustering algorithms (Adaptive KMeans or Hierarchial Gaussian Mixture Models), and one-to-one plots for EEG data.
 
-| Raw Data Plots         | Multi Dimensional Scaling Plots        | Clustering Plots         | EEG Plots        |
-| ---------------------- | -------------------------------------- | ------------------------ | ---------------- |
-|          | Multi Dimensional Scaling Plots        | Clustering Plots         | EEG Plots        |
+| Raw Data Plots         | Multi Dimensional Scaling Plots        | Clustering Plots              | EEG One-to-One Plots |
+| ---------------------- | -------------------------------------- | ----------------------------- | -------------------- |
+| Correlation Matrix     | Correlation Matrix                     | Cluster Means Dendogram       | Connected Scatter    |
+| Heatmap                | Heatmap                                | Cluster Means Level Heatmap   | Sparkline            |
+| Eigenvector Heatmap    | Eigenvector Heatmap                    | Cluster Means Level Lines     | Spatial Periodogram  |
+| Histogram Heatmap      | Histogram Heatmap                      | Pairs Plot                    | Spatial Time Series  |
+| Location Heatmap       | Location Heatmap                       | Stacked Cluster Means Heatmap |                      |
+| Location Lines         | Location Lines                         |                               |                      |
+| Scree Plot             | Scree Plot                             |                               |                      |
+
 
 ### Installing and Running the Application
 
