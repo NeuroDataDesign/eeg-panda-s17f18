@@ -51,7 +51,8 @@ docker-compose up
 ### Structuring Data
 
 - **For Graph Data**: [NetworkX Python Package](https://networkx.github.io/documentation/networkx-1.9.1/overview.html)
-- **For S3 Buckets**: LAVA was made to handle single-session BIDS formatted data. Please look at 
+- **For S3 Buckets**: Amazon S3 Buckets (part of AWS) are cheap and simple ways to store datasets. If you want more information, check out https://aws.amazon.com/s3/
+- **For BIDS Formatting**: LAVA was made to handle single-session BIDS formatted data. Please look at [the BIDS standard here](http://bids.neuroimaging.io/).
 
 | Data Modality            | Format of File                        | Upload Method            |
 | ------------------------ | ------------------------------------- | ------------------------ |
