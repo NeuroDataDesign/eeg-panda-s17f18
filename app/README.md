@@ -43,7 +43,9 @@ region = XXXXXXXXX
 ```
 Go to our app folder:
 
-`cd app`
-`docker-compose up`
+```
+cd app
+docker-compose up
+```
 
 ### Structuring Data
