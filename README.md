@@ -28,9 +28,6 @@ Explore some of our different projects:
 ### Sprint 1 Release:
 [Sprint 1 Demo Slides](https://docs.google.com/presentation/d/1WhvT_KDLle6KnK6QdVPW1PvJf-FzisBHaIJUEnq5vf0/edit?usp=sharing)
 
-* Research
-
-
 ##### Download
 * [PyPI release](https://pypi.python.org/pypi/redlemur)
 * `pip3 install redlemur` and then `import lemur`
