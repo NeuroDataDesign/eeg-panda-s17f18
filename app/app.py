@@ -174,6 +174,10 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
     if len(subjs) > 0:
         metadata = subjs[0]['metadata']
 
+    if len(subjs) < 10:
+        clust_options = { }
+    else:
+        clust_options = sorted(clustering_options[modality].values())
 
     return render_template('meda_modality.html',
                            interm=zip(subjs, datatypes, tasks),
@@ -182,7 +186,7 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
                            plot=todisp,
                            MEDA_options = sorted(aggregate_options[modality].values()),
                            MEDA_Embedded_options = sorted(embedded_options[modality].values()),
-                           MEDA_Clustering_options = sorted(clustering_options[modality].values()),
+                           MEDA_Clustering_options = clust_options,
                            One_to_One = sorted(one_to_one_options[modality].values()),
                            Modality = modality,
                            clusttype=clusttype
