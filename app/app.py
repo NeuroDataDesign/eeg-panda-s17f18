@@ -102,6 +102,7 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
     except:
         datatype = 'func'
 
+    
     # TODO: Fix this mess
     datatype = ''
     if modality == 'fmri' or modality == 'graph':
@@ -139,11 +140,9 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
         else:
             dm_path += 'dm.pkl'
 
-        n = 0
         # Actually set to disp
         with open(os.path.join(dm_dir, dm_path), 'rb') as dm_loc:
             DM = pkl.load(dm_loc)
-            n = DM.n
             if mode == 'one':
                 if modality == 'eeg' and 'spatial' in plot_name:
                     with open(os.path.join('data', ds_name, 'eeg', 'chanlocs.pkl'), 'rb') as chanloc_pkl:
@@ -176,7 +175,7 @@ def meda_modality(ds_name=None, modality=None, mode=None, plot_name=None):
     if len(subjs) > 0:
         metadata = subjs[0]['metadata']
 
-    if n < 10:
+    if (modality == 'eeg' or modality == 'fmri') and (len(subjs) < 10):
         clust_options = { }
     else:
         clust_options = sorted(clustering_options[modality].values())
