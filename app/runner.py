@@ -83,18 +83,17 @@ def run_modality(name, modality):
             pkl.dump(embedded, pkl_loc)
 
         ##### Clustering
-        # I think this may be better to do while the app is running
 
-        if DS.n > 10:
-            clustered = lcl.HGMMClustering(embedded, 4)
-            clustered.cluster()
-            with open(os.path.join(curr_dir, 'hgmm_clust_dm.pkl'), 'wb') as pkl_loc:
-                pkl.dump(clustered, pkl_loc)
+        # if DS.n > 10:
+        clustered = lcl.HGMMClustering(embedded, 4)
+        clustered.cluster()
+        with open(os.path.join(curr_dir, 'hgmm_clust_dm.pkl'), 'wb') as pkl_loc:
+            pkl.dump(clustered, pkl_loc)
 
-            clustered = lcl.AdaptiveKMeans(embedded)
-            clustered.cluster()
-            with open(os.path.join(curr_dir, 'km_clust_dm.pkl'), 'wb') as pkl_loc:
-                pkl.dump(clustered, pkl_loc)
+        clustered = lcl.AdaptiveKMeans(embedded)
+        clustered.cluster()
+        with open(os.path.join(curr_dir, 'km_clust_dm.pkl'), 'wb') as pkl_loc:
+            pkl.dump(clustered, pkl_loc)
 
 
     # Return modality list
