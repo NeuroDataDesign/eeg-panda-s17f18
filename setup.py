@@ -22,7 +22,8 @@ setup(
     'nilearn==0.4.0',
     'nibabel==2.2.1',
     'imageio==2.2.0',
-    'networkx==2.1'
+    'networkx==2.1',
+    'boto3'
   ],
   classifiers = [],
 )
